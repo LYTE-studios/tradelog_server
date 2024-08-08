@@ -1,3 +1,10 @@
 account:
   - linkAccount:
   - unlinkAccount:
+tradeLocker:
+  - initializeClient:
+  - authenticate:
+  - refresh:
+  - getAccounts:
+  - getPositions:
+  - postData:

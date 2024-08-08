@@ -12,10 +12,14 @@ library protocol; // ignore_for_file: no_leading_underscores_for_library_prefixe
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod/protocol.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
-import 'linked_accounts.dart' as _i4;
-import 'platform.dart' as _i5;
+import 'access_token.dart' as _i4;
+import 'linked_accounts.dart' as _i5;
+import 'platform.dart' as _i6;
+import 'tradelocker_account.dart' as _i7;
+export 'access_token.dart';
 export 'linked_accounts.dart';
 export 'platform.dart';
+export 'tradelocker_account.dart';
 
 class Protocol extends _i1.SerializationManagerServer {
   Protocol._();
@@ -99,6 +103,80 @@ class Protocol extends _i1.SerializationManagerServer {
       ],
       managed: true,
     ),
+    _i2.TableDefinition(
+      name: 'tradelocker_credentials',
+      dartName: 'TradelockerCredentials',
+      schema: 'public',
+      module: 'tradelog',
+      columns: [
+        _i2.ColumnDefinition(
+          name: 'id',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int?',
+          columnDefault:
+              'nextval(\'tradelocker_credentials_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'email',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'password',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'server',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'refreshToken',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'userId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: false,
+          dartType: 'int',
+        ),
+      ],
+      foreignKeys: [
+        _i2.ForeignKeyDefinition(
+          constraintName: 'tradelocker_credentials_fk_0',
+          columns: ['userId'],
+          referenceTable: 'serverpod_user_info',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        )
+      ],
+      indexes: [
+        _i2.IndexDefinition(
+          indexName: 'tradelocker_credentials_pkey',
+          tableSpace: null,
+          elements: [
+            _i2.IndexElementDefinition(
+              type: _i2.IndexElementDefinitionType.column,
+              definition: 'id',
+            )
+          ],
+          type: 'btree',
+          isUnique: true,
+          isPrimary: true,
+        )
+      ],
+      managed: true,
+    ),
     ..._i3.Protocol.targetTableDefinitions,
     ..._i2.Protocol.targetTableDefinitions,
   ];
@@ -109,17 +187,34 @@ class Protocol extends _i1.SerializationManagerServer {
     Type? t,
   ]) {
     t ??= T;
-    if (t == _i4.LinkedAccount) {
-      return _i4.LinkedAccount.fromJson(data) as T;
+    if (t == _i4.AccessToken) {
+      return _i4.AccessToken.fromJson(data) as T;
     }
-    if (t == _i5.Platform) {
-      return _i5.Platform.fromJson(data) as T;
+    if (t == _i5.LinkedAccount) {
+      return _i5.LinkedAccount.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i4.LinkedAccount?>()) {
-      return (data != null ? _i4.LinkedAccount.fromJson(data) : null) as T;
+    if (t == _i6.Platform) {
+      return _i6.Platform.fromJson(data) as T;
     }
-    if (t == _i1.getType<_i5.Platform?>()) {
-      return (data != null ? _i5.Platform.fromJson(data) : null) as T;
+    if (t == _i7.TradelockerCredentials) {
+      return _i7.TradelockerCredentials.fromJson(data) as T;
+    }
+    if (t == _i1.getType<_i4.AccessToken?>()) {
+      return (data != null ? _i4.AccessToken.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i5.LinkedAccount?>()) {
+      return (data != null ? _i5.LinkedAccount.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i6.Platform?>()) {
+      return (data != null ? _i6.Platform.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i7.TradelockerCredentials?>()) {
+      return (data != null ? _i7.TradelockerCredentials.fromJson(data) : null)
+          as T;
+    }
+    if (t == Map<String, dynamic>) {
+      return (data as Map).map((k, v) =>
+          MapEntry(deserialize<String>(k), deserialize<dynamic>(v))) as dynamic;
     }
     try {
       return _i3.Protocol().deserialize<T>(data, t);
@@ -137,11 +232,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (className != null) {
       return 'serverpod_auth.$className';
     }
-    if (data is _i4.LinkedAccount) {
+    if (data is _i4.AccessToken) {
+      return 'AccessToken';
+    }
+    if (data is _i5.LinkedAccount) {
       return 'LinkedAccount';
     }
-    if (data is _i5.Platform) {
+    if (data is _i6.Platform) {
       return 'Platform';
+    }
+    if (data is _i7.TradelockerCredentials) {
+      return 'TradelockerCredentials';
     }
     return super.getClassNameForObject(data);
   }
@@ -152,11 +253,17 @@ class Protocol extends _i1.SerializationManagerServer {
       data['className'] = data['className'].substring(15);
       return _i3.Protocol().deserializeByClassName(data);
     }
+    if (data['className'] == 'AccessToken') {
+      return deserialize<_i4.AccessToken>(data['data']);
+    }
     if (data['className'] == 'LinkedAccount') {
-      return deserialize<_i4.LinkedAccount>(data['data']);
+      return deserialize<_i5.LinkedAccount>(data['data']);
     }
     if (data['className'] == 'Platform') {
-      return deserialize<_i5.Platform>(data['data']);
+      return deserialize<_i6.Platform>(data['data']);
+    }
+    if (data['className'] == 'TradelockerCredentials') {
+      return deserialize<_i7.TradelockerCredentials>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
@@ -176,8 +283,10 @@ class Protocol extends _i1.SerializationManagerServer {
       }
     }
     switch (t) {
-      case _i4.LinkedAccount:
-        return _i4.LinkedAccount.t;
+      case _i5.LinkedAccount:
+        return _i5.LinkedAccount.t;
+      case _i7.TradelockerCredentials:
+        return _i7.TradelockerCredentials.t;
     }
     return null;
   }

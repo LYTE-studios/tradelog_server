@@ -1,0 +1,10 @@
+class: TradelockerCredentials
+
+table: tradelocker_credentials
+
+fields:
+    email: String
+    password: String
+    server: String
+    refreshToken: String?
+    user: module:auth:UserInfo?, relation
