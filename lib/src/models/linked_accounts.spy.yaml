@@ -1,0 +1,12 @@
+class: LinkedAccount
+
+table: linked_account
+
+fields:
+    userInfoId: int, relation(parent=serverpod_user_info)
+    apiKey: String
+    platform: Platform
+indexes:
+    user_info_id_unique_idx:
+        fields: userInfoId
+        unique: true
