@@ -24,6 +24,10 @@ import 'meta/trailing_stop_loss.dart' as _i12;
 import 'platform.dart' as _i13;
 import 'tradelocker_account.dart' as _i14;
 import 'protocol.dart' as _i15;
+import 'package:tradelog_server/src/generated/meta/meta_trader_position.dart'
+    as _i16;
+import 'package:tradelog_server/src/generated/meta/meta_trader_order.dart'
+    as _i17;
 export 'access_token.dart';
 export 'linked_accounts.dart';
 export 'meta/distance_trailing_stop_loss.dart';
@@ -277,6 +281,16 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == List<_i15.StopLossThreshold>) {
       return (data as List)
           .map((e) => deserialize<_i15.StopLossThreshold>(e))
+          .toList() as dynamic;
+    }
+    if (t == List<_i16.MetatraderPosition>) {
+      return (data as List)
+          .map((e) => deserialize<_i16.MetatraderPosition>(e))
+          .toList() as dynamic;
+    }
+    if (t == List<_i17.MetatraderOrder>) {
+      return (data as List)
+          .map((e) => deserialize<_i17.MetatraderOrder>(e))
           .toList() as dynamic;
     }
     try {

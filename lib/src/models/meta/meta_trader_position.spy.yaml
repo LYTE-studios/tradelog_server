@@ -3,7 +3,7 @@ fields:
   id: String
   type: String
   symbol: String
-  magic: int
+  magic: double
   time: DateTime
   brokerTime: String
   updateTime: DateTime

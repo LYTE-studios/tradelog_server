@@ -74,7 +74,8 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
-  Future<MetaTradingAccountInformation> getAccountInformation(Session session, String accountId) async {
+  Future<MetaTradingAccountInformation> getAccountInformation(
+      Session session, String accountId) async {
     await initializeClient(session);
 
     final response = await client
@@ -91,34 +92,36 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
-  Future<String> getPositions(Session session, String accountId) async {
+  Future<List<MetatraderPosition>> getPositions(Session session, String accountId) async {
     await initializeClient(session);
 
     final response =
         await client.get('/users/current/accounts/$accountId/positions');
     if (response.statusCode == 200) {
-      return response.data.toString();
+      return List<MetatraderPosition>.from(
+          response.data.map((x) => MetatraderPosition.fromJson(x)));
     } else {
       throw Exception(
           'Failed to fetch positions - Error code: ${response.statusCode}');
     }
   }
 
-  Future<String> getOrders(Session session, String accountId) async {
+  Future<List<MetatraderOrder>> getOrders(Session session, String accountId) async {
     await initializeClient(session);
 
     final response =
         await client.get('/users/current/accounts/$accountId/orders');
     if (response.statusCode == 200) {
-      return response.data.toString();
+      return List<MetatraderOrder>.from(
+          response.data.map((x) => MetatraderPosition.fromJson(x)));
     } else {
       throw Exception(
           'Failed to fetch orders - Error code: ${response.statusCode}');
     }
   }
 
-  Future<String> getHistoryOrdersByTime(
-      Session session, String accountId, String startTime, String endTime) async {
+  Future<String> getHistoryOrdersByTime(Session session, String accountId,
+      String startTime, String endTime) async {
     await initializeClient(session);
 
     final response = await client.get(

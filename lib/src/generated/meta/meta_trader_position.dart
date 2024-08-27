@@ -49,7 +49,7 @@ abstract class MetatraderPosition
     required String id,
     required String type,
     required String symbol,
-    required int magic,
+    required double magic,
     required DateTime time,
     required String brokerTime,
     required DateTime updateTime,
@@ -81,7 +81,7 @@ abstract class MetatraderPosition
       id: jsonSerialization['id'] as String,
       type: jsonSerialization['type'] as String,
       symbol: jsonSerialization['symbol'] as String,
-      magic: jsonSerialization['magic'] as int,
+      magic: (jsonSerialization['magic'] as num).toDouble(),
       time: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['time']),
       brokerTime: jsonSerialization['brokerTime'] as String,
       updateTime:
@@ -125,7 +125,7 @@ abstract class MetatraderPosition
 
   String symbol;
 
-  int magic;
+  double magic;
 
   DateTime time;
 
@@ -179,7 +179,7 @@ abstract class MetatraderPosition
     String? id,
     String? type,
     String? symbol,
-    int? magic,
+    double? magic,
     DateTime? time,
     String? brokerTime,
     DateTime? updateTime,
@@ -290,7 +290,7 @@ class _MetatraderPositionImpl extends MetatraderPosition {
     required String id,
     required String type,
     required String symbol,
-    required int magic,
+    required double magic,
     required DateTime time,
     required String brokerTime,
     required DateTime updateTime,
@@ -351,7 +351,7 @@ class _MetatraderPositionImpl extends MetatraderPosition {
     String? id,
     String? type,
     String? symbol,
-    int? magic,
+    double? magic,
     DateTime? time,
     String? brokerTime,
     DateTime? updateTime,

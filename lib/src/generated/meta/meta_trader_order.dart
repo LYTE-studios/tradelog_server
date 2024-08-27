@@ -49,7 +49,7 @@ abstract class MetatraderOrder
     required String id,
     required String type,
     required String state,
-    required int magic,
+    required double magic,
     required DateTime time,
     required String brokerTime,
     DateTime? doneTime,
@@ -81,7 +81,7 @@ abstract class MetatraderOrder
       id: jsonSerialization['id'] as String,
       type: jsonSerialization['type'] as String,
       state: jsonSerialization['state'] as String,
-      magic: jsonSerialization['magic'] as int,
+      magic: (jsonSerialization['magic'] as num).toDouble(),
       time: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['time']),
       brokerTime: jsonSerialization['brokerTime'] as String,
       doneTime: jsonSerialization['doneTime'] == null
@@ -125,7 +125,7 @@ abstract class MetatraderOrder
 
   String state;
 
-  int magic;
+  double magic;
 
   DateTime time;
 
@@ -179,7 +179,7 @@ abstract class MetatraderOrder
     String? id,
     String? type,
     String? state,
-    int? magic,
+    double? magic,
     DateTime? time,
     String? brokerTime,
     DateTime? doneTime,
@@ -290,7 +290,7 @@ class _MetatraderOrderImpl extends MetatraderOrder {
     required String id,
     required String type,
     required String state,
-    required int magic,
+    required double magic,
     required DateTime time,
     required String brokerTime,
     DateTime? doneTime,
@@ -351,7 +351,7 @@ class _MetatraderOrderImpl extends MetatraderOrder {
     String? id,
     String? type,
     String? state,
-    int? magic,
+    double? magic,
     DateTime? time,
     String? brokerTime,
     Object? doneTime = _Undefined,
