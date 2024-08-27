@@ -19,8 +19,11 @@ import 'meta/meta_account_information.dart' as _i7;
 import 'meta/meta_trader_order.dart' as _i8;
 import 'meta/meta_trader_position.dart' as _i9;
 import 'meta/stop_loss_threshold.dart' as _i10;
-import 'platform.dart' as _i11;
-import 'tradelocker_account.dart' as _i12;
+import 'meta/threshold_trailing_stop_loss.dart' as _i11;
+import 'meta/trailing_stop_loss.dart' as _i12;
+import 'platform.dart' as _i13;
+import 'tradelocker_account.dart' as _i14;
+import 'protocol.dart' as _i15;
 export 'access_token.dart';
 export 'linked_accounts.dart';
 export 'meta/distance_trailing_stop_loss.dart';
@@ -28,6 +31,8 @@ export 'meta/meta_account_information.dart';
 export 'meta/meta_trader_order.dart';
 export 'meta/meta_trader_position.dart';
 export 'meta/stop_loss_threshold.dart';
+export 'meta/threshold_trailing_stop_loss.dart';
+export 'meta/trailing_stop_loss.dart';
 export 'platform.dart';
 export 'tradelocker_account.dart';
 
@@ -218,11 +223,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i10.StopLossThreshold) {
       return _i10.StopLossThreshold.fromJson(data) as T;
     }
-    if (t == _i11.Platform) {
-      return _i11.Platform.fromJson(data) as T;
+    if (t == _i11.ThresholdTrailingStopLoss) {
+      return _i11.ThresholdTrailingStopLoss.fromJson(data) as T;
     }
-    if (t == _i12.TradelockerCredentials) {
-      return _i12.TradelockerCredentials.fromJson(data) as T;
+    if (t == _i12.TrailingStopLoss) {
+      return _i12.TrailingStopLoss.fromJson(data) as T;
+    }
+    if (t == _i13.Platform) {
+      return _i13.Platform.fromJson(data) as T;
+    }
+    if (t == _i14.TradelockerCredentials) {
+      return _i14.TradelockerCredentials.fromJson(data) as T;
     }
     if (t == _i1.getType<_i4.AccessToken?>()) {
       return (data != null ? _i4.AccessToken.fromJson(data) : null) as T;
@@ -248,12 +259,25 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i10.StopLossThreshold?>()) {
       return (data != null ? _i10.StopLossThreshold.fromJson(data) : null) as T;
     }
-    if (t == _i1.getType<_i11.Platform?>()) {
-      return (data != null ? _i11.Platform.fromJson(data) : null) as T;
+    if (t == _i1.getType<_i11.ThresholdTrailingStopLoss?>()) {
+      return (data != null
+          ? _i11.ThresholdTrailingStopLoss.fromJson(data)
+          : null) as T;
     }
-    if (t == _i1.getType<_i12.TradelockerCredentials?>()) {
-      return (data != null ? _i12.TradelockerCredentials.fromJson(data) : null)
+    if (t == _i1.getType<_i12.TrailingStopLoss?>()) {
+      return (data != null ? _i12.TrailingStopLoss.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i13.Platform?>()) {
+      return (data != null ? _i13.Platform.fromJson(data) : null) as T;
+    }
+    if (t == _i1.getType<_i14.TradelockerCredentials?>()) {
+      return (data != null ? _i14.TradelockerCredentials.fromJson(data) : null)
           as T;
+    }
+    if (t == List<_i15.StopLossThreshold>) {
+      return (data as List)
+          .map((e) => deserialize<_i15.StopLossThreshold>(e))
+          .toList() as dynamic;
     }
     try {
       return _i3.Protocol().deserialize<T>(data, t);
@@ -292,10 +316,16 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data is _i10.StopLossThreshold) {
       return 'StopLossThreshold';
     }
-    if (data is _i11.Platform) {
+    if (data is _i11.ThresholdTrailingStopLoss) {
+      return 'ThresholdTrailingStopLoss';
+    }
+    if (data is _i12.TrailingStopLoss) {
+      return 'TrailingStopLoss';
+    }
+    if (data is _i13.Platform) {
       return 'Platform';
     }
-    if (data is _i12.TradelockerCredentials) {
+    if (data is _i14.TradelockerCredentials) {
       return 'TradelockerCredentials';
     }
     return super.getClassNameForObject(data);
@@ -328,11 +358,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (data['className'] == 'StopLossThreshold') {
       return deserialize<_i10.StopLossThreshold>(data['data']);
     }
+    if (data['className'] == 'ThresholdTrailingStopLoss') {
+      return deserialize<_i11.ThresholdTrailingStopLoss>(data['data']);
+    }
+    if (data['className'] == 'TrailingStopLoss') {
+      return deserialize<_i12.TrailingStopLoss>(data['data']);
+    }
     if (data['className'] == 'Platform') {
-      return deserialize<_i11.Platform>(data['data']);
+      return deserialize<_i13.Platform>(data['data']);
     }
     if (data['className'] == 'TradelockerCredentials') {
-      return deserialize<_i12.TradelockerCredentials>(data['data']);
+      return deserialize<_i14.TradelockerCredentials>(data['data']);
     }
     return super.deserializeByClassName(data);
   }
@@ -354,8 +390,8 @@ class Protocol extends _i1.SerializationManagerServer {
     switch (t) {
       case _i5.LinkedAccount:
         return _i5.LinkedAccount.t;
-      case _i12.TradelockerCredentials:
-        return _i12.TradelockerCredentials.t;
+      case _i14.TradelockerCredentials:
+        return _i14.TradelockerCredentials.t;
     }
     return null;
   }

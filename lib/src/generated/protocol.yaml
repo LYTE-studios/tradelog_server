@@ -3,6 +3,11 @@ account:
   - unlinkAccount:
 metaApi:
   - initializeClient:
+  - authenticate:
+  - getAccountInformation:
+  - getPositions:
+  - getOrders:
+  - getHistoryOrdersByTime:
 tradeLocker:
   - initializeClient:
   - authenticate:

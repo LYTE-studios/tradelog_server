@@ -1,0 +1,5 @@
+class: ThresholdTrailingStopLoss
+fields:
+  thresholds: List<StopLossThreshold>
+  units: String?
+  stopPriceBase: String?

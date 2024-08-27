@@ -101,7 +101,111 @@ class Endpoints extends _i1.EndpointDispatch {
             session,
             accNum: params['accNum'],
           ),
-        )
+        ),
+        'authenticate': _i1.MethodConnector(
+          name: 'authenticate',
+          params: {
+            'apiKey': _i1.ParameterDescription(
+              name: 'apiKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint).authenticate(
+            session,
+            params['apiKey'],
+          ),
+        ),
+        'getAccountInformation': _i1.MethodConnector(
+          name: 'getAccountInformation',
+          params: {
+            'accountId': _i1.ParameterDescription(
+              name: 'accountId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint)
+                  .getAccountInformation(
+            session,
+            params['accountId'],
+          ),
+        ),
+        'getPositions': _i1.MethodConnector(
+          name: 'getPositions',
+          params: {
+            'accountId': _i1.ParameterDescription(
+              name: 'accountId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint).getPositions(
+            session,
+            params['accountId'],
+          ),
+        ),
+        'getOrders': _i1.MethodConnector(
+          name: 'getOrders',
+          params: {
+            'accountId': _i1.ParameterDescription(
+              name: 'accountId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint).getOrders(
+            session,
+            params['accountId'],
+          ),
+        ),
+        'getHistoryOrdersByTime': _i1.MethodConnector(
+          name: 'getHistoryOrdersByTime',
+          params: {
+            'accountId': _i1.ParameterDescription(
+              name: 'accountId',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'startTime': _i1.ParameterDescription(
+              name: 'startTime',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+            'endTime': _i1.ParameterDescription(
+              name: 'endTime',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint)
+                  .getHistoryOrdersByTime(
+            session,
+            params['accountId'],
+            params['startTime'],
+            params['endTime'],
+          ),
+        ),
       },
     );
     connectors['tradeLocker'] = _i1.EndpointConnector(

@@ -1,5 +1,6 @@
 class: MetaTradingAccountInformation
 fields:
+  platform: String
   broker: String
   currency: String
   server: String
@@ -7,12 +8,13 @@ fields:
   equity: double
   margin: double
   freeMargin: double
-  leverage: int
-  marginLevel: double
+  leverage: double
+  marginLevel: double?
   tradeAllowed: bool
+  investorMode: bool?
   marginMode: String
   name: String
-  login: int
+  login: double
   credit: double
-  accountCurrencyExchangeRate: double
+  accountCurrencyExchangeRate: double?
   type: String

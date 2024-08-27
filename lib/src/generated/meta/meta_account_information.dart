@@ -13,6 +13,7 @@ import 'package:serverpod/serverpod.dart' as _i1;
 abstract class MetaTradingAccountInformation
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
   MetaTradingAccountInformation._({
+    required this.platform,
     required this.broker,
     required this.currency,
     required this.server,
@@ -21,17 +22,19 @@ abstract class MetaTradingAccountInformation
     required this.margin,
     required this.freeMargin,
     required this.leverage,
-    required this.marginLevel,
+    this.marginLevel,
     required this.tradeAllowed,
+    this.investorMode,
     required this.marginMode,
     required this.name,
     required this.login,
     required this.credit,
-    required this.accountCurrencyExchangeRate,
+    this.accountCurrencyExchangeRate,
     required this.type,
   });
 
   factory MetaTradingAccountInformation({
+    required String platform,
     required String broker,
     required String currency,
     required String server,
@@ -39,20 +42,22 @@ abstract class MetaTradingAccountInformation
     required double equity,
     required double margin,
     required double freeMargin,
-    required int leverage,
-    required double marginLevel,
+    required double leverage,
+    double? marginLevel,
     required bool tradeAllowed,
+    bool? investorMode,
     required String marginMode,
     required String name,
-    required int login,
+    required double login,
     required double credit,
-    required double accountCurrencyExchangeRate,
+    double? accountCurrencyExchangeRate,
     required String type,
   }) = _MetaTradingAccountInformationImpl;
 
   factory MetaTradingAccountInformation.fromJson(
       Map<String, dynamic> jsonSerialization) {
     return MetaTradingAccountInformation(
+      platform: jsonSerialization['platform'] as String,
       broker: jsonSerialization['broker'] as String,
       currency: jsonSerialization['currency'] as String,
       server: jsonSerialization['server'] as String,
@@ -60,18 +65,22 @@ abstract class MetaTradingAccountInformation
       equity: (jsonSerialization['equity'] as num).toDouble(),
       margin: (jsonSerialization['margin'] as num).toDouble(),
       freeMargin: (jsonSerialization['freeMargin'] as num).toDouble(),
-      leverage: jsonSerialization['leverage'] as int,
-      marginLevel: (jsonSerialization['marginLevel'] as num).toDouble(),
+      leverage: (jsonSerialization['leverage'] as num).toDouble(),
+      marginLevel: (jsonSerialization['marginLevel'] as num?)?.toDouble(),
       tradeAllowed: jsonSerialization['tradeAllowed'] as bool,
+      investorMode: jsonSerialization['investorMode'] as bool?,
       marginMode: jsonSerialization['marginMode'] as String,
       name: jsonSerialization['name'] as String,
-      login: jsonSerialization['login'] as int,
+      login: (jsonSerialization['login'] as num).toDouble(),
       credit: (jsonSerialization['credit'] as num).toDouble(),
       accountCurrencyExchangeRate:
-          (jsonSerialization['accountCurrencyExchangeRate'] as num).toDouble(),
+          (jsonSerialization['accountCurrencyExchangeRate'] as num?)
+              ?.toDouble(),
       type: jsonSerialization['type'] as String,
     );
   }
+
+  String platform;
 
   String broker;
 
@@ -87,25 +96,28 @@ abstract class MetaTradingAccountInformation
 
   double freeMargin;
 
-  int leverage;
+  double leverage;
 
-  double marginLevel;
+  double? marginLevel;
 
   bool tradeAllowed;
+
+  bool? investorMode;
 
   String marginMode;
 
   String name;
 
-  int login;
+  double login;
 
   double credit;
 
-  double accountCurrencyExchangeRate;
+  double? accountCurrencyExchangeRate;
 
   String type;
 
   MetaTradingAccountInformation copyWith({
+    String? platform,
     String? broker,
     String? currency,
     String? server,
@@ -113,12 +125,13 @@ abstract class MetaTradingAccountInformation
     double? equity,
     double? margin,
     double? freeMargin,
-    int? leverage,
+    double? leverage,
     double? marginLevel,
     bool? tradeAllowed,
+    bool? investorMode,
     String? marginMode,
     String? name,
-    int? login,
+    double? login,
     double? credit,
     double? accountCurrencyExchangeRate,
     String? type,
@@ -126,6 +139,7 @@ abstract class MetaTradingAccountInformation
   @override
   Map<String, dynamic> toJson() {
     return {
+      'platform': platform,
       'broker': broker,
       'currency': currency,
       'server': server,
@@ -134,13 +148,15 @@ abstract class MetaTradingAccountInformation
       'margin': margin,
       'freeMargin': freeMargin,
       'leverage': leverage,
-      'marginLevel': marginLevel,
+      if (marginLevel != null) 'marginLevel': marginLevel,
       'tradeAllowed': tradeAllowed,
+      if (investorMode != null) 'investorMode': investorMode,
       'marginMode': marginMode,
       'name': name,
       'login': login,
       'credit': credit,
-      'accountCurrencyExchangeRate': accountCurrencyExchangeRate,
+      if (accountCurrencyExchangeRate != null)
+        'accountCurrencyExchangeRate': accountCurrencyExchangeRate,
       'type': type,
     };
   }
@@ -148,6 +164,7 @@ abstract class MetaTradingAccountInformation
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
+      'platform': platform,
       'broker': broker,
       'currency': currency,
       'server': server,
@@ -156,13 +173,15 @@ abstract class MetaTradingAccountInformation
       'margin': margin,
       'freeMargin': freeMargin,
       'leverage': leverage,
-      'marginLevel': marginLevel,
+      if (marginLevel != null) 'marginLevel': marginLevel,
       'tradeAllowed': tradeAllowed,
+      if (investorMode != null) 'investorMode': investorMode,
       'marginMode': marginMode,
       'name': name,
       'login': login,
       'credit': credit,
-      'accountCurrencyExchangeRate': accountCurrencyExchangeRate,
+      if (accountCurrencyExchangeRate != null)
+        'accountCurrencyExchangeRate': accountCurrencyExchangeRate,
       'type': type,
     };
   }
@@ -173,8 +192,11 @@ abstract class MetaTradingAccountInformation
   }
 }
 
+class _Undefined {}
+
 class _MetaTradingAccountInformationImpl extends MetaTradingAccountInformation {
   _MetaTradingAccountInformationImpl({
+    required String platform,
     required String broker,
     required String currency,
     required String server,
@@ -182,16 +204,18 @@ class _MetaTradingAccountInformationImpl extends MetaTradingAccountInformation {
     required double equity,
     required double margin,
     required double freeMargin,
-    required int leverage,
-    required double marginLevel,
+    required double leverage,
+    double? marginLevel,
     required bool tradeAllowed,
+    bool? investorMode,
     required String marginMode,
     required String name,
-    required int login,
+    required double login,
     required double credit,
-    required double accountCurrencyExchangeRate,
+    double? accountCurrencyExchangeRate,
     required String type,
   }) : super._(
+          platform: platform,
           broker: broker,
           currency: currency,
           server: server,
@@ -202,6 +226,7 @@ class _MetaTradingAccountInformationImpl extends MetaTradingAccountInformation {
           leverage: leverage,
           marginLevel: marginLevel,
           tradeAllowed: tradeAllowed,
+          investorMode: investorMode,
           marginMode: marginMode,
           name: name,
           login: login,
@@ -212,6 +237,7 @@ class _MetaTradingAccountInformationImpl extends MetaTradingAccountInformation {
 
   @override
   MetaTradingAccountInformation copyWith({
+    String? platform,
     String? broker,
     String? currency,
     String? server,
@@ -219,17 +245,19 @@ class _MetaTradingAccountInformationImpl extends MetaTradingAccountInformation {
     double? equity,
     double? margin,
     double? freeMargin,
-    int? leverage,
-    double? marginLevel,
+    double? leverage,
+    Object? marginLevel = _Undefined,
     bool? tradeAllowed,
+    Object? investorMode = _Undefined,
     String? marginMode,
     String? name,
-    int? login,
+    double? login,
     double? credit,
-    double? accountCurrencyExchangeRate,
+    Object? accountCurrencyExchangeRate = _Undefined,
     String? type,
   }) {
     return MetaTradingAccountInformation(
+      platform: platform ?? this.platform,
       broker: broker ?? this.broker,
       currency: currency ?? this.currency,
       server: server ?? this.server,
@@ -238,14 +266,16 @@ class _MetaTradingAccountInformationImpl extends MetaTradingAccountInformation {
       margin: margin ?? this.margin,
       freeMargin: freeMargin ?? this.freeMargin,
       leverage: leverage ?? this.leverage,
-      marginLevel: marginLevel ?? this.marginLevel,
+      marginLevel: marginLevel is double? ? marginLevel : this.marginLevel,
       tradeAllowed: tradeAllowed ?? this.tradeAllowed,
+      investorMode: investorMode is bool? ? investorMode : this.investorMode,
       marginMode: marginMode ?? this.marginMode,
       name: name ?? this.name,
       login: login ?? this.login,
       credit: credit ?? this.credit,
-      accountCurrencyExchangeRate:
-          accountCurrencyExchangeRate ?? this.accountCurrencyExchangeRate,
+      accountCurrencyExchangeRate: accountCurrencyExchangeRate is double?
+          ? accountCurrencyExchangeRate
+          : this.accountCurrencyExchangeRate,
       type: type ?? this.type,
     );
   }
