@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
+import 'package:tradelog_server/src/util/staging_config.dart';
 
 class TradeLockerEndpoint extends Endpoint {
   @override
@@ -11,41 +12,37 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<void> initializeClient(Session session, {int accNum = -1}) async {
     var authenticated = await session.authenticated;
-    if (authenticated != null) {
-      var accessToken = await session.caches.localPrio
-          .get<AccessToken>('tradelocker-${authenticated.userId}');
+    var accessToken = await session.caches.localPrio
+        .get<AccessToken>('tradelocker-${authenticated!.userId}');
 
-      if (accessToken != null) {
+    if (accessToken != null) {
+      client = TradeLockerClient(
+        demoTradelockerURI,
+        accessToken.token,
+        accNum: accNum == -1 ? '' : accNum.toString(),
+      );
+    } else {
+      var linkedAccount = await LinkedAccount.db.findFirstRow(
+        session,
+        where: (o) =>
+            o.userInfoId.equals(authenticated.userId) &
+            o.platform.equals(Platform.Tradelocker),
+      );
+
+      if (linkedAccount == null) {
+        throw Exception('Access token not found in cache/No account linked');
+      } else {
+        var accessToken = AccessToken(token: linkedAccount.apiKey);
+
+        await session.caches.localPrio
+            .put('tradelocker-${authenticated.userId}', accessToken);
+
         client = TradeLockerClient(
-          'https://demo.tradelocker.com/backend-api',
+          demoTradelockerURI,
           accessToken.token,
           accNum: accNum == -1 ? '' : accNum.toString(),
         );
-      } else {
-        var linkedAccount = await LinkedAccount.db.findFirstRow(
-          session,
-          where: (o) =>
-              o.userInfoId.equals(authenticated.userId) &
-              o.platform.equals(Platform.Tradelocker),
-        );
-
-        if (linkedAccount == null) {
-          throw Exception('Access token not found in cache/No account linked');
-        } else {
-          var accessToken = AccessToken(token: linkedAccount.apiKey);
-
-          await session.caches.localPrio
-              .put('tradelocker-${authenticated.userId}', accessToken);
-
-          client = TradeLockerClient(
-            'https://demo.tradelocker.com/backend-api',
-            accessToken.token,
-            accNum: accNum == -1 ? '' : accNum.toString(),
-          );
-        }
       }
-    } else {
-      throw Exception('User not authenticated');
     }
   }
 
@@ -57,7 +54,7 @@ class TradeLockerEndpoint extends Endpoint {
   ) async {
     var authenticated = await session.authenticated;
     client = TradeLockerClient(
-      'https://demo.tradelocker.com/backend-api',
+      demoTradelockerURI,
       '',
     );
 
@@ -72,8 +69,7 @@ class TradeLockerEndpoint extends Endpoint {
       );
 
       if (response.statusCode == 201) {
-        final data = response.data
-            as Map<String, dynamic>;
+        final data = response.data as Map<String, dynamic>;
         final accessToken = data['accessToken'] as String;
         final refreshToken = data['refreshToken'] as String;
 
@@ -137,13 +133,10 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<String> refresh(Session session) async {
     var authenticated = await session.authenticated;
-    if (authenticated == null) {
-      throw Exception('User not authenticated');
-    }
 
     var creds = await TradelockerCredentials.db.findFirstRow(
       session,
-      where: (o) => o.userId.equals(authenticated.userId),
+      where: (o) => o.userId.equals(authenticated!.userId),
     );
 
     if (creds == null) {
@@ -162,7 +155,7 @@ class TradeLockerEndpoint extends Endpoint {
           as Map<String, dynamic>; // Ensure response data is a map
       final accessToken = data['accessToken'] as String;
 
-      await session.caches.localPrio.put('tradelocker-${authenticated.userId}',
+      await session.caches.localPrio.put('tradelocker-${authenticated!.userId}',
           AccessToken(token: accessToken));
 
       var linkedAccount = await LinkedAccount.db.findFirstRow(
@@ -206,16 +199,4 @@ class TradeLockerEndpoint extends Endpoint {
     }
   }
 
-  Future<Map<String, dynamic>> postData(
-      Session session, Map<String, dynamic> data) async {
-    await initializeClient(session);
-
-    final response = await client.post('/some_endpoint', data);
-    if (response.statusCode == 200) {
-      return response.data as Map<String, dynamic>;
-    } else {
-      throw Exception(
-          'Failed to post data - Error code: ${response.statusCode}');
-    }
-  }
 }

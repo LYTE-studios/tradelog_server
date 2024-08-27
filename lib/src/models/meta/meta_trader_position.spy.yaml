@@ -1,0 +1,30 @@
+class: MetatraderPosition
+fields:
+  id: String
+  type: String
+  symbol: String
+  magic: int
+  time: DateTime
+  brokerTime: String
+  updateTime: DateTime
+  openPrice: double
+  currentPrice: double
+  currentTickValue: double
+  stopLoss: double?
+  takeProfit: double?
+  trailingStopLoss: TrailingStopLoss?
+  volume: double
+  profit: double
+  realizedProfit: double
+  unrealizedProfit: double
+  commission: double
+  realizedCommission: double
+  unrealizedCommission: double
+  swap: double
+  realizedSwap: double
+  unrealizedSwap: double
+  accountCurrencyExchangeRate: double?
+  comment: String?
+  clientId: String?
+  reason: String
+  brokerComment: String?

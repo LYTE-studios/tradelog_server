@@ -1,0 +1,4 @@
+class: StopLossThreshold
+fields:
+  threshold: double
+  stopLoss: double

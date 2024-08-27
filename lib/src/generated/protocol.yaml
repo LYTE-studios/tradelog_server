@@ -1,10 +1,11 @@
 account:
   - linkAccount:
   - unlinkAccount:
+metaApi:
+  - initializeClient:
 tradeLocker:
   - initializeClient:
   - authenticate:
   - refresh:
   - getAccounts:
   - getPositions:
-  - postData:
