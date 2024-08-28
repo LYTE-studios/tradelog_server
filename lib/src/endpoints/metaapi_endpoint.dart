@@ -3,7 +3,7 @@ import 'dart:ffi';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/metaapi_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/util/staging_config.dart';
+import 'package:tradelog_server/src/util/configuration.dart';
 
 class MetaApiEndpoint extends Endpoint {
   @override
@@ -18,43 +18,52 @@ class MetaApiEndpoint extends Endpoint {
 
     if (accessToken != null) {
       client = MetaApiClient(
-        metaApiURILN,
+        Configuration.metaApiURILN,
         accessToken.token,
       );
-    } else {
-      var linkedAccount = await LinkedAccount.db.findFirstRow(
-        session,
-        where: (o) =>
-            o.userInfoId.equals(authenticated.userId) &
-            o.platform.equals(Platform.Metatrader),
-      );
-
-      if (linkedAccount == null) {
-        throw Exception('Access token not found in cache/No account linked');
-      } else {
-        var accessToken = AccessToken(token: linkedAccount.apiKey);
-
-        await session.caches.localPrio
-            .put('metatrader-${authenticated.userId}', accessToken);
-
-        client = MetaApiClient(
-          metaApiURILN,
-          accessToken.token,
-        );
-      }
+      return;
     }
+
+    var linkedAccount = await LinkedAccount.db.findFirstRow(
+      session,
+      where: (o) =>
+          o.userInfoId.equals(authenticated.userId) &
+          o.platform.equals(Platform.Metatrader),
+    );
+
+    if (linkedAccount == null) {
+      throw Exception('Access token not found in cache/No account linked');
+    }
+
+    accessToken = AccessToken(token: linkedAccount.apiKey);
+
+    await session.caches.localPrio
+        .put('metatrader-${authenticated.userId}', accessToken);
+
+    client = MetaApiClient(
+      Configuration.metaApiURILN,
+      accessToken.token,
+    );
   }
 
   Future<void> authenticate(Session session, String apiKey) async {
     var authenticated = await session.authenticated;
     var accessToken = AccessToken(token: apiKey);
 
+    // Check if linked account exists
+    LinkedAccount? checkLinked;
     try {
-      var checkLinked = await LinkedAccount.db.findFirstRow(
+      checkLinked = await LinkedAccount.db.findFirstRow(
         session,
-        where: (o) => o.userInfoId.equals(authenticated?.userId),
+        where: (o) => o.userInfoId.equals(authenticated!.userId),
       );
+    } catch (e) {
+      throw Exception(
+          'Database error while checking linked account - Error: $e');
+    }
 
+    // Insert or update the linked account
+    try {
       if (checkLinked == null) {
         var linkedAccount = LinkedAccount(
           userInfoId: authenticated!.userId,
@@ -66,11 +75,17 @@ class MetaApiEndpoint extends Endpoint {
         checkLinked.apiKey = apiKey;
         await LinkedAccount.db.updateRow(session, checkLinked);
       }
-
-      await session.caches.localPrio.put(
-          'metatrader-${authenticated!.userId}', AccessToken(token: apiKey));
     } catch (e) {
-      throw Exception('Failed to authenticate - Error: $e');
+      throw Exception(
+          'Database error while inserting/updating linked account - Error: $e');
+    }
+
+    // Cache the access token
+    try {
+      await session.caches.localPrio
+          .put('metatrader-${authenticated!.userId}', accessToken);
+    } catch (e) {
+      throw Exception('Error caching access token - Error: $e');
     }
   }
 
@@ -92,7 +107,8 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
-  Future<List<MetatraderPosition>> getPositions(Session session, String accountId) async {
+  Future<List<MetatraderPosition>> getPositions(
+      Session session, String accountId) async {
     await initializeClient(session);
 
     final response =
@@ -106,7 +122,8 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
-  Future<List<MetatraderOrder>> getOrders(Session session, String accountId) async {
+  Future<List<MetatraderOrder>> getOrders(
+      Session session, String accountId) async {
     await initializeClient(session);
 
     final response =

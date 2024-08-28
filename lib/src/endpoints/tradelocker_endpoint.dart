@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/util/staging_config.dart';
+import 'package:tradelog_server/src/util/configuration.dart';
 
 class TradeLockerEndpoint extends Endpoint {
   @override
@@ -17,34 +17,120 @@ class TradeLockerEndpoint extends Endpoint {
 
     if (accessToken != null) {
       client = TradeLockerClient(
-        demoTradelockerURI,
+        Configuration.tradelockerURI,
         accessToken.token,
         accNum: accNum == -1 ? '' : accNum.toString(),
       );
-    } else {
-      var linkedAccount = await LinkedAccount.db.findFirstRow(
-        session,
-        where: (o) =>
-            o.userInfoId.equals(authenticated.userId) &
-            o.platform.equals(Platform.Tradelocker),
-      );
-
-      if (linkedAccount == null) {
-        throw Exception('Access token not found in cache/No account linked');
-      } else {
-        var accessToken = AccessToken(token: linkedAccount.apiKey);
-
-        await session.caches.localPrio
-            .put('tradelocker-${authenticated.userId}', accessToken);
-
-        client = TradeLockerClient(
-          demoTradelockerURI,
-          accessToken.token,
-          accNum: accNum == -1 ? '' : accNum.toString(),
-        );
-      }
+      return;
     }
+
+    var linkedAccount = await LinkedAccount.db.findFirstRow(
+      session,
+      where: (o) =>
+          o.userInfoId.equals(authenticated.userId) &
+          o.platform.equals(Platform.Tradelocker),
+    );
+
+    if (linkedAccount == null) {
+      throw Exception('Access token not found in cache/No account linked');
+    }
+
+    accessToken = AccessToken(token: linkedAccount.apiKey);
+
+    await session.caches.localPrio
+        .put('tradelocker-${authenticated.userId}', accessToken);
+
+    client = TradeLockerClient(
+      Configuration.tradelockerURI,
+      accessToken.token,
+      accNum: accNum == -1 ? '' : accNum.toString(),
+    );
   }
+
+  // Future<String> authenticate(
+  //   Session session,
+  //   String email,
+  //   String password,
+  //   String server,
+  // ) async {
+  //   var authenticated = await session.authenticated;
+  //   client = TradeLockerClient(
+  //     Configuration.tradelockerURI,
+  //     '',
+  //   );
+
+  //   try {
+  //     final response = await client.post(
+  //       '/auth/jwt/token',
+  //       {
+  //         'email': email,
+  //         'password': password,
+  //         'server': server,
+  //       },
+  //     );
+
+  //     if (response.statusCode == 201) {
+  //       final data = response.data as Map<String, dynamic>;
+  //       final accessToken = data['accessToken'] as String;
+  //       final refreshToken = data['refreshToken'] as String;
+
+  //       await session.caches.localPrio.put(
+  //           'tradelocker-${authenticated!.userId}',
+  //           AccessToken(token: accessToken));
+
+  //       var checkCred = await TradelockerCredentials.db.findFirstRow(session,
+  //           where: (o) => o.userId.equals(authenticated.userId));
+
+  //       if (checkCred == null) {
+  //         var account = TradelockerCredentials(
+  //           email: email,
+  //           password: password,
+  //           server: server,
+  //           userId: authenticated.userId,
+  //           refreshToken: refreshToken,
+  //         );
+  //         await TradelockerCredentials.db.insertRow(session, account);
+  //       } else {
+  //         checkCred.email = email;
+  //         checkCred.password = password;
+  //         checkCred.server = server;
+  //         checkCred.refreshToken = refreshToken;
+  //         await TradelockerCredentials.db.updateRow(session, checkCred);
+  //       }
+
+  //       var checkLinked = await LinkedAccount.db.findFirstRow(
+  //         session,
+  //         where: (o) => o.userInfoId.equals(authenticated.userId),
+  //       );
+
+  //       if (checkLinked == null) {
+  //         var linkedAccount = LinkedAccount(
+  //           userInfoId: authenticated.userId,
+  //           apiKey: accessToken,
+  //           platform: Platform.Tradelocker,
+  //         );
+  //         await LinkedAccount.db.insertRow(session, linkedAccount);
+  //       } else {
+  //         checkLinked.apiKey = accessToken;
+  //         await LinkedAccount.db.updateRow(session, checkLinked);
+  //       }
+
+  //       return accessToken;
+  //     } else {
+  //       throw Exception('Failed to authenticate: ${response.statusCode}');
+  //     }
+  //   } catch (e) {
+  //     if (e is DioException) {
+  //       if (e.response?.statusCode == 500) {
+  //         throw Exception('Internal server error: ${e.response?.data}');
+  //       } else {
+  //         throw Exception('Failed to authenticate: ${e.message}');
+  //       }
+  //     } else {
+  //       throw Exception('Unexpected error: $e');
+  //     }
+  //   }
+  // }
 
   Future<String> authenticate(
     Session session,
@@ -54,10 +140,31 @@ class TradeLockerEndpoint extends Endpoint {
   ) async {
     var authenticated = await session.authenticated;
     client = TradeLockerClient(
-      demoTradelockerURI,
+      Configuration.tradelockerURI,
       '',
     );
 
+    // Step 1: Perform authentication
+    final data = await _performAuthentication(client, email, password, server);
+
+    final accessToken = data['accessToken'] as String;
+    final refreshToken = data['refreshToken'] as String;
+
+    // Step 2: Store tokens and update credentials in the database
+    await _storeTokens(session, authenticated!.userId, accessToken, refreshToken, email, password, server);
+
+    // Step 3: Manage Linked Account
+    await _manageLinkedAccount(session, authenticated.userId, accessToken);
+
+    return accessToken;
+  }
+
+  Future<Map<String, dynamic>> _performAuthentication(
+    TradeLockerClient client,
+    String email,
+    String password,
+    String server,
+  ) async {
     try {
       final response = await client.post(
         '/auth/jwt/token',
@@ -70,51 +177,7 @@ class TradeLockerEndpoint extends Endpoint {
 
       if (response.statusCode == 201) {
         final data = response.data as Map<String, dynamic>;
-        final accessToken = data['accessToken'] as String;
-        final refreshToken = data['refreshToken'] as String;
-
-        await session.caches.localPrio.put(
-            'tradelocker-${authenticated!.userId}',
-            AccessToken(token: accessToken));
-
-        var checkCred = await TradelockerCredentials.db.findFirstRow(session,
-            where: (o) => o.userId.equals(authenticated.userId));
-
-        if (checkCred == null) {
-          var account = TradelockerCredentials(
-            email: email,
-            password: password,
-            server: server,
-            userId: authenticated.userId,
-            refreshToken: refreshToken,
-          );
-          await TradelockerCredentials.db.insertRow(session, account);
-        } else {
-          checkCred.email = email;
-          checkCred.password = password;
-          checkCred.server = server;
-          checkCred.refreshToken = refreshToken;
-          await TradelockerCredentials.db.updateRow(session, checkCred);
-        }
-
-        var checkLinked = await LinkedAccount.db.findFirstRow(
-          session,
-          where: (o) => o.userInfoId.equals(authenticated.userId),
-        );
-
-        if (checkLinked == null) {
-          var linkedAccount = LinkedAccount(
-            userInfoId: authenticated.userId,
-            apiKey: accessToken,
-            platform: Platform.Tradelocker,
-          );
-          await LinkedAccount.db.insertRow(session, linkedAccount);
-        } else {
-          checkLinked.apiKey = accessToken;
-          await LinkedAccount.db.updateRow(session, checkLinked);
-        }
-
-        return accessToken;
+        return data;
       } else {
         throw Exception('Failed to authenticate: ${response.statusCode}');
       }
@@ -128,6 +191,75 @@ class TradeLockerEndpoint extends Endpoint {
       } else {
         throw Exception('Unexpected error: $e');
       }
+    }
+  }
+
+  Future<void> _storeTokens(
+    Session session,
+    int userId,
+    String accessToken,
+    String refreshToken,
+    String email,
+    String password,
+    String server,
+  ) async {
+    try {
+      // Store access token in cache
+      await session.caches.localPrio.put(
+        'tradelocker-$userId',
+        AccessToken(token: accessToken),
+      );
+    } catch (e) {
+      throw Exception('Failed to store access token: $e');
+    }
+
+    try {
+      // Check if credentials already exist in the database
+      var checkCred = await TradelockerCredentials.db
+          .findFirstRow(session, where: (o) => o.userId.equals(userId));
+
+      if (checkCred == null) {
+          var account = TradelockerCredentials(
+            email: email,
+            password: password,
+            server: server,
+            userId: userId,
+            refreshToken: refreshToken,
+          );
+          await TradelockerCredentials.db.insertRow(session, account);
+        } else {
+          checkCred.email = email;
+          checkCred.password = password;
+          checkCred.server = server;
+          checkCred.refreshToken = refreshToken;
+          await TradelockerCredentials.db.updateRow(session, checkCred);
+        }
+    } catch (e) {
+      throw Exception('Failed to store/update credentials: $e');
+    }
+  }
+
+  Future<void> _manageLinkedAccount(
+      Session session, int userId, String accessToken) async {
+    try {
+      var checkLinked = await LinkedAccount.db.findFirstRow(
+        session,
+        where: (o) => o.userInfoId.equals(userId),
+      );
+
+      if (checkLinked == null) {
+        var linkedAccount = LinkedAccount(
+          userInfoId: userId,
+          apiKey: accessToken,
+          platform: Platform.Tradelocker,
+        );
+        await LinkedAccount.db.insertRow(session, linkedAccount);
+      } else {
+        checkLinked.apiKey = accessToken;
+        await LinkedAccount.db.updateRow(session, checkLinked);
+      }
+    } catch (e) {
+      throw Exception('Failed to manage linked account: $e');
     }
   }
 
@@ -198,5 +330,4 @@ class TradeLockerEndpoint extends Endpoint {
           'Failed to load data - Error code: ${response.statusCode}');
     }
   }
-
 }
