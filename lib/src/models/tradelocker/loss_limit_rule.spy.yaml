@@ -1,0 +1,10 @@
+class: LossLimitRule
+fields:
+  value: double
+  # Loss limit value.
+
+  warnLevel1: double
+  # Warning level 1.
+
+  warnLevel2: double
+  # Warning level 2.
