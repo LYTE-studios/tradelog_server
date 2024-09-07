@@ -11,6 +11,9 @@ class MetaApiEndpoint extends Endpoint {
 
   late MetaApiClient client;
 
+  /// Initializes the MetaApiClient using an access token from the session cache.
+  /// If no access token is found, retrieves it from the linked account.
+  /// Throws an exception if no linked account is found or if there's an error during initialization.
   Future<void> initializeClient(Session session, {int accNum = -1}) async {
     var authenticated = await session.authenticated;
     var accessToken = await session.caches.localPrio
@@ -46,6 +49,9 @@ class MetaApiEndpoint extends Endpoint {
     );
   }
 
+  /// Authenticates the user by storing the provided API key and linking it to the user's account.
+  /// If a linked account exists, it updates the API key. Otherwise, it inserts a new linked account.
+  /// Caches the access token after authentication.
   Future<void> authenticate(Session session, String apiKey) async {
     var authenticated = await session.authenticated;
     var accessToken = AccessToken(token: apiKey);
@@ -89,6 +95,9 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
+  /// Retrieves the account information for the specified MetaTrader account.
+  /// Initializes the MetaApiClient if not already initialized.
+  /// Returns a [MetaTradingAccountInformation] object if successful, otherwise throws an exception.
   Future<MetaTradingAccountInformation> getAccountInformation(
       Session session, String accountId) async {
     await initializeClient(session);
@@ -107,6 +116,9 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
+  /// Retrieves the list of open positions for the specified MetaTrader account.
+  /// Initializes the MetaApiClient if not already initialized.
+  /// Returns a list of [MetatraderPosition] objects if successful, otherwise throws an exception.
   Future<List<MetatraderPosition>> getPositions(
       Session session, String accountId) async {
     await initializeClient(session);
@@ -122,6 +134,9 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
+  /// Retrieves the list of open orders for the specified MetaTrader account.
+  /// Initializes the MetaApiClient if not already initialized.
+  /// Returns a list of [MetatraderOrder] objects if successful, otherwise throws an exception.
   Future<List<MetatraderOrder>> getOrders(
       Session session, String accountId) async {
     await initializeClient(session);
@@ -137,6 +152,9 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
+    /// Retrieves the history of orders for the specified MetaTrader account within the given time range.
+  /// Initializes the MetaApiClient if not already initialized.
+  /// Returns the history orders as a string if successful, otherwise throws an exception.
   Future<String> getHistoryOrdersByTime(Session session, String accountId,
       String startTime, String endTime) async {
     await initializeClient(session);

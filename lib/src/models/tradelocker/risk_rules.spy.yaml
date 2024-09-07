@@ -1,0 +1,47 @@
+class: RiskRules
+fields:
+  balanceRelativeDrawdown: double
+  # The minimum allowable Projected balance value that the account can have.
+  # Max drawdown value calculates as % from the current Balance value.
+
+  dailyLossLimit: LossLimitRule
+  # Daily loss limit rules.
+
+  dailyProfitTarget: double
+  # A maximum value of daily net profit allowed for an account.
+
+  maxDrawdownLevel: double
+  # The minimal allowed Projected balance value in the account currency 
+  # for the account not to trigger a Stop out.
+
+  maxOrderAmount: double
+  # The maximum amount for a single order measured in the instrument units.
+
+  maxOrderCapital: double
+  # The maximum order capital which can be sent by user. 
+  # Order capital = Qty. * Lot size * Price * Cross price.
+
+  maxOrdersCount: double
+  # The maximum number of orders that user can place or modify during a day.
+
+  maxPendingOrdersNumber: double
+  # The maximum quantity of pending orders which can be placed by account.
+
+  maxPositionsNumber: double
+  # The maximum number of positions which can be opened by one account.
+
+  maxTrailingDrawdown: double
+  # Maximum drawdown level for an account. A reached 'Max trailing drawdown' blocks trading.
+
+  positionLossLimit: double
+  # Loss limit value for the position in percent.
+
+  totalMaxPositionQty: double
+  # Maximum possible qty in lots of all positions and orders for all trading instruments.
+  # A reached 'Total max position qty' blocks an order placement and an order modification.
+
+  unrealizedLossLimit: LossLimitRule
+  # Unrealized loss limit rules.
+
+  weeklyLossLimit: LossLimitRule
+  # Weekly loss limit rules.

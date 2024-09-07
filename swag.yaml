@@ -1,0 +1,366 @@
+openapi: 3.0.0
+info:
+  title: MetaApi Service
+  version: 1.0.0
+  description: API for interacting with MetaTrader accounts.
+
+servers:
+  - url: http://localhost:8080/api
+
+paths:
+  /authenticate:
+    post:
+      summary: Authenticate with MetaApi
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                apiKey:
+                  type: string
+      responses:
+        '200':
+          description: Authentication successful
+        '400':
+          description: Error during authentication
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /accounts/{accountId}/information:
+    get:
+      summary: Get MetaTrading account information
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Account information retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetaTradingAccountInformation'
+        '400':
+          description: Error retrieving account information
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /accounts/{accountId}/positions:
+    get:
+      summary: Get MetaTrader positions
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Positions retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetatraderPosition'
+        '400':
+          description: Error retrieving positions
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /accounts/{accountId}/orders:
+    get:
+      summary: Get MetaTrader orders
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MetatraderOrder'
+        '400':
+          description: Error retrieving orders
+          content:
+            application/json:
+              schema:
+                type: string
+
+  /accounts/{accountId}/history-orders/time/{startTime}/{endTime}:
+    get:
+      summary: Get history orders by time
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startTime
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: endTime
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: History orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Error retrieving history orders
+          content:
+            application/json:
+              schema:
+                type: string
+
+components:
+  schemas:
+    MetaTradingAccountInformation:
+      type: object
+      properties:
+        platform:
+          type: string
+        broker:
+          type: string
+        currency:
+          type: string
+        server:
+          type: string
+        balance:
+          type: number
+        equity:
+          type: number
+        margin:
+          type: number
+        freeMargin:
+          type: number
+        leverage:
+          type: number
+        marginLevel:
+          type: number
+          nullable: true
+        tradeAllowed:
+          type: boolean
+        investorMode:
+          type: boolean
+          nullable: true
+        marginMode:
+          type: string
+        name:
+          type: string
+        login:
+          type: number
+        credit:
+          type: number
+        accountCurrencyExchangeRate:
+          type: number
+          nullable: true
+        type:
+          type: string
+
+    MetatraderPosition:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        symbol:
+          type: string
+        magic:
+          type: number
+        time:
+          type: string
+          format: date-time
+        brokerTime:
+          type: string
+        updateTime:
+          type: string
+          format: date-time
+        openPrice:
+          type: number
+        currentPrice:
+          type: number
+        currentTickValue:
+          type: number
+        stopLoss:
+          type: number
+          nullable: true
+        takeProfit:
+          type: number
+          nullable: true
+        trailingStopLoss:
+          $ref: '#/components/schemas/TrailingStopLoss'
+        volume:
+          type: number
+        profit:
+          type: number
+        realizedProfit:
+          type: number
+        unrealizedProfit:
+          type: number
+        commission:
+          type: number
+        realizedCommission:
+          type: number
+        unrealizedCommission:
+          type: number
+        swap:
+          type: number
+        realizedSwap:
+          type: number
+        unrealizedSwap:
+          type: number
+        accountCurrencyExchangeRate:
+          type: number
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        clientId:
+          type: string
+          nullable: true
+        reason:
+          type: string
+        brokerComment:
+          type: string
+          nullable: true
+
+    MetatraderOrder:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        state:
+          type: string
+        magic:
+          type: number
+        time:
+          type: string
+          format: date-time
+        brokerTime:
+          type: string
+        doneTime:
+          type: string
+          format: date-time
+          nullable: true
+        doneBrokerTime:
+          type: string
+          nullable: true
+        symbol:
+          type: string
+        openPrice:
+          type: number
+          nullable: true
+        stopLimitPrice:
+          type: number
+          nullable: true
+        currentPrice:
+          type: number
+          nullable: true
+        stopLoss:
+          type: number
+          nullable: true
+        takeProfit:
+          type: number
+          nullable: true
+        trailingStopLoss:
+          $ref: '#/components/schemas/TrailingStopLoss'
+        volume:
+          type: number
+        currentVolume:
+          type: number
+        positionId:
+          type: string
+          nullable: true
+        comment:
+          type: string
+          nullable: true
+        brokerComment:
+          type: string
+          nullable: true
+        clientId:
+          type: string
+          nullable: true
+        platform:
+          type: string
+        reason:
+          type: string
+        fillingMode:
+          type: string
+        expirationType:
+          type: string
+        expirationTime:
+          type: string
+          format: date-time
+          nullable: true
+        accountCurrencyExchangeRate:
+          type: number
+          nullable: true
+        closeByPositionId:
+          type: string
+          nullable: true
+
+    DistanceTrailingStopLoss:
+      type: object
+      properties:
+        distance:
+          type: number
+        units:
+          type: string
+          nullable: true
+
+    StopLossThreshold:
+      type: object
+      properties:
+        threshold:
+          type: number
+        stopLoss:
+          type: number
+
+    ThresholdTrailingStopLoss:
+      type: object
+      properties:
+        thresholds:
+          type: array
+          items:
+            $ref: '#/components/schemas/StopLossThreshold'
+        units:
+          type: string
+          nullable: true
+        stopPriceBase:
+          type: string
+          nullable: true
+
+    TrailingStopLoss:
+      type: object
+      properties:
+        distance:
+          $ref: '#/components/schemas/DistanceTrailingStopLoss'
+        threshold:
+          $ref: '#/components/schemas/ThresholdTrailingStopLoss'
