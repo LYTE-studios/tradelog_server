@@ -1,0 +1,4 @@
+class: DistanceTrailingStopLoss
+fields:
+  distance: double
+  units: String?

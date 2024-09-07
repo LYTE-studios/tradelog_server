@@ -1,10 +1,16 @@
 account:
   - linkAccount:
   - unlinkAccount:
+metaApi:
+  - initializeClient:
+  - authenticate:
+  - getAccountInformation:
+  - getPositions:
+  - getOrders:
+  - getHistoryOrdersByTime:
 tradeLocker:
   - initializeClient:
   - authenticate:
   - refresh:
   - getAccounts:
   - getPositions:
-  - postData:

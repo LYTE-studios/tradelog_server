@@ -1,0 +1,30 @@
+class: MetatraderOrder
+fields:
+  id: String
+  type: String
+  state: String
+  magic: double
+  time: DateTime
+  brokerTime: String
+  doneTime: DateTime?
+  doneBrokerTime: String?
+  symbol: String
+  openPrice: double?
+  stopLimitPrice: double?
+  currentPrice: double?
+  stopLoss: double?
+  takeProfit: double?
+  trailingStopLoss: TrailingStopLoss?
+  volume: double
+  currentVolume: double
+  positionId: String?
+  comment: String?
+  brokerComment: String?
+  clientId: String?
+  platform: String
+  reason: String
+  fillingMode: String
+  expirationType: String
+  expirationTime: DateTime?
+  accountCurrencyExchangeRate: double?
+  closeByPositionId: String?

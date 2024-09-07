@@ -1,0 +1,4 @@
+class: TrailingStopLoss
+fields:
+  distance: DistanceTrailingStopLoss
+  threshold: ThresholdTrailingStopLoss
