@@ -6,10 +6,6 @@ class AccountEndpoint extends Endpoint {
   bool get requireLogin => true;
 
   Future<void> linkAccount(Session session, LinkedAccount account) async { 
-    var authenticatedInfo = await session.authenticated;
-    if (authenticatedInfo?.userId != account.userInfoId) {
-      throw FormatException("User mismatch");
-    }
     await LinkedAccount.db.insertRow(session, account);
   }
 

@@ -1,0 +1,15 @@
+class: Trade 
+
+table: trade
+
+fields:
+  option: Option
+  user: module:auth:UserInfo?, relation
+  currency: String
+  fee: double
+  date: DateTime
+  lotSize: double
+  takeProfit: double
+  stoploss: double
+  profitLoss: String
+  amount: double

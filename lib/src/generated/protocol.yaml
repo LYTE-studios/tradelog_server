@@ -6,11 +6,16 @@ metaApi:
   - authenticate:
   - getAccountInformation:
   - getPositions:
+  - getTrades:
   - getOrders:
   - getHistoryOrdersByTime:
+trade:
+  - addTrade:
+  - unlinkAccount:
 tradeLocker:
   - initializeClient:
   - authenticate:
   - refresh:
   - getAccounts:
   - getPositions:
+  - getOrders:

@@ -1,0 +1,16 @@
+class: TradingRules
+fields:
+  supportBrackets: bool
+  # Whether the brackets (take profit and stop loss) for orders and positions are supported.
+
+  supportPartialClosePosition: bool
+  # Supporting partial closing of a position.
+
+  supportSelfTrading: bool
+  # Whether the user is allowed to trade on this account.
+
+  supportTradingOutOfTradingHours: bool
+  # Whether placing orders out of trading hours is allowed for the account.
+
+  supportTrailingStop: bool
+  # Whether the trailing stop orders are supported.

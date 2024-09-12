@@ -1,4 +1,7 @@
 class: TrailingStopLoss
 fields:
   distance: DistanceTrailingStopLoss
+  # Distance-based trailing stop loss configuration.
+
   threshold: ThresholdTrailingStopLoss
+  # Threshold-based trailing stop loss configuration.

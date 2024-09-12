@@ -1,4 +1,9 @@
 class: StopLossThreshold
 fields:
   threshold: double
+  # Price level threshold at which the stop loss is adjusted.
+  # Example: 100.0
+
   stopLoss: double
+  # Stop loss value corresponding to the threshold.
+  # Example: 50.0

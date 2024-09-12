@@ -1,30 +1,112 @@
 class: MetatraderPosition
 fields:
   id: String
+  # Unique position identifier.
+  # Example: POS-001
+
   type: String
+  # Type of the position (buy or sell).
+  # Enum: [POSITION_TYPE_BUY, POSITION_TYPE_SELL]
+
   symbol: String
+  # Trading symbol associated with the position.
+  # Example: EURUSD
+
   magic: double
+  # A unique identifier for expert advisors (EAs).
+  # Example: 98765432
+
   time: DateTime
+  # Time when the position was opened.
+  # Example: 2023-09-12T10:15:30Z
+
   brokerTime: String
+  # Broker's server time when the position was opened.
+  # Example: 2023-09-12 10:15:30
+
   updateTime: DateTime
+  # Time when the position was last updated.
+  # Example: 2023-09-12T12:45:30Z
+
   openPrice: double
+  # Price at which the position was opened.
+  # Example: 1.1050
+
   currentPrice: double
+  # Current market price of the symbol.
+  # Example: 1.1080
+
   currentTickValue: double
+  # Value of the current tick (price movement) for the symbol.
+  # Example: 0.01
+
   stopLoss: double?
+  # Stop loss level for the position.
+  # Example: 1.1000
+
   takeProfit: double?
+  # Take profit level for the position.
+  # Example: 1.1200
+
   trailingStopLoss: TrailingStopLoss?
+  # Trailing stop loss configuration for the position.
+
   volume: double
+  # Volume (lot size) of the position.
+  # Example: 1.0
+
   profit: double
+  # Current profit of the position.
+  # Example: 150.75
+
   realizedProfit: double
+  # Profit realized after closing part of the position.
+  # Example: 75.50
+
   unrealizedProfit: double
+  # Profit that has not yet been realized (floating profit).
+  # Example: 75.25
+
   commission: double
+  # Total commission for the position.
+  # Example: 2.50
+
   realizedCommission: double
+  # Commission that has been realized after closing part of the position.
+  # Example: 1.25
+
   unrealizedCommission: double
+  # Commission that is yet to be realized for the position.
+  # Example: 1.25
+
   swap: double
+  # Total swap fee for the position.
+  # Example: 1.75
+
   realizedSwap: double
+  # Swap fee that has been realized after closing part of the position.
+  # Example: 0.75
+
   unrealizedSwap: double
+  # Swap fee that is yet to be realized for the position.
+  # Example: 1.00
+
   accountCurrencyExchangeRate: double?
+  # Exchange rate between the account currency and the symbol currency, if applicable.
+  # Example: 1.15
+
   comment: String?
+  # Optional user-defined comment for the position.
+  # Example: Opening a long-term position
+
   clientId: String?
+  # Client's identifier, if applicable.
+  # Example: CLI-12345
+
   reason: String
+  # Reason for opening the position.
+  # Enum: [POSITION_REASON_CLIENT, POSITION_REASON_EXPERT, POSITION_REASON_MOBILE, POSITION_REASON_WEB, POSITION_REASON_UNKNOWN]
+
   brokerComment: String?
+  # Broker-defined comment, if applicable.
+  # Example: Executed by dealer

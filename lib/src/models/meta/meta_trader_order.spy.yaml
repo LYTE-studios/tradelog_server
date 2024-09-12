@@ -1,30 +1,113 @@
 class: MetatraderOrder
 fields:
   id: String
+  # Unique order identifier.
+  # Example: ORD-001
+
   type: String
+  # Type of the order.
+  # Enum: [ORDER_TYPE_SELL, ORDER_TYPE_BUY, ORDER_TYPE_BUY_LIMIT, ORDER_TYPE_SELL_LIMIT, ORDER_TYPE_BUY_STOP, ORDER_TYPE_SELL_STOP, ORDER_TYPE_BUY_STOP_LIMIT, ORDER_TYPE_SELL_STOP_LIMIT, ORDER_TYPE_CLOSE_BY]
+
   state: String
+  # Current state of the order.
+  # Enum: [ORDER_STATE_STARTED, ORDER_STATE_PLACED, ORDER_STATE_CANCELED, ORDER_STATE_PARTIAL, ORDER_STATE_FILLED, ORDER_STATE_REJECTED, ORDER_STATE_EXPIRED, ORDER_STATE_REQUEST_ADD, ORDER_STATE_REQUEST_MODIFY, ORDER_STATE_REQUEST_CANCEL]
+
   magic: double
+  # A unique identifier for expert advisors (EAs).
+  # Example: 12345678
+
   time: DateTime
+  # Time when the order was created.
+  # Example: 2023-09-12T10:15:30Z
+
   brokerTime: String
+  # Broker's server time when the order was created.
+  # Example: 2023-09-12 10:15:30
+
   doneTime: DateTime?
+  # Time when the order was completed (closed or canceled).
+  # Example: 2023-09-12T12:45:30Z
+
   doneBrokerTime: String?
+  # Broker's server time when the order was completed (closed or canceled).
+  # Example: 2023-09-12 12:45:30
+
   symbol: String
+  # Trading symbol for the order.
+  # Example: EURUSD
+
   openPrice: double?
+  # Price at which the order was opened.
+  # Example: 1.1050
+
   stopLimitPrice: double?
+  # Stop limit price, if applicable.
+  # Example: 1.1100
+
   currentPrice: double?
+  # Current market price of the symbol.
+  # Example: 1.1080
+
   stopLoss: double?
+  # Stop loss level for the order.
+  # Example: 1.1000
+
   takeProfit: double?
+  # Take profit level for the order.
+  # Example: 1.1200
+
   trailingStopLoss: TrailingStopLoss?
+  # Trailing stop loss configuration for the order.
+
   volume: double
+  # Initial volume (lot size) of the order.
+  # Example: 1.0
+
   currentVolume: double
+  # Current volume of the order, may differ from initial volume if partially closed.
+  # Example: 0.5
+
   positionId: String?
+  # Identifier of the position associated with the order, if applicable.
+  # Example: POS-12345
+
   comment: String?
+  # Optional user-defined comment for the order.
+  # Example: Opening a long position
+
   brokerComment: String?
+  # Broker-defined comment, if applicable.
+  # Example: Executed by dealer
+
   clientId: String?
+  # Client's identifier, if applicable.
+  # Example: CLI-67890
+
   platform: String
+  # Trading platform where the order was placed.
+  # Enum: [mt4, mt5]
+
   reason: String
+  # Reason for the order.
+  # Enum: [ORDER_REASON_CLIENT, ORDER_REASON_MOBILE, ORDER_REASON_WEB, ORDER_REASON_EXPERT, ORDER_REASON_SL, ORDER_REASON_TP, ORDER_REASON_SO, ORDER_REASON_UNKNOWN]
+
   fillingMode: String
+  # Order filling mode.
+  # Enum: [ORDER_FILLING_FOK, ORDER_FILLING_IOC, ORDER_FILLING_RETURN]
+
   expirationType: String
+  # Expiration type for pending orders.
+  # Enum: [ORDER_TIME_GTC, ORDER_TIME_DAY, ORDER_TIME_SPECIFIED, ORDER_TIME_SPECIFIED_DAY]
+
   expirationTime: DateTime?
+  # Expiration time for the order, if applicable.
+  # Example: 2023-09-13T15:30:00Z
+
   accountCurrencyExchangeRate: double?
+  # Exchange rate between the account's currency and the order's symbol, if applicable.
+  # Example: 1.15
+
   closeByPositionId: String?
+  # Position identifier for closing the order by another position, if applicable.
+  # Example: POS-54321
+
