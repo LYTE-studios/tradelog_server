@@ -4,6 +4,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/metaapi_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
+import 'package:tradelog_server/src/models/trade_extension.dart' show TradeExtension;
 
 class MetaApiEndpoint extends Endpoint {
   @override
@@ -131,6 +132,25 @@ class MetaApiEndpoint extends Endpoint {
     } else {
       throw Exception(
           'Failed to fetch positions - Error code: ${response.statusCode}');
+    }
+  }
+
+  Future<List<DisplayTrade>> getTrades(Session session, String accountId) async {
+    await initializeClient(session);
+
+    final response =
+        await client.get('/users/current/accounts/$accountId/positions');
+    if (response.statusCode == 200) {
+      var positions = List<MetatraderPosition>.from(
+          response.data.map((x) => MetatraderPosition.fromJson(x)));
+      var trades = <DisplayTrade>[];
+      for (var position in positions) {
+        trades.add(TradeExtension.fromMetaTrader(position));
+      }
+      return trades;
+    } else {
+      throw Exception(
+          'Failed to fetch trades - Error code: ${response.statusCode}');
     }
   }
 

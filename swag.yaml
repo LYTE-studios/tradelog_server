@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-  title: MetaApi Service
+  title: tradely endpoints
   version: 1.0.0
   description: API for interacting with MetaTrader accounts.
 
@@ -30,7 +30,7 @@ paths:
               schema:
                 type: string
 
-  /accounts/{accountId}/information:
+  /getAccountInformation:
     get:
       summary: Get MetaTrading account information
       parameters:
@@ -53,7 +53,7 @@ paths:
               schema:
                 type: string
 
-  /accounts/{accountId}/positions:
+  /getPositions:
     get:
       summary: Get MetaTrader positions
       parameters:
@@ -78,7 +78,7 @@ paths:
               schema:
                 type: string
 
-  /accounts/{accountId}/orders:
+  /getOrders:
     get:
       summary: Get MetaTrader orders
       parameters:

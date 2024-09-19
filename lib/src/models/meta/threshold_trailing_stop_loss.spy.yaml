@@ -1,5 +1,13 @@
 class: ThresholdTrailingStopLoss
 fields:
   thresholds: List<StopLossThreshold>
+  # A list of threshold levels and corresponding stop loss values.
+  # Example: [{threshold: 100.0, stopLoss: 50.0}, {threshold: 200.0, stopLoss: 100.0}]
+
   units: String?
+  # Units of the threshold (e.g., pips, points), nullable.
+  # Example: pips
+
   stopPriceBase: String?
+  # Base price used to calculate the stop loss (e.g., last price, bid, ask), nullable.
+  # Example: last price

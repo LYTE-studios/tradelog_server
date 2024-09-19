@@ -245,4 +245,17 @@ class TradeLockerEndpoint extends Endpoint {
           'Failed to load data - Error code: ${response.statusCode}');
     }
   }
+
+  Future< /*Map<String, dynamic>*/ String> getOrders(
+      Session session, int accountId, int accNum) async {
+    await initializeClient(session, accNum: accNum);
+
+    final response = await client.get('/trade/accounts/$accountId/orders');
+    if (response.statusCode == 200) {
+      return response.data.toString();
+    } else {
+      throw Exception(
+          'Failed to load data - Error code: ${response.statusCode}');
+    }
+  }
 }

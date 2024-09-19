@@ -1,20 +1,73 @@
 class: MetaTradingAccountInformation
 fields:
   platform: String
+  # Trading platform associated with the account.
+  # Example: mt4, mt5
+
   broker: String
+  # Name of the broker.
+  # Example: BrokerXYZ
+
   currency: String
+  # Abbreviation of the account's base currency.
+  # Example: USD
+
   server: String
+  # Trading server name.
+  # Example: BrokerXYZ-Demo
+
   balance: double
+  # Current account balance.
+  # Example: 10000.00
+
   equity: double
+  # Current equity (balance + floating profit/loss).
+  # Example: 10500.00
+
   margin: double
+  # Margin currently used for open positions.
+  # Example: 500.00
+
   freeMargin: double
+  # Free margin available for opening new positions.
+  # Example: 10000.00
+
   leverage: double
+  # Leverage applied to the account.
+  # Example: 100.0
+
   marginLevel: double?
+  # Current margin level (equity / margin * 100), nullable.
+  # Example: 2100.00
+
   tradeAllowed: bool
+  # Indicates if trading is allowed on the account.
+  # Example: true
+
   investorMode: bool?
+  # Indicates if the account is in investor (read-only) mode.
+  # Example: false
+
   marginMode: String
+  # Margin calculation mode.
+  # Enum: [ACCOUNT_MARGIN_MODE_EXCHANGE, ACCOUNT_MARGIN_MODE_RETAIL_NETTING, ACCOUNT_MARGIN_MODE_RETAIL_HEDGING]
+
   name: String
+  # Account holder's name or account title.
+  # Example: John Doe
+
   login: double
+  # Account login ID.
+  # Example: 12345678
+
   credit: double
+  # Credit balance on the account.
+  # Example: 500.00
+
   accountCurrencyExchangeRate: double?
+  # Exchange rate between the account currency and the quote currency, nullable.
+  # Example: 1.15
+
   type: String
+  # Account type.
+  # Enum: [ACCOUNT_TRADE_MODE_DEMO, ACCOUNT_TRADE_MODE_CONTEST, ACCOUNT_TRADE_MODE_REAL]

@@ -1,4 +1,9 @@
 class: DistanceTrailingStopLoss
 fields:
   distance: double
+  # Distance in the specified units for the trailing stop loss to follow the market price.
+  # Example: 50.0
+
   units: String?
+  # Units of the distance (e.g., pips, points), nullable.
+  # Example: pips
