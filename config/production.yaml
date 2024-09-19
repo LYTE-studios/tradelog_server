@@ -36,7 +36,6 @@ database:
   port: 8090
   name: tradelog
   user: postgres
-  password: "-AAEF__HE-PZp9KcWPTRbTW4m8E6OQ9j"
 
 # This is the setup for Redis. The default for the Google Cloud Engine Terraform
 # configuration is to connect on a private IP address.
