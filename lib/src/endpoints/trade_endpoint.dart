@@ -9,7 +9,7 @@ class TradeEndpoint extends Endpoint {
     await Trade.db.insertRow(session, trade);
   }
 
-  Future<void> unlinkAccount(Session session, Trade trade) async { 
+  Future<void> deleteTrade(Session session, Trade trade) async { 
     await Trade.db.deleteRow(session, trade);
   }
 }

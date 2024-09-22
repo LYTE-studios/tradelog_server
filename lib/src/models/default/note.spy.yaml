@@ -1,0 +1,13 @@
+class: Note
+
+table: note
+
+fields:
+  content: String
+  # Content of the note.
+
+  user: module:auth:UserInfo?, relation
+  # User who created the note.
+
+  date: DateTime
+  # Date of the note.

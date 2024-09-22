@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
+import 'package:tradelog_server/src/models/trade_extension.dart';
+import 'package:tradelog_server/src/models/tradelocker_extension.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
 
 class TradeLockerEndpoint extends Endpoint {
@@ -10,7 +12,10 @@ class TradeLockerEndpoint extends Endpoint {
 
   late TradeLockerClient client;
 
-  Future<void> initializeClient(Session session, {int accNum = -1}) async {
+  Future<void> initializeClient(
+    Session session, {
+    int accNum = -1,
+  }) async {
     var authenticated = await session.authenticated;
     var accessToken = await session.caches.localPrio
         .get<AccessToken>('tradelocker-${authenticated!.userId}');
@@ -66,7 +71,8 @@ class TradeLockerEndpoint extends Endpoint {
     final refreshToken = data['refreshToken'] as String;
 
     // Step 2: Store tokens and update credentials in the database
-    await _storeTokens(session, authenticated!.userId, accessToken, refreshToken, email, password, server);
+    await _storeTokens(session, authenticated!.userId, accessToken,
+        refreshToken, email, password, server);
 
     // Step 3: Manage Linked Account
     await _manageLinkedAccount(session, authenticated.userId, accessToken);
@@ -120,6 +126,7 @@ class TradeLockerEndpoint extends Endpoint {
   ) async {
     try {
       // Store access token in cache
+      print(accessToken);
       await session.caches.localPrio.put(
         'tradelocker-$userId',
         AccessToken(token: accessToken),
@@ -134,21 +141,21 @@ class TradeLockerEndpoint extends Endpoint {
           .findFirstRow(session, where: (o) => o.userId.equals(userId));
 
       if (checkCred == null) {
-          var account = TradelockerCredentials(
-            email: email,
-            password: password,
-            server: server,
-            userId: userId,
-            refreshToken: refreshToken,
-          );
-          await TradelockerCredentials.db.insertRow(session, account);
-        } else {
-          checkCred.email = email;
-          checkCred.password = password;
-          checkCred.server = server;
-          checkCred.refreshToken = refreshToken;
-          await TradelockerCredentials.db.updateRow(session, checkCred);
-        }
+        var account = TradelockerCredentials(
+          email: email,
+          password: password,
+          server: server,
+          userId: userId,
+          refreshToken: refreshToken,
+        );
+        await TradelockerCredentials.db.insertRow(session, account);
+      } else {
+        checkCred.email = email;
+        checkCred.password = password;
+        checkCred.server = server;
+        checkCred.refreshToken = refreshToken;
+        await TradelockerCredentials.db.updateRow(session, checkCred);
+      }
     } catch (e) {
       throw Exception('Failed to store/update credentials: $e');
     }
@@ -233,11 +240,32 @@ class TradeLockerEndpoint extends Endpoint {
     }
   }
 
-  Future< /*Map<String, dynamic>*/ String> getPositions(
+  Future<List<TradelockerPosition>> getPositions(
       Session session, int accountId, int accNum) async {
     await initializeClient(session, accNum: accNum);
 
     final response = await client.get('/trade/accounts/$accountId/positions');
+    print(response.data);
+    if (response.statusCode == 200) {
+      final positions = response.data['d']['positions'] as List<dynamic>;
+
+      return positions
+          .map((position) =>
+              TradeLockerExtension.fromJson(position as List<dynamic>))
+          .toList();
+    } else {
+      throw Exception(
+          'Failed to load data - Error code: ${response.statusCode}');
+    }
+  }
+
+  //Future<TradelockerIns
+
+  Future< /*Map<String, dynamic>*/ String> getOrders(
+      Session session, int accountId, int accNum) async {
+    await initializeClient(session, accNum: accNum);
+
+    final response = await client.get('/trade/accounts/$accountId/orders');
     if (response.statusCode == 200) {
       return response.data.toString();
     } else {
@@ -246,11 +274,41 @@ class TradeLockerEndpoint extends Endpoint {
     }
   }
 
-  Future< /*Map<String, dynamic>*/ String> getOrders(
+  Future<TradelockerInstrument> getInstrument(
+    Session session, int accNum, int instrumentId, int routeId) async {
+    await initializeClient(session, accNum: accNum);
+
+    final response = await client.get('/trade/instruments/$instrumentId?routeId=$routeId');
+    if (response.statusCode == 200) {
+        if (response.data != null && response.data['d'] != null) {
+            return TradelockerInstrument.fromJson(response.data['d']);
+        } else {
+            throw Exception('No data found for this instrument.');
+        }
+    } else {
+        throw Exception('Failed to load data - Error code: ${response.statusCode}');
+    }
+  }
+
+  Future<List<DisplayTrade>> getTrades(Session session, int accountId, int accNum) async {
+    final positions = await getPositions(session, accountId, accNum);
+
+    var trades = <DisplayTrade>[];
+    for (var position in positions) {
+      await Future.delayed(Duration(milliseconds: 500));
+
+      var instrument = await getInstrument(session, accNum, position.tradableInstrumentId, position.routeId);
+      trades.add(TradeExtension.fromTradelocker(position, instrument));
+    }
+
+    return trades;
+  }
+
+  Future< /*Map<String, dynamic>*/ String> getConfig(
       Session session, int accountId, int accNum) async {
     await initializeClient(session, accNum: accNum);
 
-    final response = await client.get('/trade/accounts/$accountId/orders');
+    final response = await client.get('/trade/config');
     if (response.statusCode == 200) {
       return response.data.toString();
     } else {

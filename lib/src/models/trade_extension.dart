@@ -28,4 +28,24 @@ extension TradeExtension on DisplayTrade {
       netroi: netroi,
     );
   }
+
+  static DisplayTrade fromTradelocker(TradelockerPosition position, TradelockerInstrument instrument) {
+    // Assuming 'open' if position is unrealized, otherwise could check a close date if available
+    String status = position.unrealizedPl != 0 ? 'open' : 'closed';
+
+    // Calculate the net profit/loss
+    double netpl = position.unrealizedPl;
+
+    // Calculate ROI: netpl / (avgPrice * quantity)
+    double netroi = netpl / (position.avgPrice * position.quantity);
+
+    return DisplayTrade(
+      openTime: position.openDate,
+      symbol: instrument.name,
+      direction: position.side,
+      status: status,
+      netpl: netpl,
+      netroi: netroi,
+    );
+  }
 }

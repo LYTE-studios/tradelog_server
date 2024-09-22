@@ -1,0 +1,8 @@
+class: TickSize
+
+fields:
+    leftRangeLimit: double?
+    # Left range limit for tick size.
+
+    tickSize: double?
+    # The size of a single tick.
