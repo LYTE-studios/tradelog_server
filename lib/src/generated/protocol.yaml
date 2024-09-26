@@ -24,6 +24,12 @@ tradeLocker:
   - getAccounts:
   - getPositions:
   - getOrders:
+  - getOrdersHistory:
   - getInstrument:
+  - getPositionsWithRateLimit:
+  - getOrdersHistoryWithRateLimit:
+  - getSymbolFromInstrumentIdWithRateLimit:
   - getTrades:
+  - getExecutions:
+  - getState:
   - getConfig:
