@@ -1,6 +1,8 @@
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 import 'package:serverpod/serverpod.dart';
+import 'package:tradelog_server/src/clients/mail_client.dart';
+import 'package:tradelog_server/src/clients/rate_limiter.dart';
 
 import 'package:tradelog_server/src/web/routes/root.dart';
 
@@ -26,58 +28,73 @@ void run(List<String> args) async {
   auth.AuthConfig.set(auth.AuthConfig(
     sendValidationEmail: (session, email, validationCode) async {
       // Retrieve the credentials
-      final gmailEmail = session.serverpod.getPassword('gmailEmail')!;
-      final gmailPassword = session.serverpod.getPassword('gmailPassword')!;
+      // final gmailEmail = session.serverpod.getPassword('gmailEmail')!;
+      // final gmailPassword = session.serverpod.getPassword('gmailPassword')!;
 
-      // Create a SMTP client for Gmail.
-      final smtpServer = gmail(gmailEmail, gmailPassword);
+      // // Create a SMTP client for Gmail.
+      // final smtpServer = gmail(gmailEmail, gmailPassword);
 
-      // Create an email message with the validation code.
-      final message = Message()
-        ..from = Address(gmailEmail)
-        ..recipients.add(email)
-        ..subject = 'Verification code for Serverpod'
-        ..html = 'Your verification code is: $validationCode';
+      // // Create an email message with the validation code.
+      // final message = Message()
+      //   ..from = Address(gmailEmail)
+      //   ..recipients.add(email)
+      //   ..subject = 'Verification code for Serverpod'
+      //   ..html = 'Your verification code is: $validationCode';
 
-      // Send the email message.
-      try {
-        await send(message, smtpServer);
-      } catch (_) {
-        // Return false if the email could not be sent.
-        return false;
-      }
+      // // Send the email message.
+      // try {
+      //   await send(message, smtpServer);
+      // } catch (_) {
+      //   // Return false if the email could not be sent.
+      //   return false;
+      // }
 
-      return true;
+      // return true;
+
+      final mailClient = MailClient(
+        session.serverpod.getPassword('mailjetApiKey')!,
+        session.serverpod.getPassword('mailjetSecretKey')!,
+      );
+
+      return mailClient.sendVerificationEmail(email, validationCode);
     },
     sendPasswordResetEmail: (session, userInfo, validationCode) async {
-      // Retrieve the credentials
-      final gmailEmail = session.serverpod.getPassword('gmailEmail')!;
-      final gmailPassword = session.serverpod.getPassword('gmailPassword')!;
+      // // Retrieve the credentials
+      // final gmailEmail = session.serverpod.getPassword('gmailEmail')!;
+      // final gmailPassword = session.serverpod.getPassword('gmailPassword')!;
 
-      // Create a SMTP client for Gmail.
-      final smtpServer = gmail(gmailEmail, gmailPassword);
+      // // Create a SMTP client for Gmail.
+      // final smtpServer = gmail(gmailEmail, gmailPassword);
 
-      // Create an email message with the password reset link.
-      final message = Message()
-        ..from = Address(gmailEmail)
-        ..recipients.add(userInfo.email!)
-        ..subject = 'Password reset link for Serverpod'
-        ..html = 'Here is your password reset code: $validationCode>';
+      // // Create an email message with the password reset link.
+      // final message = Message()
+      //   ..from = Address(gmailEmail)
+      //   ..recipients.add(userInfo.email!)
+      //   ..subject = 'Password reset link for Serverpod'
+      //   ..html = 'Here is your password reset code: $validationCode>';
 
-      // Send the email message.
-      try {
-        await send(message, smtpServer);
-      } catch (_) {
-        // Return false if the email could not be sent.
-        return false;
-      }
+      // // Send the email message.
+      // try {
+      //   await send(message, smtpServer);
+      // } catch (_) {
+      //   // Return false if the email could not be sent.
+      //   return false;
+      // }
 
-      return true;
+      // return true;
+
+      final mailClient = MailClient(
+        session.serverpod.getPassword('mailjetApiKey')!,
+        session.serverpod.getPassword('mailjetSecretKey')!,
+      );
+
+      return mailClient.sendPasswordResetEmail(userInfo.email!, validationCode);
     },
   ));
 
   // If you are using any future calls, they need to be registered here.
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
+  final RateLimiter rateLimiter = RateLimiter(maxRequestsPerSecond: 2);
 
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
