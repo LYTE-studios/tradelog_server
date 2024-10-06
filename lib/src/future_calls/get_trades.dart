@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
 
 // Future calls are calls that will be invoked at a later time. An example is if
 // you want to send a drip-email campaign after a user signs up. You can
@@ -11,9 +12,16 @@ import 'package:serverpod/serverpod.dart';
 //  methods. You can optionally pass a serializable object together with the
 //  call.
 
-class ExampleFutureCall extends FutureCall {
-  @override
-  Future<void> invoke(Session session, SerializableModel? object) async {
-    // Do something interesting in the future here.
-  }
-}
+// class GetTradesCall extends FutureCall {
+//   // @override
+//   // Future<void> invoke(Session session, SerializableModel? object) async {
+//   //    // Cast the SerializableModel to a map or any object type you passed
+//   //   var data = object as Map<String, dynamic>;
+
+//   //   int accountId = data['accountId'];
+//   //   int accNum = data['accNum'];
+
+//   //   // Fetch the trades
+//   //   var trades = await session.server.endpoints.connectors.
+//   // }
+// }

@@ -3,6 +3,8 @@ import 'package:mailer/smtp_server/gmail.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/mail_client.dart';
 import 'package:tradelog_server/src/clients/rate_limiter.dart';
+import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
+import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
 
 import 'package:tradelog_server/src/web/routes/root.dart';
 
@@ -46,9 +48,10 @@ void run(List<String> args) async {
     },
   ));
 
+  final RequestQueue tradelockerRequestQueue = RequestQueue(maxRequestsPerSecond: 2);
+  TradeLockerEndpoint.requestQueue = tradelockerRequestQueue;
   // If you are using any future calls, they need to be registered here.
   // pod.registerFutureCall(ExampleFutureCall(), 'exampleFutureCall');
-  final RateLimiter rateLimiter = RateLimiter(maxRequestsPerSecond: 2);
 
   // Setup a default page at the web root.
   pod.webServer.addRoute(RouteRoot(), '/');
