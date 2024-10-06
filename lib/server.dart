@@ -2,7 +2,6 @@ import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server/gmail.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/mail_client.dart';
-import 'package:tradelog_server/src/clients/rate_limiter.dart';
 import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
 import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
 

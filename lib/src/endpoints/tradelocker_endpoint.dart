@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
-import 'package:tradelog_server/src/clients/rate_limiter.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/models/trade_extension.dart';
