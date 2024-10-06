@@ -1,0 +1,36 @@
+class: TradelockerPosition
+fields:
+  id: String
+  # Unique identifier of the position.
+
+  tradableInstrumentId: int
+  # Unique identifier of the tradable instrument.
+
+  routeId: int
+  # Unique identifier of the route.
+
+  side: String
+  # Side of the position.
+
+  quantity: double
+  # Quantity of the position.
+
+  avgPrice: double
+  # Average price of the position.
+
+  stopLossId: String?
+  # Unique identifier of the stop loss order.
+
+  takeProfitId: String?
+  # Unique identifier of the take profit order.
+
+  openDate: DateTime
+  # Date when the position was opened.
+
+  unrealizedPl: double
+  # Unrealized profit or loss of the position.
+
+  strategyId: String?
+  # Unique identifier of the strategy.
+
+

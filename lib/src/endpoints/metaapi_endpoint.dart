@@ -4,7 +4,8 @@ import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/metaapi_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
-import 'package:tradelog_server/src/models/trade_extension.dart' show TradeExtension;
+import 'package:tradelog_server/src/models/trade_extension.dart'
+    show TradeExtension;
 
 class MetaApiEndpoint extends Endpoint {
   @override
@@ -135,7 +136,8 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
-  Future<List<DisplayTrade>> getTrades(Session session, String accountId) async {
+  Future<List<DisplayTrade>> getTrades(
+      Session session, String accountId) async {
     await initializeClient(session);
 
     final response =
@@ -172,7 +174,7 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
-    /// Retrieves the history of orders for the specified MetaTrader account within the given time range.
+  /// Retrieves the history of orders for the specified MetaTrader account within the given time range.
   /// Initializes the MetaApiClient if not already initialized.
   /// Returns the history orders as a string if successful, otherwise throws an exception.
   Future<String> getHistoryOrdersByTime(Session session, String accountId,

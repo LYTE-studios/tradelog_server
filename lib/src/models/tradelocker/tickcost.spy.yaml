@@ -1,0 +1,8 @@
+class: TickCost
+
+fields:
+    leftRangeLimit: double?
+    # Left range limit for tick cost.
+
+    tickCost: double?
+    # The cost of a single tick.

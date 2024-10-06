@@ -9,9 +9,14 @@ metaApi:
   - getTrades:
   - getOrders:
   - getHistoryOrdersByTime:
+note:
+  - addNote:
+  - deleteNote:
+  - updateNote:
+  - getNotes:
 trade:
   - addTrade:
-  - unlinkAccount:
+  - deleteTrade:
 tradeLocker:
   - initializeClient:
   - authenticate:
@@ -19,3 +24,12 @@ tradeLocker:
   - getAccounts:
   - getPositions:
   - getOrders:
+  - getOrdersHistory:
+  - getInstrument:
+  - getPositionsWithRateLimit:
+  - getOrdersHistoryWithRateLimit:
+  - getSymbolFromInstrumentIdWithRateLimit:
+  - getTrades:
+  - getExecutions:
+  - getState:
+  - getConfig:

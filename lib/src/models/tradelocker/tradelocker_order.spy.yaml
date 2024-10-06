@@ -1,0 +1,67 @@
+class: TradelockerOrder
+fields:
+  id: String
+  # Unique identifier of the order.
+
+  tradableInstrumentId: int
+  # Unique identifier of the tradable instrument.
+
+  routeId: int
+  # Unique identifier of the route.
+
+  qty: double
+  # Quantity of the order.
+
+  side: String
+  # Side of the order (e.g., Buy or Sell).
+
+  type: String
+  # Type of the order (e.g., Market, Limit).
+
+  status: String
+  # Current status of the order (e.g., Filled, Pending).
+
+  filledQty: double
+  # Quantity of the order that has been filled.
+
+  avgPrice: double
+  # Average price at which the order has been filled.
+
+  price: double
+  # Price at which the order was placed.
+
+  stopPrice: double?
+  # Stop price for Stop Loss or Stop Limit orders.
+
+  validity: String
+  # Validity of the order (e.g., Day, Good Till Canceled).
+
+  expireDate: DateTime?
+  # Expiration date of the order, if applicable.
+
+  createdDate: DateTime
+  # Date when the order was created.
+
+  lastModified: DateTime
+  # Date when the order was last modified.
+
+  isOpen: bool
+  # Whether the order is still open.
+
+  positionId: String?
+  # Identifier of the associated position, if applicable.
+
+  stopLoss: double?
+  # Stop Loss value for the order, if applicable.
+
+  stopLossType: String?
+  # Type of Stop Loss (e.g., Trailing, Fixed).
+
+  takeProfit: double?
+  # Take Profit value for the order, if applicable.
+
+  takeProfitType: String?
+  # Type of Take Profit (e.g., Trailing, Fixed).
+
+  strategyId: String?
+  # Unique identifier of the strategy associated with the order.
