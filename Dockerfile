@@ -8,7 +8,7 @@ RUN dart compile exe bin/main.dart -o bin/server
 
 FROM alpine:latest
 
-ENV runmode=production
+ENV runmode=development
 ENV serverid=default
 ENV logging=normal
 ENV role=monolith
@@ -20,6 +20,5 @@ COPY --from=build /app/web/ web/
 
 EXPOSE 8080
 EXPOSE 8081
-EXPOSE 8082
 
 ENTRYPOINT ./server --mode=$runmode --server-id=$serverid --logging=$logging --role=$role
