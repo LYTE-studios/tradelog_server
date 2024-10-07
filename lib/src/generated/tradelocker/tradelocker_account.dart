@@ -12,17 +12,17 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i2;
 
-abstract class TradelockerCredentials extends _i1.TableRow
-    implements _i1.ProtocolSerialization {
+abstract class TradelockerCredentials
+    implements _i1.TableRow, _i1.ProtocolSerialization {
   TradelockerCredentials._({
-    int? id,
+    this.id,
     required this.email,
     required this.password,
     required this.server,
     this.refreshToken,
     required this.userId,
     this.user,
-  }) : super(id);
+  });
 
   factory TradelockerCredentials({
     int? id,
@@ -53,6 +53,9 @@ abstract class TradelockerCredentials extends _i1.TableRow
   static final t = TradelockerCredentialsTable();
 
   static const db = TradelockerCredentialsRepository._();
+
+  @override
+  int? id;
 
   String email;
 
