@@ -29,7 +29,7 @@ class RequestQueue {
       final EndpointRequest request = _queue.removeFirst();
       
       // Process the main request and its sub-requests
-      await _processRequestWithSubRequests(request);
+      await _processRequest(request);
 
       // Wait to respect the 2 requests per second limit before moving to the next one
       await Future.delayed(delayBetweenRequests);
@@ -39,7 +39,7 @@ class RequestQueue {
   }
 
   // Process a request with its sub-requests
-  Future<void> _processRequestWithSubRequests(EndpointRequest request) async {
+  Future<void> _processRequest(EndpointRequest request) async {
     try {
       await _handleRequestWithRateLimit(request); // Process the request
     } catch (e) {
@@ -82,17 +82,9 @@ class RequestQueue {
 class EndpointRequest {
   final int priority;
   final Future<void> Function() request;
-  final int subRequestsCount;
-  final Future<void> Function()? subRequest;
-  final Duration subRequestDelay;
-  final bool hasSubRequests;
 
   EndpointRequest({
     required this.priority,
     required this.request,
-    this.subRequestsCount = 0,
-    this.subRequest,
-    this.subRequestDelay = const Duration(milliseconds: 500), // Default sub-request delay
-    this.hasSubRequests = false,
   });
 }
