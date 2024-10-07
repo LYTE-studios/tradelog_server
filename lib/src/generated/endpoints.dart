@@ -1,11 +1,12 @@
 /* AUTOMATICALLY GENERATED CODE DO NOT MODIFY */
 /*   To generate run: "serverpod generate"    */
 
-// ignore_for_file: library_private_types_in_public_api
-// ignore_for_file: public_member_api_docs
 // ignore_for_file: implementation_imports
-// ignore_for_file: use_super_parameters
+// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: non_constant_identifier_names
+// ignore_for_file: public_member_api_docs
 // ignore_for_file: type_literal_in_constant_pattern
+// ignore_for_file: use_super_parameters
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
@@ -417,18 +418,8 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
                   .refresh(session),
         ),
-        'getAccounts': _i1.MethodConnector(
-          name: 'getAccounts',
-          params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
-                  .getAccounts(session),
-        ),
-        'getPositions': _i1.MethodConnector(
-          name: 'getPositions',
+        'getTrades': _i1.MethodConnector(
+          name: 'getTrades',
           params: {
             'accountId': _i1.ParameterDescription(
               name: 'accountId',
@@ -445,91 +436,10 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
-                  .getPositions(
+              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint).getTrades(
             session,
             params['accountId'],
             params['accNum'],
-          ),
-        ),
-        'getOrders': _i1.MethodConnector(
-          name: 'getOrders',
-          params: {
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint).getOrders(
-            session,
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
-        'getOrdersHistory': _i1.MethodConnector(
-          name: 'getOrdersHistory',
-          params: {
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
-                  .getOrdersHistory(
-            session,
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
-        'getInstrument': _i1.MethodConnector(
-          name: 'getInstrument',
-          params: {
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'instrumentId': _i1.ParameterDescription(
-              name: 'instrumentId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'routeId': _i1.ParameterDescription(
-              name: 'routeId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
-                  .getInstrument(
-            session,
-            params['accNum'],
-            params['instrumentId'],
-            params['routeId'],
           ),
         ),
         'getPositionsWithRateLimit': _i1.MethodConnector(
@@ -577,134 +487,6 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
                   .getOrdersHistoryWithRateLimit(
-            session,
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
-        'getSymbolFromInstrumentIdWithRateLimit': _i1.MethodConnector(
-          name: 'getSymbolFromInstrumentIdWithRateLimit',
-          params: {
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'instrumentId': _i1.ParameterDescription(
-              name: 'instrumentId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'routeId': _i1.ParameterDescription(
-              name: 'routeId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
-                  .getSymbolFromInstrumentIdWithRateLimit(
-            session,
-            params['accNum'],
-            params['instrumentId'],
-            params['routeId'],
-          ),
-        ),
-        'getTrades': _i1.MethodConnector(
-          name: 'getTrades',
-          params: {
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint).getTrades(
-            session,
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
-        'getExecutions': _i1.MethodConnector(
-          name: 'getExecutions',
-          params: {
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
-                  .getExecutions(
-            session,
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
-        'getState': _i1.MethodConnector(
-          name: 'getState',
-          params: {
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint).getState(
-            session,
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
-        'getConfig': _i1.MethodConnector(
-          name: 'getConfig',
-          params: {
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint).getConfig(
             session,
             params['accountId'],
             params['accNum'],

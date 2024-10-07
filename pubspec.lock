@@ -74,7 +74,7 @@ packages:
     source: hosted
     version: "1.1.1"
   collection:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: collection
       sha256: a1ace0a119f20aabc852d165077c036cd864315bd99b7eaa10a60100341941bf
@@ -357,34 +357,34 @@ packages:
     dependency: "direct main"
     description:
       name: serverpod
-      sha256: "45a33dc9cc25f3d70b41dea1e52c9bcfa9ecd7e93735c61d7d450c1eed19e45d"
+      sha256: f9c1e29303634d448e8f4e2d1f9add016d9b8839041eae81a9445499a054a29a
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.2"
   serverpod_auth_server:
     dependency: "direct main"
     description:
       name: serverpod_auth_server
-      sha256: "012b1728af35667859886d953625b58c9388403c4b8057ee2de8e05b99ebb6bb"
+      sha256: "6a0429452ece620865270b54a948a63d1373643a9bf531861591cc3ac3ab41b1"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.2"
   serverpod_serialization:
     dependency: transitive
     description:
       name: serverpod_serialization
-      sha256: e700eb909a03de7220540f92372b515c84b960eeefd954fd81851f57f03d5970
+      sha256: "3cb991546d6a44710df28676b6e274a5a16bbebf722397e75b9217c7ea7d795e"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.2"
   serverpod_shared:
     dependency: transitive
     description:
       name: serverpod_shared
-      sha256: f6742eadae5dac9a7b596b800b929101c560725956825b7a4437a400966e69f3
+      sha256: "0d12469c66854c899882877eeecf7f5c24027bf67ab3ca5f0ca9f2e0f9b30213"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.2"
+    version: "2.1.2"
   source_span:
     dependency: transitive
     description:
@@ -434,7 +434,7 @@ packages:
     source: hosted
     version: "1.0.3"
   synchronized:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: synchronized
       sha256: "539ef412b170d65ecdafd780f924e5be3f60032a1128df156adad6c5b373d558"
