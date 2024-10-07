@@ -21,15 +21,6 @@ tradeLocker:
   - initializeClient:
   - authenticate:
   - refresh:
-  - getAccounts:
-  - getPositions:
-  - getOrders:
-  - getOrdersHistory:
-  - getInstrument:
+  - getTrades:
   - getPositionsWithRateLimit:
   - getOrdersHistoryWithRateLimit:
-  - getSymbolFromInstrumentIdWithRateLimit:
-  - getTrades:
-  - getExecutions:
-  - getState:
-  - getConfig:
