@@ -10,9 +10,9 @@ extension MailjetTemplatesExtension on MailjetTemplates {
   int getTemplateId() {
     switch (this) {
       case MailjetTemplates.emailVerification:
-        return 000;
+        return 6362477;
       case MailjetTemplates.passwordReset:
-        return 000;
+        return 6362477;
     }
   }
 }
@@ -74,8 +74,7 @@ class MailClient {
   ) async {
     try {
       _sendTemplatedMail(
-        // TODO: Set the template id
-        templateId: 000,
+        templateId: MailjetTemplates.emailVerification.getTemplateId(),
         receiverEmail: email,
         variables: {
           'code': verificationCode,
@@ -95,8 +94,7 @@ class MailClient {
   ) async {
     try {
       _sendTemplatedMail(
-        // TODO: Set the template id
-        templateId: 000,
+        templateId: MailjetTemplates.passwordReset.getTemplateId(),
         receiverEmail: email,
         variables: {
           'code': resetCode,

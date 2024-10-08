@@ -43,6 +43,6 @@ database:
 # connect on the public IP of the database e.g. redis.examplepod.com.
 # This is the setup for Redis.
 redis:
-  enabled: false
-  host: localhost
-  port: 8091
+  enabled: true
+  host: 127.0.0.1
+  port: 6379
