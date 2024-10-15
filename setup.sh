@@ -9,8 +9,10 @@ cd tradelog_server
 git checkout acceptance
 
 sudo touch config/passwords.yaml
+sudo touch config/google_client_secret.json
 
 sudo cp ../passwords.yaml config/passwords.yaml
+sudo cp ../google_client_secret.json config/google_client_secret.json
 
 sudo docker compose up -d --build
 

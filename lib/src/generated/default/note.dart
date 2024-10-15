@@ -12,14 +12,14 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i2;
 
-abstract class Note extends _i1.TableRow implements _i1.ProtocolSerialization {
+abstract class Note implements _i1.TableRow, _i1.ProtocolSerialization {
   Note._({
-    int? id,
+    this.id,
     required this.content,
     required this.userId,
     this.user,
     required this.date,
-  }) : super(id);
+  });
 
   factory Note({
     int? id,
@@ -45,6 +45,9 @@ abstract class Note extends _i1.TableRow implements _i1.ProtocolSerialization {
   static final t = NoteTable();
 
   static const db = NoteRepository._();
+
+  @override
+  int? id;
 
   String content;
 
