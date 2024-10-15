@@ -7,8 +7,7 @@ services:
       - 8081
   redis:
     image: redis:6.2.6
-    ports:
-      - '8091:6379'
-    command: redis-server --requirepass "A1VvFRBq9GCCPsYnkRhCz_BDASxgTS2L"
+    network_mode: "host"
+    command: redis-server
     environment:
       - REDIS_REPLICATION_MODE=master
