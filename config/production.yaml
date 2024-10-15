@@ -14,7 +14,7 @@ apiServer:
 # Configuration for the Insights server.
 insightsServer:
   port: 8081
-  publicHost: api.tradely.lytestudios.be
+  publicHost: insights.tradely.lytestudios.be
   publicPort: 443
   publicScheme: https
 
@@ -25,17 +25,12 @@ webServer:
   publicPort: 443
   publicScheme: https
 
-# This is the database setup for your servers. The default for the Google Cloud
-# Engine Terraform configuration is to connect on a private IP address.
-# If you are connecting on a public IP (e.g. on AWS or Google Cloud Run), you
-# connect on the public IP of the database e.g. database.examplepod.com.
-
-# TODO Change to production db
 database:
-  host: localhost
-  port: 8090
-  name: tradelog
+  host: database.tradely.lytestudios.be
+  port: 5432
+  name: lytestudios_api_tradely
   user: postgres
+  requireSsl: true
 
 # This is the setup for Redis. The default for the Google Cloud Engine Terraform
 # configuration is to connect on a private IP address.

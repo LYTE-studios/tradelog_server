@@ -1,0 +1,1 @@
+dart run bin/main.dart --apply-migrations --mode production --role maintenance

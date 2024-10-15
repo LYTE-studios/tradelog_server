@@ -445,9 +445,9 @@ ALTER TABLE ONLY "serverpod_query_log"
 -- MIGRATION VERSION FOR tradelog
 --
 INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
-    VALUES ('tradelog', '20240921173515357', now())
+    VALUES ('tradelog', '20241015095619252', now())
     ON CONFLICT ("module")
-    DO UPDATE SET "version" = '20240921173515357', "timestamp" = now();
+    DO UPDATE SET "version" = '20241015095619252', "timestamp" = now();
 
 --
 -- MIGRATION VERSION FOR serverpod
