@@ -1,3 +1,5 @@
+sudo docker system prune
+
 sudo apt install git
 
 sudo rm -r tradelog_server
@@ -5,8 +7,6 @@ sudo rm -r tradelog_server
 git clone https://lyte-manager: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@github.com/LYTE-studios/tradelog_server
 
 cd tradelog_server
-
-git checkout acceptance
 
 sudo touch config/passwords.yaml
 sudo touch config/google_client_secret.json
