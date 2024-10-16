@@ -19,7 +19,7 @@ extension MailjetTemplatesExtension on MailjetTemplates {
 
 class MailClient {
   final Dio _dio;
-  static const String myEmail = 'hello@tradely.io';
+  static const String myEmail = 'lucas@lytestudios.be';
 
   MailClient(String apiKey, String secretKey)
       : _dio = Dio(
