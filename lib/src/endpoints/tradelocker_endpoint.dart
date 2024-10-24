@@ -23,41 +23,13 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Future<void> initializeClient(
-    Session session, {
+    Session session,
+    String apiKey, {
     int accNum = -1,
   }) async {
-    var authenticated = await session.authenticated;
-    var accessToken = await session.caches.localPrio
-        .get<AccessToken>('tradelocker-${authenticated!.userId}');
-
-    if (accessToken != null) {
-      client = TradeLockerClient(
-        Configuration.tradelockerURI,
-        accessToken.token,
-        accNum: accNum == -1 ? '' : accNum.toString(),
-      );
-      return;
-    }
-
-    var linkedAccount = await LinkedAccount.db.findFirstRow(
-      session,
-      where: (o) =>
-          o.userInfoId.equals(authenticated.userId) &
-          o.platform.equals(Platform.Tradelocker),
-    );
-
-    if (linkedAccount == null) {
-      throw Exception('Access token not found in cache/No account linked');
-    }
-
-    accessToken = AccessToken(token: linkedAccount.apiKey);
-
-    await session.caches.localPrio
-        .put('tradelocker-${authenticated.userId}', accessToken);
-
     client = TradeLockerClient(
       Configuration.tradelockerURI,
-      accessToken.token,
+      apiKey,
       accNum: accNum == -1 ? '' : accNum.toString(),
     );
   }
@@ -102,7 +74,7 @@ class TradeLockerEndpoint extends Endpoint {
       throw Exception('Credentials not found');
     }
 
-    await initializeClient(session);
+    await initializeClient(session, "");
 
     final response = await client.post(
       '/auth/jwt/refresh',
@@ -114,12 +86,9 @@ class TradeLockerEndpoint extends Endpoint {
           as Map<String, dynamic>; // Ensure response data is a map
       final accessToken = data['accessToken'] as String;
 
-      await session.caches.localPrio.put('tradelocker-${authenticated!.userId}',
-          AccessToken(token: accessToken));
-
       var linkedAccount = await LinkedAccount.db.findFirstRow(
         session,
-        where: (o) => o.userInfoId.equals(authenticated.userId),
+        where: (o) => o.userInfoId.equals(authenticated!.userId),
       );
 
       if (linkedAccount != null) {
@@ -133,16 +102,68 @@ class TradeLockerEndpoint extends Endpoint {
     }
   }
 
+  Future<List<DisplayTrade>> getAllTrades(Session session) async {
+    // Ensure the user is authenticated
+    var authenticated = await session.authenticated;
+
+    // Fetch linked accounts for the user with platform == Platform.Tradelocker
+    var linkedAccounts = await LinkedAccount.db.find(
+      session,
+      where: (o) =>
+          o.userInfoId.equals(authenticated!.userId) &
+          o.platform.equals(Platform.Tradelocker),
+    );
+
+    List<DisplayTrade> allTrades = [];
+
+    for (var linkedAccount in linkedAccounts) {
+      if (linkedAccount.tradelockerAccountId == null ||
+          linkedAccount.tradelockerAccounts == null) {
+        throw Exception('No subaccounts found');
+      }
+
+      String apiKey = linkedAccount.apiKey;
+      final accountIds = linkedAccount.tradelockerAccountId!;
+      final accountNumbers = linkedAccount.tradelockerAccounts!;
+
+      // Ensure accountIds and accountNumbers have the same length
+      if (accountIds.length != accountNumbers.length) {
+        throw Exception('Mismatch between account IDs and account numbers');
+      }
+
+      for (int i = 0; i < accountIds.length; i++) {
+        var accountId = int.parse(accountIds[i]) ;
+        var accountNumber = int.parse(accountNumbers[i]);
+
+        // Call getTrades for this account
+        try {
+          List<DisplayTrade> trades =
+              await getTrades(session, apiKey, accountId, accountNumber);
+          allTrades.addAll(trades);
+        } catch (e) {
+          // Handle errors for this account and continue
+          print('Error fetching trades for account $accountId: $e');
+          continue;
+        }
+      }
+    }
+
+    // Optionally, sort the trades by openTime
+    allTrades.sort((a, b) => a.openTime.compareTo(b.openTime));
+
+    return allTrades;
+  }
+
   Future<List<DisplayTrade>> getTrades(
-      Session session, int accountId, int accNum) async {
+      Session session, String apiKey, int accountId, int accNum) async {
     // Initialize client for the current session
-    await initializeClient(session, accNum: accNum);
+    await initializeClient(session, apiKey, accNum: accNum);
 
     // Fetch positions and orders from the external API (rate-limited)
     final positions =
-        await _getPositionsWithRateLimit(session, accountId, accNum);
+        await _getPositionsWithRateLimit(session, apiKey, accountId, accNum);
     final orders =
-        await getOrdersHistoryWithRateLimit(session, accountId, accNum);
+        await getOrdersHistoryWithRateLimit(session, apiKey, accountId, accNum);
 
     // Map orders to their respective positions
     final Map<String, List<TradelockerOrder>> ordersByPosition =
@@ -152,10 +173,10 @@ class TradeLockerEndpoint extends Endpoint {
     final openPositionIds = positions.map((position) => position.id).toSet();
 
     // Wait for both open and closed trades to complete
-    final List<DisplayTrade> openTrades = await _processPositions(
-                session, positions, ordersByPosition, accNum);
+    final List<DisplayTrade> openTrades =
+        await _processPositions(session, positions, ordersByPosition, accNum);
     final List<DisplayTrade> closedTrades = await _processClosedPositions(
-                session, ordersByPosition, openPositionIds, accNum);
+        session, ordersByPosition, openPositionIds, accNum);
 
     // Return the combined list of open and closed trades
     return [...openTrades, ...closedTrades];
@@ -201,8 +222,9 @@ class TradeLockerEndpoint extends Endpoint {
             totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
 
         // Fetch symbol for closed position
-        final symbol = Instrument.instrumentMap[firstOrder.tradableInstrumentId] ??
-          'unknown';
+        final symbol =
+            Instrument.instrumentMap[firstOrder.tradableInstrumentId] ??
+                'unknown';
 
         // Create a DisplayTrade object for the closed position
         trades.add(DisplayTrade(
@@ -283,8 +305,8 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Future<List<TradelockerPosition>> _getPositionsWithRateLimit(
-      Session session, int accountId, int accNum) async {
-    await initializeClient(session, accNum: accNum);
+      Session session, String apiKey, int accountId, int accNum) async {
+    await initializeClient(session, apiKey, accNum: accNum);
 
     final positionsFuture = Completer<List<TradelockerPosition>>();
     requestQueue.addRequest(
@@ -311,8 +333,8 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Future<List<TradelockerOrder>> getOrdersHistoryWithRateLimit(
-      Session session, int accountId, int accNum) async {
-    await initializeClient(session, accNum: accNum);
+      Session session, String apiKey, int accountId, int accNum) async {
+    await initializeClient(session, apiKey, accNum: accNum);
 
     final ordersFuture = Completer<List<TradelockerOrder>>();
     requestQueue.addRequest(
@@ -441,19 +463,66 @@ class TradeLockerEndpoint extends Endpoint {
         where: (o) => o.userInfoId.equals(userId),
       );
 
+      final accounts = await getAccounts(session, accessToken);
+      List<String> accountIds = accounts.map((x) => x.id).toList();
+      List<String> accountNumbers = accounts.map((x) => x.accNum).toList();
+
       if (checkLinked == null) {
         var linkedAccount = LinkedAccount(
           userInfoId: userId,
           apiKey: accessToken,
           platform: Platform.Tradelocker,
+          tradelockerAccountId: accountIds,
+          tradelockerAccounts: accountNumbers,
         );
         await LinkedAccount.db.insertRow(session, linkedAccount);
       } else {
         checkLinked.apiKey = accessToken;
+        checkLinked.tradelockerAccountId = accountIds;
+        checkLinked.tradelockerAccounts = accountNumbers;
         await LinkedAccount.db.updateRow(session, checkLinked);
       }
     } catch (e) {
       throw Exception('Failed to manage linked account: $e');
     }
+  }
+
+  Future<List<TradelockerAccountInformation>> getAccounts(
+      Session session, String apiKey) async {
+
+    await initializeClient(session, apiKey);
+
+    final accountsFuture = Completer<List<TradelockerAccountInformation>>();
+    requestQueue.addRequest(
+      EndpointRequest(
+        priority: 1,
+        request: () async {
+          try {
+            final response = await client.get('/auth/jwt/all-accounts');
+
+            // Check if 'accounts' key exists in the response data
+            if (response.data == null ||
+                !response.data.containsKey('accounts')) {
+              throw Exception('Missing accounts key in response');
+            }
+            print(response.data.toString());
+
+            var accountsData = response.data['accounts'];
+
+            // Map accounts data to TradelockerAccountInformation objects
+            accountsFuture.complete(List<TradelockerAccountInformation>.from(
+                accountsData
+                    .map((x) => TradelockerAccountInformation.fromJson(x))));
+
+          } catch (e) {
+            // Log the error before completing with an error
+            print("Error occurred in getAccounts: $e");
+            accountsFuture.completeError(e); // Complete with error if it fails
+          }
+        },
+      ),
+    );
+
+    return await accountsFuture.future;
   }
 }
