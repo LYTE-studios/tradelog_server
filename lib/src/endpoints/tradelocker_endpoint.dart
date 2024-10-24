@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/models/trade_extension.dart';
 import 'package:tradelog_server/src/models/tradelocker_extension.dart';
 import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
@@ -185,9 +184,10 @@ class TradeLockerEndpoint extends Endpoint {
             tradesFuture.completeError(e);
           }
         },
-        hasSubRequests: true, // There will be sub-requests to fetch symbols
-        subRequestsCount:
-            1, // Assuming each position requires one sub-request to get the symbol
+        hasSubRequests: true,
+        // There will be sub-requests to fetch symbols
+        subRequestsCount: 1,
+        // Assuming each position requires one sub-request to get the symbol
         subRequestDelay:
             Duration(milliseconds: 500), // Sub-requests rate-limited by 500ms
       ),
@@ -263,7 +263,7 @@ class TradeLockerEndpoint extends Endpoint {
   Future<String> _getSymbolFromInstrumentIdWithRateLimit(
       Session session, int accNum, int instrumentId, int routeId) async {
     final instrument =
-                await _getInstrument(session, accNum, instrumentId, routeId);
+        await _getInstrument(session, accNum, instrumentId, routeId);
     return instrument.name;
     // final symbolFuture = Completer<String>();
 
@@ -315,7 +315,7 @@ class TradeLockerEndpoint extends Endpoint {
           try {
             final response =
                 await client.get('/trade/accounts/$accountId/positions');
-            final positions = response.data['d']['positions'] as List<dynamic>;
+            final positions = (response.data['d'] ?? [])['positions'] ?? [];
             positionsFuture.complete(positions
                 .map((position) => TradeLockerExtension.positionFromJson(
                     position as List<dynamic>))
@@ -350,8 +350,7 @@ class TradeLockerEndpoint extends Endpoint {
             }
 
             // Extract and process the orders
-            final orders =
-                response.data['d']['ordersHistory'] as List<dynamic>?;
+            final orders = (response.data['d'] ?? [])['ordersHistory'] ?? [];
             if (orders == null) {
               throw Exception('No orders found in the response.');
             }
