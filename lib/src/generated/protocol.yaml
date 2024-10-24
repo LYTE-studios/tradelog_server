@@ -2,6 +2,9 @@ account:
   - fetchAccounts:
   - linkAccount:
   - unlinkAccount:
+file:
+  - getUploadDescription:
+  - verifyUpload:
 metaApi:
   - initializeClient:
   - authenticate:
