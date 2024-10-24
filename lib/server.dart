@@ -68,7 +68,7 @@ void run(List<String> args) async {
       public: true,
       region: 'us-east-1',
       bucket: 'tradely',
-      publicHost: 'tradely.s3.us-east-1.amazonaws.com',
+      publicHost: 'storage.tradely.lytestudios.be',
     ),
   );
 
