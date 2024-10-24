@@ -11,7 +11,7 @@ metaApi:
   - getOrders:
   - getHistoryOrdersByTime:
 note:
-  - addNote:
+  - getNoteForDate:
   - deleteNote:
   - updateNote:
   - getNotes:

@@ -266,12 +266,12 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'note',
       endpoint: endpoints['note']!,
       methodConnectors: {
-        'addNote': _i1.MethodConnector(
-          name: 'addNote',
+        'getNoteForDate': _i1.MethodConnector(
+          name: 'getNoteForDate',
           params: {
-            'note': _i1.ParameterDescription(
-              name: 'note',
-              type: _i1.getType<_i9.Note>(),
+            'date': _i1.ParameterDescription(
+              name: 'date',
+              type: _i1.getType<DateTime>(),
               nullable: false,
             )
           },
@@ -279,9 +279,9 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['note'] as _i4.NoteEndpoint).addNote(
+              (endpoints['note'] as _i4.NoteEndpoint).getNoteForDate(
             session,
-            params['note'],
+            params['date'],
           ),
         ),
         'deleteNote': _i1.MethodConnector(
