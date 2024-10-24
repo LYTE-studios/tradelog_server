@@ -315,11 +315,16 @@ class TradeLockerEndpoint extends Endpoint {
           try {
             final response =
                 await client.get('/trade/accounts/$accountId/positions');
-            final positions = (response.data['d'] ?? [])['positions'] ?? [];
-            positionsFuture.complete(positions
-                .map((position) => TradeLockerExtension.positionFromJson(
-                    position as List<dynamic>))
-                .toList());
+
+            try {
+              if (response.statusCode == 200 && response.data['d'] != null) {
+                final positions = (response.data['d'] ?? [])['positions'] ?? [];
+                positionsFuture.complete(positions
+                    .map((position) => TradeLockerExtension.positionFromJson(
+                        position as List<dynamic>))
+                    .toList());
+              }
+            } catch (e) {}
           } catch (e) {
             positionsFuture.completeError(
                 e); // Complete the future with an error if it fails
