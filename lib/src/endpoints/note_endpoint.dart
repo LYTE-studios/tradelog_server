@@ -14,7 +14,7 @@ class NoteEndpoint extends Endpoint {
 
     Note? note = (await Note.db.find(
       session,
-      where: (t) => t.date.equals(date),
+      where: (t) => t.date.equals(date) & t.userId.equals(info!.userId),
     ))
         .firstOrNull;
 
