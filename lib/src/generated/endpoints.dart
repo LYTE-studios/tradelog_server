@@ -442,31 +442,6 @@ class Endpoints extends _i1.EndpointDispatch {
             params['accNum'],
           ),
         ),
-        'getPositionsWithRateLimit': _i1.MethodConnector(
-          name: 'getPositionsWithRateLimit',
-          params: {
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
-                  .getPositionsWithRateLimit(
-            session,
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
         'getOrdersHistoryWithRateLimit': _i1.MethodConnector(
           name: 'getOrdersHistoryWithRateLimit',
           params: {

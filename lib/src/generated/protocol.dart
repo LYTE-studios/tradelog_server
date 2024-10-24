@@ -45,10 +45,8 @@ import 'package:tradelog_server/src/generated/default/display_trade.dart'
 import 'package:tradelog_server/src/generated/meta/meta_trader_order.dart'
     as _i31;
 import 'package:tradelog_server/src/generated/default/note.dart' as _i32;
-import 'package:tradelog_server/src/generated/tradelocker/tradelocker_position.dart'
-    as _i33;
 import 'package:tradelog_server/src/generated/tradelocker/tradelocker_order.dart'
-    as _i34;
+    as _i33;
 export 'access_token.dart';
 export 'default/display_trade.dart';
 export 'default/note.dart';
@@ -592,14 +590,9 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data as List).map((e) => deserialize<_i32.Note>(e)).toList()
           as dynamic;
     }
-    if (t == List<_i33.TradelockerPosition>) {
+    if (t == List<_i33.TradelockerOrder>) {
       return (data as List)
-          .map((e) => deserialize<_i33.TradelockerPosition>(e))
-          .toList() as dynamic;
-    }
-    if (t == List<_i34.TradelockerOrder>) {
-      return (data as List)
-          .map((e) => deserialize<_i34.TradelockerOrder>(e))
+          .map((e) => deserialize<_i33.TradelockerOrder>(e))
           .toList() as dynamic;
     }
     try {
