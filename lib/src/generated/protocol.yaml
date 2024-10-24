@@ -1,4 +1,5 @@
 account:
+  - fetchAccounts:
   - linkAccount:
   - unlinkAccount:
 metaApi:
@@ -14,6 +15,9 @@ note:
   - deleteNote:
   - updateNote:
   - getNotes:
+profile:
+  - updateProfile:
+  - getProfile:
 trade:
   - addTrade:
   - deleteTrade:

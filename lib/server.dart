@@ -22,24 +22,27 @@ void run(List<String> args) async {
   );
 
   // Configuration for sign in with email.
-  auth.AuthConfig.set(auth.AuthConfig(
-    sendValidationEmail: (session, email, validationCode) async {
-      final mailClient = MailClient(
-        session.serverpod.getPassword('mailjetApiKey')!,
-        session.serverpod.getPassword('mailjetSecretKey')!,
-      );
+  auth.AuthConfig.set(
+    auth.AuthConfig(
+      sendValidationEmail: (session, email, validationCode) async {
+        final mailClient = MailClient(
+          session.serverpod.getPassword('mailjetApiKey')!,
+          session.serverpod.getPassword('mailjetSecretKey')!,
+        );
 
-      return mailClient.sendVerificationEmail(email, validationCode);
-    },
-    sendPasswordResetEmail: (session, userInfo, validationCode) async {
-      final mailClient = MailClient(
-        session.serverpod.getPassword('mailjetApiKey')!,
-        session.serverpod.getPassword('mailjetSecretKey')!,
-      );
+        return mailClient.sendVerificationEmail(email, validationCode);
+      },
+      sendPasswordResetEmail: (session, userInfo, validationCode) async {
+        final mailClient = MailClient(
+          session.serverpod.getPassword('mailjetApiKey')!,
+          session.serverpod.getPassword('mailjetSecretKey')!,
+        );
 
-      return mailClient.sendPasswordResetEmail(userInfo.email!, validationCode);
-    },
-  ));
+        return mailClient.sendPasswordResetEmail(
+            userInfo.email!, validationCode);
+      },
+    ),
+  );
 
   final RequestQueue tradelockerRequestQueue =
       RequestQueue(maxRequestsPerSecond: 2);
