@@ -49,6 +49,8 @@ import 'package:tradelog_server/src/generated/meta/meta_trader_order.dart'
 import 'package:tradelog_server/src/generated/default/note.dart' as _i34;
 import 'package:tradelog_server/src/generated/tradelocker/tradelocker_order.dart'
     as _i35;
+import 'package:tradelog_server/src/generated/tradelocker/tradelocker_account_info.dart'
+    as _i34;
 export 'access_token.dart';
 export 'default/display_trade.dart';
 export 'default/note.dart';
@@ -113,6 +115,24 @@ class Protocol extends _i1.SerializationManagerServer {
           columnType: _i2.ColumnType.bigint,
           isNullable: false,
           dartType: 'protocol:Platform',
+        ),
+        _i2.ColumnDefinition(
+          name: 'tradelockerAccountId',
+          columnType: _i2.ColumnType.json,
+          isNullable: true,
+          dartType: 'List<String>?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'tradelockerAccounts',
+          columnType: _i2.ColumnType.json,
+          isNullable: true,
+          dartType: 'List<String>?',
+        ),
+        _i2.ColumnDefinition(
+          name: 'metaID',
+          columnType: _i2.ColumnType.text,
+          isNullable: true,
+          dartType: 'String?',
         ),
       ],
       foreignKeys: [
@@ -230,6 +250,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: false,
           dartType: 'int?',
           columnDefault: 'nextval(\'trade_id_seq\'::regclass)',
+        ),
+        _i2.ColumnDefinition(
+          name: 'platform',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
         ),
         _i2.ColumnDefinition(
           name: 'option',
@@ -634,7 +660,21 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i28.TradingRules?>()) {
       return (data != null ? _i28.TradingRules.fromJson(data) : null) as T;
     }
+
     if (t == List<_i29.StopLossThreshold>) {
+
+    if (t == _i1.getType<List<String>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<String>(e)).toList()
+          : null) as dynamic;
+    }
+    if (t == _i1.getType<List<String>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<String>(e)).toList()
+          : null) as dynamic;
+    }
+    if (t == List<_i28.StopLossThreshold>) {
+
       return (data as List)
           .map((e) => deserialize<_i29.StopLossThreshold>(e))
           .toList() as dynamic;
@@ -672,8 +712,17 @@ class Protocol extends _i1.SerializationManagerServer {
           as dynamic;
     }
     if (t == List<_i35.TradelockerOrder>) {
+    if (t == List<int>) {
+      return (data as List).map((e) => deserialize<int>(e)).toList() as dynamic;
+    }
+    if (t == List<_i33.TradelockerOrder>) {
       return (data as List)
           .map((e) => deserialize<_i35.TradelockerOrder>(e))
+          .toList() as dynamic;
+    }
+    if (t == List<_i34.TradelockerAccountInformation>) {
+      return (data as List)
+          .map((e) => deserialize<_i34.TradelockerAccountInformation>(e))
           .toList() as dynamic;
     }
     try {

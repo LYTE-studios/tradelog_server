@@ -453,6 +453,24 @@ class Endpoints extends _i1.EndpointDispatch {
             params['trade'],
           ),
         ),
+        'importTrades': _i1.MethodConnector(
+          name: 'importTrades',
+          params: {
+            'csvFile': _i1.ParameterDescription(
+              name: 'csvFile',
+              type: _i1.getType<List<int>>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['trade'] as _i5.TradeEndpoint).importTrades(
+            session,
+            params['csvFile'],
+          ),
+        ),
       },
     );
     connectors['tradeLocker'] = _i1.EndpointConnector(
@@ -462,11 +480,16 @@ class Endpoints extends _i1.EndpointDispatch {
         'initializeClient': _i1.MethodConnector(
           name: 'initializeClient',
           params: {
+            'apiKey': _i1.ParameterDescription(
+              name: 'apiKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'accNum': _i1.ParameterDescription(
               name: 'accNum',
               type: _i1.getType<int>(),
               nullable: false,
-            )
+            ),
           },
           call: (
             _i1.Session session,
@@ -475,6 +498,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint)
                   .initializeClient(
             session,
+            params['apiKey'],
             accNum: params['accNum'],
           ),
         ),
@@ -519,9 +543,24 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint)
                   .refresh(session),
         ),
+        'getAllTrades': _i1.MethodConnector(
+          name: 'getAllTrades',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
+                  .getAllTrades(session),
+        ),
         'getTrades': _i1.MethodConnector(
           name: 'getTrades',
           params: {
+            'apiKey': _i1.ParameterDescription(
+              name: 'apiKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'accountId': _i1.ParameterDescription(
               name: 'accountId',
               type: _i1.getType<int>(),
@@ -539,6 +578,7 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint).getTrades(
             session,
+            params['apiKey'],
             params['accountId'],
             params['accNum'],
           ),
@@ -546,6 +586,11 @@ class Endpoints extends _i1.EndpointDispatch {
         'getOrdersHistoryWithRateLimit': _i1.MethodConnector(
           name: 'getOrdersHistoryWithRateLimit',
           params: {
+            'apiKey': _i1.ParameterDescription(
+              name: 'apiKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'accountId': _i1.ParameterDescription(
               name: 'accountId',
               type: _i1.getType<int>(),
@@ -564,8 +609,27 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint)
                   .getOrdersHistoryWithRateLimit(
             session,
+            params['apiKey'],
             params['accountId'],
             params['accNum'],
+          ),
+        ),
+        'getAccounts': _i1.MethodConnector(
+          name: 'getAccounts',
+          params: {
+            'apiKey': _i1.ParameterDescription(
+              name: 'apiKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint).getAccounts(
+            session,
+            params['apiKey'],
           ),
         ),
       },

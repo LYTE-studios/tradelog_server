@@ -24,9 +24,12 @@ profile:
 trade:
   - addTrade:
   - deleteTrade:
+  - importTrades:
 tradeLocker:
   - initializeClient:
   - authenticate:
   - refresh:
+  - getAllTrades:
   - getTrades:
   - getOrdersHistoryWithRateLimit:
+  - getAccounts:

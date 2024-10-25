@@ -10,7 +10,6 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
-import '../protocol.dart' as _i2;
 
 abstract class TradelockerAccountInformation
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
@@ -18,20 +17,18 @@ abstract class TradelockerAccountInformation
     required this.id,
     required this.currency,
     required this.name,
-    required this.riskRules,
-    required this.status,
-    required this.tradingRules,
-    required this.type,
+    required this.currency,
+    required this.accNum,
+    required this.accountBalance,
   });
 
   factory TradelockerAccountInformation({
     required String id,
     required String currency,
     required String name,
-    required _i2.RiskRules riskRules,
-    required String status,
-    required _i2.TradingRules tradingRules,
-    required String type,
+    required String currency,
+    required String accNum,
+    required String accountBalance,
   }) = _TradelockerAccountInformationImpl;
 
   factory TradelockerAccountInformation.fromJson(
@@ -40,37 +37,29 @@ abstract class TradelockerAccountInformation
       id: jsonSerialization['id'] as String,
       currency: jsonSerialization['currency'] as String,
       name: jsonSerialization['name'] as String,
-      riskRules: _i2.RiskRules.fromJson(
-          (jsonSerialization['riskRules'] as Map<String, dynamic>)),
-      status: jsonSerialization['status'] as String,
-      tradingRules: _i2.TradingRules.fromJson(
-          (jsonSerialization['tradingRules'] as Map<String, dynamic>)),
-      type: jsonSerialization['type'] as String,
+      currency: jsonSerialization['currency'] as String,
+      accNum: jsonSerialization['accNum'] as String,
+      accountBalance: jsonSerialization['accountBalance'] as String,
     );
   }
-
-  String currency;
 
   String id;
 
   String name;
 
-  _i2.RiskRules riskRules;
+  String currency;
 
-  String status;
+  String accNum;
 
-  _i2.TradingRules tradingRules;
-
-  String type;
+  String accountBalance;
 
   TradelockerAccountInformation copyWith({
     String? id,
     String? currency,
     String? name,
-    _i2.RiskRules? riskRules,
-    String? status,
-    _i2.TradingRules? tradingRules,
-    String? type,
+    String? currency,
+    String? accNum,
+    String? accountBalance,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -78,10 +67,9 @@ abstract class TradelockerAccountInformation
       'id': id,
       'currency': currency,
       'name': name,
-      'riskRules': riskRules.toJson(),
-      'status': status,
-      'tradingRules': tradingRules.toJson(),
-      'type': type,
+      'currency': currency,
+      'accNum': accNum,
+      'accountBalance': accountBalance,
     };
   }
 
@@ -91,10 +79,9 @@ abstract class TradelockerAccountInformation
       'id': id,
       'currency': currency,
       'name': name,
-      'riskRules': riskRules.toJsonForProtocol(),
-      'status': status,
-      'tradingRules': tradingRules.toJsonForProtocol(),
-      'type': type,
+      'currency': currency,
+      'accNum': accNum,
+      'accountBalance': accountBalance,
     };
   }
 
@@ -109,18 +96,16 @@ class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
     required String id,
     required String currency,
     required String name,
-    required _i2.RiskRules riskRules,
-    required String status,
-    required _i2.TradingRules tradingRules,
-    required String type,
+    required String currency,
+    required String accNum,
+    required String accountBalance,
   }) : super._(
           id: id,
           currency: currency,
           name: name,
-          riskRules: riskRules,
-          status: status,
-          tradingRules: tradingRules,
-          type: type,
+          currency: currency,
+          accNum: accNum,
+          accountBalance: accountBalance,
         );
 
   @override
@@ -128,19 +113,17 @@ class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
     String? id,
     String? currency,
     String? name,
-    _i2.RiskRules? riskRules,
-    String? status,
-    _i2.TradingRules? tradingRules,
-    String? type,
+    String? currency,
+    String? accNum,
+    String? accountBalance,
   }) {
     return TradelockerAccountInformation(
       id: id ?? this.id,
       currency: currency ?? this.currency,
       name: name ?? this.name,
-      riskRules: riskRules ?? this.riskRules.copyWith(),
-      status: status ?? this.status,
-      tradingRules: tradingRules ?? this.tradingRules.copyWith(),
-      type: type ?? this.type,
+      currency: currency ?? this.currency,
+      accNum: accNum ?? this.accNum,
+      accountBalance: accountBalance ?? this.accountBalance,
     );
   }
 }

@@ -1,27 +1,18 @@
 class: TradelockerAccountInformation
 fields:
+  id: String
+  # Unique account identifier.
+
+  name: String
+  # Account title that is displayed to a user.
+  # Example: Demo trading account 
+
   currency: String
   # Abbreviation of account currency.
   # Example: JPY
 
-  id: String
-  # Unique account identifier.
-  # Example: ACC-001
+  accNum: String
+  # Account number.
 
-  name: String
-  # Account title that is displayed to a user.
-  # Example: Demo trading account
-
-  riskRules: RiskRules
-  # Risk rules associated with the account.
-
-  status: String
-  # Status of the account.
-  # Enum: [Status1, Status2, Status3, Status4, Status5, Status6]
-
-  tradingRules: TradingRules
-  # Trading rules associated with the account.
-
-  type: String
-  # Type of the account.
-  # Enum: [Type1, Type2]
+  accountBalance: String
+  # Current account balance.

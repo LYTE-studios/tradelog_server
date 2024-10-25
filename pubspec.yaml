@@ -12,6 +12,7 @@ dependencies:
   collection: ^1.19.0
 
   # Network
+  csv: ^6.0.0
   dio: ^5.5.0+1
 
   # Serverpod
