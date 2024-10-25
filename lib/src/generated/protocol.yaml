@@ -29,5 +29,4 @@ tradeLocker:
   - authenticate:
   - refresh:
   - getTrades:
-  - getPositionsWithRateLimit:
   - getOrdersHistoryWithRateLimit:

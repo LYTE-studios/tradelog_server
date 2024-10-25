@@ -4,9 +4,11 @@ import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
+import 'package:tradelog_server/src/models/trade_extension.dart';
 import 'package:tradelog_server/src/models/tradelocker_extension.dart';
 import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
+import 'package:tradelog_server/src/util/instruments.dart';
 
 class TradeLockerEndpoint extends Endpoint {
   @override
@@ -58,27 +60,6 @@ class TradeLockerEndpoint extends Endpoint {
       accessToken.token,
       accNum: accNum == -1 ? '' : accNum.toString(),
     );
-  }
-
-  // Error handling and retrying function
-  Future<Response> safeApiCall(Future<Response> apiCall) async {
-    try {
-      final response = await apiCall;
-      if (response.statusCode == 200) {
-        return response;
-      } else {
-        throw Exception(
-            'Failed to load data - Error code: ${response.statusCode}');
-      }
-    } catch (e) {
-      if (e is DioException && e.response?.statusCode == 502) {
-        // Retry after a short delay for 502 errors
-        await Future.delayed(Duration(seconds: 1));
-        return safeApiCall(apiCall);
-      } else {
-        rethrow;
-      }
-    }
   }
 
   Future<String> authenticate(
@@ -156,45 +137,87 @@ class TradeLockerEndpoint extends Endpoint {
       Session session, int accountId, int accNum) async {
     // Initialize client for the current session
     await initializeClient(session, accNum: accNum);
+
+    // Fetch positions and orders from the external API (rate-limited)
     final positions =
-        await getPositionsWithRateLimit(session, accountId, accNum);
+        await _getPositionsWithRateLimit(session, accountId, accNum);
     final orders =
         await getOrdersHistoryWithRateLimit(session, accountId, accNum);
-    // Future to hold the final list of DisplayTrades
-    final tradesFuture = Completer<List<DisplayTrade>>();
 
-    // Add the main request to fetch positions and orders to the queue
-    requestQueue.addRequest(
-      EndpointRequest(
-        priority: 1,
-        request: () async {
-          // Fetch positions and orders in parallel
-          try {
-            // Map orders to their respective positions
-            final Map<String, List<TradelockerOrder>> ordersByPosition =
-                _groupOrdersByPosition(orders);
+    // Map orders to their respective positions
+    final Map<String, List<TradelockerOrder>> ordersByPosition =
+        _groupOrdersByPosition(orders);
 
-            // Process the positions to create trades
-            final List<DisplayTrade> trades = await _processPositions(
+    // Set of position IDs from open positions
+    final openPositionIds = positions.map((position) => position.id).toSet();
+
+    // Wait for both open and closed trades to complete
+    final List<DisplayTrade> openTrades = await _processPositions(
                 session, positions, ordersByPosition, accNum);
+    final List<DisplayTrade> closedTrades = await _processClosedPositions(
+                session, ordersByPosition, openPositionIds, accNum);
 
-            // Complete the future with the list of trades
-            tradesFuture.complete(trades);
-          } on Exception catch (e) {
-            tradesFuture.completeError(e);
+    // Return the combined list of open and closed trades
+    return [...openTrades, ...closedTrades];
+  }
+
+  /// Private Helper Functions
+
+  Future<List<DisplayTrade>> _processClosedPositions(
+      Session session,
+      Map<String, List<TradelockerOrder>> ordersByPosition,
+      Set<String> openPositionIds,
+      int accNum) async {
+    final List<DisplayTrade> trades = [];
+
+    // Process closed positions (positions not present in openPositionIds)
+    for (var orderGroup in ordersByPosition.entries) {
+      final positionId = orderGroup.key;
+      final associatedOrders = orderGroup.value;
+
+      // If the position is not in the set of open positions, it's closed
+      if (!openPositionIds.contains(positionId)) {
+        final firstOrder = associatedOrders.first;
+        double totalQty = 0.0;
+        double avgPrice = 0.0;
+        double realizedPl = 0.0;
+
+        // Calculate realized P&L and the average price of the closed position
+        for (var order in associatedOrders) {
+          if (order.status == 'Filled' && order.filledQty > 0) {
+            totalQty += order.filledQty;
+            avgPrice += order.avgPrice * order.filledQty;
+            realizedPl += order.filledQty * (order.avgPrice - firstOrder.price);
           }
-        },
-        hasSubRequests: true,
-        // There will be sub-requests to fetch symbols
-        subRequestsCount: 1,
-        // Assuming each position requires one sub-request to get the symbol
-        subRequestDelay:
-            Duration(milliseconds: 500), // Sub-requests rate-limited by 500ms
-      ),
-    );
+        }
 
-    // Return the result when the queue finishes processing
-    return await tradesFuture.future;
+        if (totalQty > 0) {
+          avgPrice = avgPrice / totalQty; // Weighted average price
+        }
+
+        // Calculate net ROI
+        final totalInvestment = totalQty * avgPrice;
+        final netRoi =
+            totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
+
+        // Fetch symbol for closed position
+        final symbol = Instrument.instrumentMap[firstOrder.tradableInstrumentId] ??
+          'unknown';
+
+        // Create a DisplayTrade object for the closed position
+        trades.add(DisplayTrade(
+          openTime: firstOrder.createdDate,
+          symbol: symbol,
+          direction: firstOrder.side,
+          status: 'Closed',
+          netpl: realizedPl,
+          netroi: netRoi,
+        ));
+      }
+    }
+
+    // print(trades);
+    return trades;
   }
 
   Future<List<DisplayTrade>> _processPositions(
@@ -203,9 +226,8 @@ class TradeLockerEndpoint extends Endpoint {
       Map<String, List<TradelockerOrder>> ordersByPosition,
       int accNum) async {
     final List<DisplayTrade> trades = [];
-    int idx = 0;
+
     for (var position in positions) {
-      print(idx++);
       final associatedOrders = ordersByPosition[position.id] ?? [];
 
       // Calculate realized P&L and ROI for the position
@@ -216,8 +238,8 @@ class TradeLockerEndpoint extends Endpoint {
       final status = position.quantity == 0 ? 'Closed' : 'Open';
 
       // Sub-request: Fetch symbol for each position, queued and rate-limited
-      final symbol = await _getSymbolFromInstrumentIdWithRateLimit(
-          session, accNum, position.tradableInstrumentId, position.routeId);
+      final symbol = Instrument.instrumentMap[position.tradableInstrumentId] ??
+          'unknown'; // Default to 'unknown' if symbol not found
 
       // Create a DisplayTrade entry and add it to the list
       trades.add(DisplayTrade(
@@ -230,21 +252,8 @@ class TradeLockerEndpoint extends Endpoint {
       ));
     }
 
-    print(trades);
+    // print(trades);
     return trades;
-  }
-
-  double _calculateRealizedPl(
-      TradelockerPosition position, List<TradelockerOrder> orders) {
-    double realizedPl = 0.0;
-
-    for (var order in orders) {
-      if (order.status == 'Filled' && order.filledQty > 0) {
-        realizedPl += (order.filledQty * (order.avgPrice - position.avgPrice));
-      }
-    }
-
-    return realizedPl;
   }
 
   Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
@@ -260,50 +269,20 @@ class TradeLockerEndpoint extends Endpoint {
     return ordersByPosition;
   }
 
-  Future<String> _getSymbolFromInstrumentIdWithRateLimit(
-      Session session, int accNum, int instrumentId, int routeId) async {
-    final instrument =
-        await _getInstrument(session, accNum, instrumentId, routeId);
-    return instrument.name;
-    // final symbolFuture = Completer<String>();
+  double _calculateRealizedPl(
+      TradelockerPosition position, List<TradelockerOrder> orders) {
+    double realizedPl = 0.0;
 
-    // // Add a request to the queue to fetch the symbol
-    // requestQueue.addRequest(
-    //   EndpointRequest(
-    //     priority: 2, // Lower priority for sub-requests
-    //     request: () async {
-    //       try {
-    //         final instrument =
-    //             await _getInstrument(session, accNum, instrumentId, routeId);
-    //             print(instrument.name);
-    //         symbolFuture.complete(instrument.name);
-    //       } on Exception catch (e) {
-    //         symbolFuture.completeError(e);
-    //       }
-    //     },
-    //     subRequestsCount: 0, // No further sub-requests in this case
-    //   ),
-    // );
-
-    // return await symbolFuture.future;
-  }
-
-  Future<TradelockerInstrument> _getInstrument(
-      Session session, int accNum, int instrumentId, int routeId) async {
-    await initializeClient(session, accNum: accNum);
-    final response =
-        await client.get('/trade/instruments/$instrumentId?routeId=$routeId');
-
-    if (response.statusCode == 200 && response.data['d'] != null) {
-      return TradelockerInstrument.fromJson(response.data['d']);
-    } else {
-      throw Exception('Failed to load instrument data.');
+    for (var order in orders) {
+      if (order.status == 'Filled' && order.filledQty > 0) {
+        realizedPl += (order.filledQty * (order.avgPrice - position.avgPrice));
+      }
     }
+
+    return realizedPl;
   }
 
-  /// Private Helper Functions
-
-  Future<List<TradelockerPosition>> getPositionsWithRateLimit(
+  Future<List<TradelockerPosition>> _getPositionsWithRateLimit(
       Session session, int accountId, int accNum) async {
     await initializeClient(session, accNum: accNum);
 
@@ -315,16 +294,11 @@ class TradeLockerEndpoint extends Endpoint {
           try {
             final response =
                 await client.get('/trade/accounts/$accountId/positions');
-
-            try {
-              if (response.statusCode == 200 && response.data['d'] != null) {
-                final positions = (response.data['d'] ?? [])['positions'] ?? [];
-                positionsFuture.complete(positions
-                    .map((position) => TradeLockerExtension.positionFromJson(
-                        position as List<dynamic>))
-                    .toList());
-              }
-            } catch (e) {}
+            final positions = response.data['d']['positions'] as List<dynamic>;
+            positionsFuture.complete(positions
+                .map((position) => TradeLockerExtension.positionFromJson(
+                    position as List<dynamic>))
+                .toList());
           } catch (e) {
             positionsFuture.completeError(
                 e); // Complete the future with an error if it fails
@@ -351,11 +325,13 @@ class TradeLockerEndpoint extends Endpoint {
 
             // Check if the response is valid and contains the expected data
             if (response.data == null || response.data['d'] == null) {
+              // print(response.data); // uncomment if random error
               throw Exception('Invalid response or no data found.');
             }
 
             // Extract and process the orders
-            final orders = (response.data['d'] ?? [])['ordersHistory'] ?? [];
+            final orders =
+                response.data['d']['ordersHistory'] as List<dynamic>?;
             if (orders == null) {
               throw Exception('No orders found in the response.');
             }
@@ -376,34 +352,6 @@ class TradeLockerEndpoint extends Endpoint {
 
     return await ordersFuture.future;
   }
-
-// Future<String> _getSymbolFromInstrumentIdWithRateLimit(
-//     Session session, int accNum, int instrumentId, int routeId) async {
-//   // Use the rate limiter before making the API request
-//   await rateLimiter.waitForAvailability();
-
-//   final instrument =
-//       await _getInstrument(session, accNum, instrumentId, routeId);
-//   return instrument.name;
-// }
-
-// Future<TradelockerInstrument> _getInstrument(
-//     Session session, int accNum, int instrumentId, int routeId) async {
-//   await initializeClient(session, accNum: accNum);
-
-//   final response =
-//       await client.get('/trade/instruments/$instrumentId?routeId=$routeId');
-//   if (response.statusCode == 200) {
-//     if (response.data != null && response.data['d'] != null) {
-//       return TradelockerInstrument.fromJson(response.data['d']);
-//     } else {
-//       throw Exception('No data found for this instrument.');
-//     }
-//   } else {
-//     throw Exception(
-//         'Failed to load data - Error code: ${response.statusCode}');
-//   }
-// }
 
   Future<Map<String, dynamic>> _performAuthentication(
     TradeLockerClient client,

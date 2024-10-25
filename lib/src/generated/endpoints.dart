@@ -11,18 +11,14 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../endpoints/account_endpoint.dart' as _i2;
-import '../endpoints/file_endpoint.dart' as _i3;
-import '../endpoints/metaapi_endpoint.dart' as _i4;
-import '../endpoints/note_endpoint.dart' as _i5;
-import '../endpoints/profile_endpoint.dart' as _i6;
-import '../endpoints/trade_endpoint.dart' as _i7;
-import '../endpoints/tradelocker_endpoint.dart' as _i8;
-import 'package:tradelog_server/src/generated/linked_accounts.dart' as _i9;
-import 'package:tradelog_server/src/generated/default/note.dart' as _i10;
-import 'package:tradelog_server/src/generated/profile/tradely_profile.dart'
-    as _i11;
-import 'package:tradelog_server/src/generated/default/trade.dart' as _i12;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i13;
+import '../endpoints/metaapi_endpoint.dart' as _i3;
+import '../endpoints/note_endpoint.dart' as _i4;
+import '../endpoints/trade_endpoint.dart' as _i5;
+import '../endpoints/tradelocker_endpoint.dart' as _i6;
+import 'package:tradelog_server/src/generated/linked_accounts.dart' as _i7;
+import 'package:tradelog_server/src/generated/default/note.dart' as _i8;
+import 'package:tradelog_server/src/generated/default/trade.dart' as _i9;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i10;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -34,37 +30,25 @@ class Endpoints extends _i1.EndpointDispatch {
           'account',
           null,
         ),
-      'file': _i3.FileEndpoint()
-        ..initialize(
-          server,
-          'file',
-          null,
-        ),
-      'metaApi': _i4.MetaApiEndpoint()
+      'metaApi': _i3.MetaApiEndpoint()
         ..initialize(
           server,
           'metaApi',
           null,
         ),
-      'note': _i5.NoteEndpoint()
+      'note': _i4.NoteEndpoint()
         ..initialize(
           server,
           'note',
           null,
         ),
-      'profile': _i6.ProfileEndpoint()
-        ..initialize(
-          server,
-          'profile',
-          null,
-        ),
-      'trade': _i7.TradeEndpoint()
+      'trade': _i5.TradeEndpoint()
         ..initialize(
           server,
           'trade',
           null,
         ),
-      'tradeLocker': _i8.TradeLockerEndpoint()
+      'tradeLocker': _i6.TradeLockerEndpoint()
         ..initialize(
           server,
           'tradeLocker',
@@ -75,22 +59,12 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'account',
       endpoint: endpoints['account']!,
       methodConnectors: {
-        'fetchAccounts': _i1.MethodConnector(
-          name: 'fetchAccounts',
-          params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['account'] as _i2.AccountEndpoint)
-                  .fetchAccounts(session),
-        ),
         'linkAccount': _i1.MethodConnector(
           name: 'linkAccount',
           params: {
             'account': _i1.ParameterDescription(
               name: 'account',
-              type: _i1.getType<_i9.LinkedAccount>(),
+              type: _i1.getType<_i7.LinkedAccount>(),
               nullable: false,
             )
           },
@@ -108,7 +82,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'account': _i1.ParameterDescription(
               name: 'account',
-              type: _i1.getType<_i9.LinkedAccount>(),
+              type: _i1.getType<_i7.LinkedAccount>(),
               nullable: false,
             )
           },
@@ -119,48 +93,6 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['account'] as _i2.AccountEndpoint).unlinkAccount(
             session,
             params['account'],
-          ),
-        ),
-      },
-    );
-    connectors['file'] = _i1.EndpointConnector(
-      name: 'file',
-      endpoint: endpoints['file']!,
-      methodConnectors: {
-        'getUploadDescription': _i1.MethodConnector(
-          name: 'getUploadDescription',
-          params: {
-            'path': _i1.ParameterDescription(
-              name: 'path',
-              type: _i1.getType<String>(),
-              nullable: false,
-            )
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['file'] as _i3.FileEndpoint).getUploadDescription(
-            session,
-            params['path'],
-          ),
-        ),
-        'verifyUpload': _i1.MethodConnector(
-          name: 'verifyUpload',
-          params: {
-            'path': _i1.ParameterDescription(
-              name: 'path',
-              type: _i1.getType<String>(),
-              nullable: false,
-            )
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['file'] as _i3.FileEndpoint).verifyUpload(
-            session,
-            params['path'],
           ),
         ),
       },
@@ -182,7 +114,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['metaApi'] as _i4.MetaApiEndpoint).initializeClient(
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint).initializeClient(
             session,
             accNum: params['accNum'],
           ),
@@ -200,7 +132,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['metaApi'] as _i4.MetaApiEndpoint).authenticate(
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint).authenticate(
             session,
             params['apiKey'],
           ),
@@ -218,7 +150,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['metaApi'] as _i4.MetaApiEndpoint)
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint)
                   .getAccountInformation(
             session,
             params['accountId'],
@@ -237,7 +169,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['metaApi'] as _i4.MetaApiEndpoint).getPositions(
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint).getPositions(
             session,
             params['accountId'],
           ),
@@ -255,7 +187,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['metaApi'] as _i4.MetaApiEndpoint).getTrades(
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint).getTrades(
             session,
             params['accountId'],
           ),
@@ -273,7 +205,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['metaApi'] as _i4.MetaApiEndpoint).getOrders(
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint).getOrders(
             session,
             params['accountId'],
           ),
@@ -301,7 +233,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['metaApi'] as _i4.MetaApiEndpoint)
+              (endpoints['metaApi'] as _i3.MetaApiEndpoint)
                   .getHistoryOrdersByTime(
             session,
             params['accountId'],
@@ -315,12 +247,12 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'note',
       endpoint: endpoints['note']!,
       methodConnectors: {
-        'getNoteForDate': _i1.MethodConnector(
-          name: 'getNoteForDate',
+        'addNote': _i1.MethodConnector(
+          name: 'addNote',
           params: {
-            'date': _i1.ParameterDescription(
-              name: 'date',
-              type: _i1.getType<DateTime>(),
+            'note': _i1.ParameterDescription(
+              name: 'note',
+              type: _i1.getType<_i8.Note>(),
               nullable: false,
             )
           },
@@ -328,9 +260,9 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['note'] as _i5.NoteEndpoint).getNoteForDate(
+              (endpoints['note'] as _i4.NoteEndpoint).addNote(
             session,
-            params['date'],
+            params['note'],
           ),
         ),
         'deleteNote': _i1.MethodConnector(
@@ -338,7 +270,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'note': _i1.ParameterDescription(
               name: 'note',
-              type: _i1.getType<_i10.Note>(),
+              type: _i1.getType<_i8.Note>(),
               nullable: false,
             )
           },
@@ -346,7 +278,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['note'] as _i5.NoteEndpoint).deleteNote(
+              (endpoints['note'] as _i4.NoteEndpoint).deleteNote(
             session,
             params['note'],
           ),
@@ -356,7 +288,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'note': _i1.ParameterDescription(
               name: 'note',
-              type: _i1.getType<_i10.Note>(),
+              type: _i1.getType<_i8.Note>(),
               nullable: false,
             )
           },
@@ -364,7 +296,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['note'] as _i5.NoteEndpoint).updateNote(
+              (endpoints['note'] as _i4.NoteEndpoint).updateNote(
             session,
             params['note'],
           ),
@@ -376,40 +308,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['note'] as _i5.NoteEndpoint).getNotes(session),
-        ),
-      },
-    );
-    connectors['profile'] = _i1.EndpointConnector(
-      name: 'profile',
-      endpoint: endpoints['profile']!,
-      methodConnectors: {
-        'updateProfile': _i1.MethodConnector(
-          name: 'updateProfile',
-          params: {
-            'profile': _i1.ParameterDescription(
-              name: 'profile',
-              type: _i1.getType<_i11.TradelyProfile>(),
-              nullable: false,
-            )
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['profile'] as _i6.ProfileEndpoint).updateProfile(
-            session,
-            params['profile'],
-          ),
-        ),
-        'getProfile': _i1.MethodConnector(
-          name: 'getProfile',
-          params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['profile'] as _i6.ProfileEndpoint).getProfile(session),
+              (endpoints['note'] as _i4.NoteEndpoint).getNotes(session),
         ),
       },
     );
@@ -422,7 +321,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'trade': _i1.ParameterDescription(
               name: 'trade',
-              type: _i1.getType<_i12.Trade>(),
+              type: _i1.getType<_i9.Trade>(),
               nullable: false,
             )
           },
@@ -430,7 +329,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['trade'] as _i7.TradeEndpoint).addTrade(
+              (endpoints['trade'] as _i5.TradeEndpoint).addTrade(
             session,
             params['trade'],
           ),
@@ -440,7 +339,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'trade': _i1.ParameterDescription(
               name: 'trade',
-              type: _i1.getType<_i12.Trade>(),
+              type: _i1.getType<_i9.Trade>(),
               nullable: false,
             )
           },
@@ -448,7 +347,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['trade'] as _i7.TradeEndpoint).deleteTrade(
+              (endpoints['trade'] as _i5.TradeEndpoint).deleteTrade(
             session,
             params['trade'],
           ),
@@ -472,7 +371,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint)
+              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
                   .initializeClient(
             session,
             accNum: params['accNum'],
@@ -501,7 +400,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint)
+              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
                   .authenticate(
             session,
             params['email'],
@@ -516,7 +415,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint)
+              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
                   .refresh(session),
         ),
         'getTrades': _i1.MethodConnector(
@@ -537,32 +436,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint).getTrades(
-            session,
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
-        'getPositionsWithRateLimit': _i1.MethodConnector(
-          name: 'getPositionsWithRateLimit',
-          params: {
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint)
-                  .getPositionsWithRateLimit(
+              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint).getTrades(
             session,
             params['accountId'],
             params['accNum'],
@@ -586,7 +460,7 @@ class Endpoints extends _i1.EndpointDispatch {
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['tradeLocker'] as _i8.TradeLockerEndpoint)
+              (endpoints['tradeLocker'] as _i6.TradeLockerEndpoint)
                   .getOrdersHistoryWithRateLimit(
             session,
             params['accountId'],
@@ -595,6 +469,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i13.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i10.Endpoints()..initializeEndpoints(server);
   }
 }
