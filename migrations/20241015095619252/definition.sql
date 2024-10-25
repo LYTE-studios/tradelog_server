@@ -14,6 +14,33 @@ CREATE TABLE "linked_account" (
 CREATE UNIQUE INDEX "user_info_id_unique_idx" ON "linked_account" USING btree ("userInfoId");
 
 --
+-- Class Note as table note
+--
+CREATE TABLE "note" (
+    "id" bigserial PRIMARY KEY,
+    "content" text NOT NULL,
+    "userId" bigint NOT NULL,
+    "date" timestamp without time zone NOT NULL
+);
+
+--
+-- Class Trade as table trade
+--
+CREATE TABLE "trade" (
+    "id" bigserial PRIMARY KEY,
+    "option" bigint NOT NULL,
+    "userId" bigint NOT NULL,
+    "currency" text NOT NULL,
+    "fee" double precision NOT NULL,
+    "date" timestamp without time zone NOT NULL,
+    "lotSize" double precision NOT NULL,
+    "takeProfit" double precision NOT NULL,
+    "stoploss" double precision NOT NULL,
+    "profitLoss" text NOT NULL,
+    "amount" double precision NOT NULL
+);
+
+--
 -- Class TradelockerCredentials as table tradelocker_credentials
 --
 CREATE TABLE "tradelocker_credentials" (
@@ -354,6 +381,26 @@ ALTER TABLE ONLY "linked_account"
     ON UPDATE NO ACTION;
 
 --
+-- Foreign relations for "note" table
+--
+ALTER TABLE ONLY "note"
+    ADD CONSTRAINT "note_fk_0"
+    FOREIGN KEY("userId")
+    REFERENCES "serverpod_user_info"("id")
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION;
+
+--
+-- Foreign relations for "trade" table
+--
+ALTER TABLE ONLY "trade"
+    ADD CONSTRAINT "trade_fk_0"
+    FOREIGN KEY("userId")
+    REFERENCES "serverpod_user_info"("id")
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION;
+
+--
 -- Foreign relations for "tradelocker_credentials" table
 --
 ALTER TABLE ONLY "tradelocker_credentials"
@@ -398,9 +445,9 @@ ALTER TABLE ONLY "serverpod_query_log"
 -- MIGRATION VERSION FOR tradelog
 --
 INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
-    VALUES ('tradelog', '20240807110035912', now())
+    VALUES ('tradelog', '20241015095619252', now())
     ON CONFLICT ("module")
-    DO UPDATE SET "version" = '20240807110035912', "timestamp" = now();
+    DO UPDATE SET "version" = '20241015095619252', "timestamp" = now();
 
 --
 -- MIGRATION VERSION FOR serverpod

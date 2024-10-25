@@ -53,6 +53,17 @@ CREATE TABLE "tradelocker_credentials" (
 );
 
 --
+-- Class TradelyProfile as table tradely_profile
+--
+CREATE TABLE "tradely_profile" (
+    "id" bigserial PRIMARY KEY,
+    "userInfoId" bigint NOT NULL,
+    "firstName" text NOT NULL,
+    "lastName" text NOT NULL,
+    "dateOfBirth" timestamp without time zone
+);
+
+--
 -- Class CloudStorageEntry as table serverpod_cloud_storage
 --
 CREATE TABLE "serverpod_cloud_storage" (
@@ -411,6 +422,16 @@ ALTER TABLE ONLY "tradelocker_credentials"
     ON UPDATE NO ACTION;
 
 --
+-- Foreign relations for "tradely_profile" table
+--
+ALTER TABLE ONLY "tradely_profile"
+    ADD CONSTRAINT "tradely_profile_fk_0"
+    FOREIGN KEY("userInfoId")
+    REFERENCES "serverpod_user_info"("id")
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION;
+
+--
 -- Foreign relations for "serverpod_log" table
 --
 ALTER TABLE ONLY "serverpod_log"
@@ -445,9 +466,9 @@ ALTER TABLE ONLY "serverpod_query_log"
 -- MIGRATION VERSION FOR tradelog
 --
 INSERT INTO "serverpod_migrations" ("module", "version", "timestamp")
-    VALUES ('tradelog', '20240921173515357', now())
+    VALUES ('tradelog', '20241024105036238', now())
     ON CONFLICT ("module")
-    DO UPDATE SET "version" = '20240921173515357', "timestamp" = now();
+    DO UPDATE SET "version" = '20241024105036238', "timestamp" = now();
 
 --
 -- MIGRATION VERSION FOR serverpod

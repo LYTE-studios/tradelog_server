@@ -1,57 +1,90 @@
 import 'package:dio/dio.dart';
+import 'package:sentry/sentry.dart';
+
+enum MailjetTemplates {
+  emailVerification,
+  passwordReset,
+}
+
+extension MailjetTemplatesExtension on MailjetTemplates {
+  int getTemplateId() {
+    switch (this) {
+      case MailjetTemplates.emailVerification:
+        return 6362477;
+      case MailjetTemplates.passwordReset:
+        return 6362477;
+    }
+  }
+}
 
 class MailClient {
   final Dio _dio;
-  static const String myEmail = 'bogdan@lytestudios.be';
-  // static Map<String, int> verificationTemplates = {
-  //   'en': 6209328,
-  //   'nl': 6310271,
-  // };
+  static const String myEmail = 'lucas@lytestudios.be';
 
   MailClient(String apiKey, String secretKey)
-      : _dio = Dio(BaseOptions(
-          baseUrl: 'https://$apiKey:$secretKey@api.mailjet.com/v3.1',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        ));
+      : _dio = Dio(
+          BaseOptions(
+            baseUrl: 'https://$apiKey:$secretKey@api.mailjet.com/v3.1',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          ),
+        );
+
+  /// Sends a mail with given template id and passed variable parameters
+  Future<void> _sendTemplatedMail({
+    required int templateId,
+    required String receiverEmail,
+    Map<String, dynamic>? variables,
+  }) async {
+    try {
+      await _dio.post(
+        '/send',
+        data: {
+          'Messages': [
+            {
+              "TemplateID": templateId,
+              'From': {
+                'Email': myEmail,
+                'Name': 'Tradely',
+              },
+              'To': [
+                {
+                  'Email': receiverEmail,
+                }
+              ],
+              "TemplateLanguage": true,
+              "Variables": variables,
+            }
+          ]
+        },
+      );
+    } on DioException catch (e) {
+      // Log the exception
+      Sentry.captureException(e);
+
+      // Rethrow to notify parent functions
+      rethrow;
+    }
+  }
 
   Future<bool> sendVerificationEmail(
     String email,
     String verificationCode,
   ) async {
-    final emailData = {
-      'Messages': [
-        {
-          'From': {
-            'Email': myEmail,
-            'Name': 'Tradely',
-          },
-          'To': [
-            {
-              'Email': email,
-            }
-          ],
-          'Subject': 'Your verification code for tradely',
-          'TextPart': 'Your verification code is $verificationCode',
-          'HTMLPart': '<h3>Your verification code is $verificationCode</h3>',
-        }
-      ]
-    };
     try {
-      await _dio.post('/send', data: emailData);
-    } on Exception catch (_) {
+      _sendTemplatedMail(
+        templateId: MailjetTemplates.emailVerification.getTemplateId(),
+        receiverEmail: email,
+        variables: {
+          'code': verificationCode,
+        },
+      );
+    } catch (e) {
+      // If anything goes wrong, report [false]
       return false;
-      // if (e is DioException) {
-      //   if (e.response?.statusCode == 500) {
-      //     throw Exception('Internal server error: ${e.response?.data}');
-      //   } else {
-      //     throw Exception('Failed to authenticate: ${e.message}');
-      //   }
-      // } else {
-      //   throw Exception('Unexpected error: $e');
-      // }
     }
+
     return true;
   }
 
@@ -59,29 +92,19 @@ class MailClient {
     String email,
     String resetCode,
   ) async {
-    final emailData = {
-      'Messages': [
-        {
-          'From': {
-            'Email': myEmail,
-            'Name': 'Tradely',
-          },
-          'To': [
-            {
-              'Email': email,
-            }
-          ],
-          'Subject': 'Your password reset code for tradely',
-          'TextPart': 'Your password reset code is $resetCode',
-          'HTMLPart': '<h3>Your password reset code is $resetCode</h3>',
-        }
-      ]
-    };
     try {
-      await _dio.post('/send', data: emailData);
-    } on Exception catch (_) {
+      _sendTemplatedMail(
+        templateId: MailjetTemplates.passwordReset.getTemplateId(),
+        receiverEmail: email,
+        variables: {
+          'code': resetCode,
+        },
+      );
+    } catch (e) {
+      // If anything goes wrong, report [false]
       return false;
     }
+
     return true;
   }
 }

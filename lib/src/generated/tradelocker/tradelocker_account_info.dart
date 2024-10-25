@@ -15,6 +15,7 @@ abstract class TradelockerAccountInformation
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
   TradelockerAccountInformation._({
     required this.id,
+    required this.currency,
     required this.name,
     required this.currency,
     required this.accNum,
@@ -23,6 +24,7 @@ abstract class TradelockerAccountInformation
 
   factory TradelockerAccountInformation({
     required String id,
+    required String currency,
     required String name,
     required String currency,
     required String accNum,
@@ -33,6 +35,7 @@ abstract class TradelockerAccountInformation
       Map<String, dynamic> jsonSerialization) {
     return TradelockerAccountInformation(
       id: jsonSerialization['id'] as String,
+      currency: jsonSerialization['currency'] as String,
       name: jsonSerialization['name'] as String,
       currency: jsonSerialization['currency'] as String,
       accNum: jsonSerialization['accNum'] as String,
@@ -52,6 +55,7 @@ abstract class TradelockerAccountInformation
 
   TradelockerAccountInformation copyWith({
     String? id,
+    String? currency,
     String? name,
     String? currency,
     String? accNum,
@@ -61,6 +65,7 @@ abstract class TradelockerAccountInformation
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'currency': currency,
       'name': name,
       'currency': currency,
       'accNum': accNum,
@@ -72,6 +77,7 @@ abstract class TradelockerAccountInformation
   Map<String, dynamic> toJsonForProtocol() {
     return {
       'id': id,
+      'currency': currency,
       'name': name,
       'currency': currency,
       'accNum': accNum,
@@ -88,12 +94,14 @@ abstract class TradelockerAccountInformation
 class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
   _TradelockerAccountInformationImpl({
     required String id,
+    required String currency,
     required String name,
     required String currency,
     required String accNum,
     required String accountBalance,
   }) : super._(
           id: id,
+          currency: currency,
           name: name,
           currency: currency,
           accNum: accNum,
@@ -103,6 +111,7 @@ class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
   @override
   TradelockerAccountInformation copyWith({
     String? id,
+    String? currency,
     String? name,
     String? currency,
     String? accNum,
@@ -110,6 +119,7 @@ class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
   }) {
     return TradelockerAccountInformation(
       id: id ?? this.id,
+      currency: currency ?? this.currency,
       name: name ?? this.name,
       currency: currency ?? this.currency,
       accNum: accNum ?? this.accNum,

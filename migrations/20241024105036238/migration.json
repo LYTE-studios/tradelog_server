@@ -3,8 +3,8 @@
     {
       "type": "createTable",
       "createTable": {
-        "name": "tradelocker_credentials",
-        "dartName": "TradelockerCredentials",
+        "name": "tradely_profile",
+        "dartName": "TradelyProfile",
         "module": "tradelog",
         "schema": "public",
         "columns": [
@@ -12,45 +12,39 @@
             "name": "id",
             "columnType": 6,
             "isNullable": false,
-            "columnDefault": "nextval('tradelocker_credentials_id_seq'::regclass)",
+            "columnDefault": "nextval('tradely_profile_id_seq'::regclass)",
             "dartType": "int?"
           },
           {
-            "name": "email",
-            "columnType": 0,
-            "isNullable": false,
-            "dartType": "String"
-          },
-          {
-            "name": "password",
-            "columnType": 0,
-            "isNullable": false,
-            "dartType": "String"
-          },
-          {
-            "name": "server",
-            "columnType": 0,
-            "isNullable": false,
-            "dartType": "String"
-          },
-          {
-            "name": "refreshToken",
-            "columnType": 0,
-            "isNullable": true,
-            "dartType": "String?"
-          },
-          {
-            "name": "userId",
+            "name": "userInfoId",
             "columnType": 6,
             "isNullable": false,
             "dartType": "int"
+          },
+          {
+            "name": "firstName",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "lastName",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "dateOfBirth",
+            "columnType": 4,
+            "isNullable": true,
+            "dartType": "DateTime?"
           }
         ],
         "foreignKeys": [
           {
-            "constraintName": "tradelocker_credentials_fk_0",
+            "constraintName": "tradely_profile_fk_0",
             "columns": [
-              "userId"
+              "userInfoId"
             ],
             "referenceTable": "serverpod_user_info",
             "referenceTableSchema": "public",
@@ -63,7 +57,7 @@
         ],
         "indexes": [
           {
-            "indexName": "tradelocker_credentials_pkey",
+            "indexName": "tradely_profile_pkey",
             "elements": [
               {
                 "type": 0,

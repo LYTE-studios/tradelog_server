@@ -12,13 +12,14 @@
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'protocol.dart' as _i2;
 
-abstract class LinkedAccount extends _i1.TableRow
-    implements _i1.ProtocolSerialization {
+abstract class LinkedAccount
+    implements _i1.TableRow, _i1.ProtocolSerialization {
   LinkedAccount._({
-    int? id,
+    this.id,
     required this.userInfoId,
     required this.apiKey,
     required this.platform,
+  });
     this.tradelockerAccountId,
     this.tradelockerAccounts,
     this.metaID,
@@ -53,6 +54,9 @@ abstract class LinkedAccount extends _i1.TableRow
   static final t = LinkedAccountTable();
 
   static const db = LinkedAccountRepository._();
+
+  @override
+  int? id;
 
   int userInfoId;
 

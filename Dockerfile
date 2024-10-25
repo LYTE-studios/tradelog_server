@@ -1,4 +1,4 @@
-FROM dart:3.2.5 AS build
+FROM dart:3.5.2 AS build
 
 WORKDIR /app
 COPY . .
@@ -10,7 +10,7 @@ FROM alpine:latest
 
 ENV runmode=production
 ENV serverid=default
-ENV logging=normal
+ENV logging=verbose
 ENV role=monolith
 
 COPY --from=build /runtime/ /
@@ -20,6 +20,5 @@ COPY --from=build /app/web/ web/
 
 EXPOSE 8080
 EXPOSE 8081
-EXPOSE 8082
 
 ENTRYPOINT ./server --mode=$runmode --server-id=$serverid --logging=$logging --role=$role

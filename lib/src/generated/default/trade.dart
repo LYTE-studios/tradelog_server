@@ -13,8 +13,9 @@ import 'package:serverpod/serverpod.dart' as _i1;
 import '../protocol.dart' as _i2;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 
-abstract class Trade extends _i1.TableRow implements _i1.ProtocolSerialization {
+abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   Trade._({
+    this.id,
     int? id,
     required this.platform,
     required this.option,
@@ -28,7 +29,7 @@ abstract class Trade extends _i1.TableRow implements _i1.ProtocolSerialization {
     required this.stoploss,
     required this.profitLoss,
     required this.amount,
-  }) : super(id);
+  });
 
   factory Trade({
     int? id,
@@ -71,7 +72,12 @@ abstract class Trade extends _i1.TableRow implements _i1.ProtocolSerialization {
 
   static const db = TradeRepository._();
 
+
+  @override
+  int? id;
+  
   String platform;
+
 
   _i2.Option option;
 

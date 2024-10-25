@@ -1,6 +1,10 @@
 account:
+  - fetchAccounts:
   - linkAccount:
   - unlinkAccount:
+file:
+  - getUploadDescription:
+  - verifyUpload:
 metaApi:
   - initializeClient:
   - authenticate:
@@ -10,10 +14,13 @@ metaApi:
   - getOrders:
   - getHistoryOrdersByTime:
 note:
-  - addNote:
+  - getNoteForDate:
   - deleteNote:
   - updateNote:
   - getNotes:
+profile:
+  - updateProfile:
+  - getProfile:
 trade:
   - addTrade:
   - deleteTrade:
