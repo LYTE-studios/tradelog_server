@@ -40,17 +40,18 @@ import 'tradelocker/tradelocker_position.dart' as _i27;
 import 'tradelocker/trading_rules.dart' as _i28;
 import 'protocol.dart' as _i29;
 import 'package:tradelog_server/src/generated/linked_accounts.dart' as _i30;
-import 'package:tradelog_server/src/generated/meta/meta_trader_position.dart'
-    as _i31;
 import 'package:tradelog_server/src/generated/default/display_trade.dart'
+    as _i31;
+import 'package:tradelog_server/src/generated/meta/meta_trader_position.dart'
     as _i32;
 import 'package:tradelog_server/src/generated/meta/meta_trader_order.dart'
     as _i33;
 import 'package:tradelog_server/src/generated/default/note.dart' as _i34;
+import 'package:tradelog_server/src/generated/default/trade.dart' as _i35;
 import 'package:tradelog_server/src/generated/tradelocker/tradelocker_order.dart'
-    as _i35;
+    as _i36;
 import 'package:tradelog_server/src/generated/tradelocker/tradelocker_account_info.dart'
-    as _i34;
+    as _i37;
 export 'access_token.dart';
 export 'default/display_trade.dart';
 export 'default/note.dart';
@@ -117,6 +118,12 @@ class Protocol extends _i1.SerializationManagerServer {
           dartType: 'protocol:Platform',
         ),
         _i2.ColumnDefinition(
+          name: 'tradelockerCredentialsId',
+          columnType: _i2.ColumnType.bigint,
+          isNullable: true,
+          dartType: 'int?',
+        ),
+        _i2.ColumnDefinition(
           name: 'tradelockerAccountId',
           columnType: _i2.ColumnType.json,
           isNullable: true,
@@ -145,7 +152,17 @@ class Protocol extends _i1.SerializationManagerServer {
           onUpdate: _i2.ForeignKeyAction.noAction,
           onDelete: _i2.ForeignKeyAction.noAction,
           matchType: null,
-        )
+        ),
+        _i2.ForeignKeyDefinition(
+          constraintName: 'linked_account_fk_1',
+          columns: ['tradelockerCredentialsId'],
+          referenceTable: 'tradelocker_credentials',
+          referenceTableSchema: 'public',
+          referenceColumns: ['id'],
+          onUpdate: _i2.ForeignKeyAction.noAction,
+          onDelete: _i2.ForeignKeyAction.noAction,
+          matchType: null,
+        ),
       ],
       indexes: [
         _i2.IndexDefinition(
@@ -660,21 +677,17 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i1.getType<_i28.TradingRules?>()) {
       return (data != null ? _i28.TradingRules.fromJson(data) : null) as T;
     }
-
+    if (t == _i1.getType<List<String>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<String>(e)).toList()
+          : null) as dynamic;
+    }
+    if (t == _i1.getType<List<String>?>()) {
+      return (data != null
+          ? (data as List).map((e) => deserialize<String>(e)).toList()
+          : null) as dynamic;
+    }
     if (t == List<_i29.StopLossThreshold>) {
-
-    if (t == _i1.getType<List<String>?>()) {
-      return (data != null
-          ? (data as List).map((e) => deserialize<String>(e)).toList()
-          : null) as dynamic;
-    }
-    if (t == _i1.getType<List<String>?>()) {
-      return (data != null
-          ? (data as List).map((e) => deserialize<String>(e)).toList()
-          : null) as dynamic;
-    }
-    if (t == List<_i28.StopLossThreshold>) {
-
       return (data as List)
           .map((e) => deserialize<_i29.StopLossThreshold>(e))
           .toList() as dynamic;
@@ -692,14 +705,14 @@ class Protocol extends _i1.SerializationManagerServer {
           .map((e) => deserialize<_i30.LinkedAccount>(e))
           .toList() as dynamic;
     }
-    if (t == List<_i31.MetatraderPosition>) {
+    if (t == List<_i31.DisplayTrade>) {
       return (data as List)
-          .map((e) => deserialize<_i31.MetatraderPosition>(e))
+          .map((e) => deserialize<_i31.DisplayTrade>(e))
           .toList() as dynamic;
     }
-    if (t == List<_i32.DisplayTrade>) {
+    if (t == List<_i32.MetatraderPosition>) {
       return (data as List)
-          .map((e) => deserialize<_i32.DisplayTrade>(e))
+          .map((e) => deserialize<_i32.MetatraderPosition>(e))
           .toList() as dynamic;
     }
     if (t == List<_i33.MetatraderOrder>) {
@@ -711,18 +724,21 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data as List).map((e) => deserialize<_i34.Note>(e)).toList()
           as dynamic;
     }
-    if (t == List<_i35.TradelockerOrder>) {
+    if (t == List<_i35.Trade>) {
+      return (data as List).map((e) => deserialize<_i35.Trade>(e)).toList()
+          as dynamic;
+    }
     if (t == List<int>) {
       return (data as List).map((e) => deserialize<int>(e)).toList() as dynamic;
     }
-    if (t == List<_i33.TradelockerOrder>) {
+    if (t == List<_i36.TradelockerOrder>) {
       return (data as List)
-          .map((e) => deserialize<_i35.TradelockerOrder>(e))
+          .map((e) => deserialize<_i36.TradelockerOrder>(e))
           .toList() as dynamic;
     }
-    if (t == List<_i34.TradelockerAccountInformation>) {
+    if (t == List<_i37.TradelockerAccountInformation>) {
       return (data as List)
-          .map((e) => deserialize<_i34.TradelockerAccountInformation>(e))
+          .map((e) => deserialize<_i37.TradelockerAccountInformation>(e))
           .toList() as dynamic;
     }
     try {

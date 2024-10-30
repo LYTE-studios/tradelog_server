@@ -54,33 +54,39 @@ class MetaApiEndpoint extends Endpoint {
   /// Authenticates the user by storing the provided API key and linking it to the user's account.
   /// If a linked account exists, it updates the API key. Otherwise, it inserts a new linked account.
   /// Caches the access token after authentication.
-  Future<void> authenticate(Session session, String apiKey) async {
+  Future<void> authenticate(
+      Session session, String apiKey, String metaId) async {
     var authenticated = await session.authenticated;
     var accessToken = AccessToken(token: apiKey);
 
-    // Check if linked account exists
+    // Check if a linked account exists for this user on the MetaTrader platform
     LinkedAccount? checkLinked;
     try {
       checkLinked = await LinkedAccount.db.findFirstRow(
         session,
-        where: (o) => o.userInfoId.equals(authenticated!.userId),
+        where: (o) =>
+            o.userInfoId.equals(authenticated!.userId) &
+            o.platform.equals(Platform.Metatrader),
       );
     } catch (e) {
       throw Exception(
           'Database error while checking linked account - Error: $e');
     }
 
-    // Insert or update the linked account
+    // Insert or update the linked account, setting the metaId
     try {
       if (checkLinked == null) {
         var linkedAccount = LinkedAccount(
           userInfoId: authenticated!.userId,
           apiKey: apiKey,
           platform: Platform.Metatrader,
+          metaID: metaId, // Set the metaId here
         );
         await LinkedAccount.db.insertRow(session, linkedAccount);
       } else {
         checkLinked.apiKey = apiKey;
+        checkLinked.metaID =
+            metaId; // Update the metaId here if it already exists
         await LinkedAccount.db.updateRow(session, checkLinked);
       }
     } catch (e) {
