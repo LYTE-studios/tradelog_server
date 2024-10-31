@@ -18,6 +18,7 @@ class TradeEndpoint extends Endpoint {
 
 
   Future<List<Trade>> fetchTrades(Session session) async { 
+    
     return await Trade.db.find(session);
   }
 

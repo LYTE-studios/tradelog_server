@@ -8,6 +8,7 @@ RUN dart compile exe bin/main.dart -o bin/server
 
 FROM alpine:latest
 
+# ENV runmode=development
 ENV runmode=production
 ENV serverid=default
 ENV logging=verbose

@@ -13,4 +13,4 @@ fields:
 indexes:
     user_info_id_unique_idx:
         fields: userInfoId
-        unique: true
+        unique: false

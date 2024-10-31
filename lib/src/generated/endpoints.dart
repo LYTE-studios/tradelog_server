@@ -185,7 +185,17 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['global'] as _i4.GlobalEndpoint)
                   .fetchFromAPIs(session),
-        )
+        ),
+        'getCachedTrades': _i1.MethodConnector(
+          name: 'getCachedTrades',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['global'] as _i4.GlobalEndpoint)
+                  .getCachedTrades(session),
+        ),
       },
     );
     connectors['metaApi'] = _i1.EndpointConnector(

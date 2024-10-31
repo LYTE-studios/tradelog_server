@@ -134,6 +134,7 @@ class MetaApiEndpoint extends Endpoint {
     final response =
         await client.get('/users/current/accounts/$accountId/positions');
     if (response.statusCode == 200) {
+      print(response.data);
       return List<MetatraderPosition>.from(
           response.data.map((x) => MetatraderPosition.fromJson(x)));
     } else {
@@ -146,20 +147,60 @@ class MetaApiEndpoint extends Endpoint {
       Session session, String accountId) async {
     await initializeClient(session);
 
-    final response =
-        await client.get('/users/current/accounts/$accountId/positions');
-    if (response.statusCode == 200) {
-      var positions = List<MetatraderPosition>.from(
-          response.data.map((x) => MetatraderPosition.fromJson(x)));
-      var trades = <DisplayTrade>[];
-      for (var position in positions) {
-        trades.add(TradeExtension.fromMetaTrader(position));
-      }
-      return trades;
-    } else {
-      throw Exception(
-          'Failed to fetch trades - Error code: ${response.statusCode}');
+  // Fetch orders for the specified account within a date range
+  final orderResponse = await client.get(
+      '/users/current/accounts/$accountId/history-orders/time/:${DateTime(2021)}/:${DateTime.now()}');
+
+  if (orderResponse.statusCode == 200) {
+    // Convert response data to a list of MetatraderOrder objects
+    var orders = List<MetatraderOrder>.from(
+        orderResponse.data.map((x) => MetatraderOrder.fromJson(x)));
+
+    // Group orders by positionId
+    Map<String, List<MetatraderOrder>> ordersByPosition = {};
+    for (var order in orders) {
+      ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
     }
+
+    // Calculate net profit/loss and convert to DisplayTrade objects
+    var displayTrades = <DisplayTrade>[];
+    for (var entry in ordersByPosition.entries) {
+      var positionOrders = entry.value;
+
+      double netpl = 0.0;
+      double netroi = 0.0;
+
+      // Process orders in pairs to calculate netpl based on buy/sell price differences
+      for (var i = 0; i < positionOrders.length - 1; i++) {
+        var buyOrder = positionOrders[i];
+        var sellOrder = positionOrders[i + 1];
+
+        // Calculate profit/loss only if we have a BUY followed by a SELL
+        if (buyOrder.type == 'ORDER_TYPE_BUY' &&
+            sellOrder.type == 'ORDER_TYPE_SELL') {
+          netpl += (sellOrder.openPrice! - buyOrder.openPrice!) * buyOrder.volume;
+          double investment = buyOrder.openPrice! * buyOrder.volume;
+          netroi += investment != 0 ? (netpl / investment) * 100 : 0.0;
+        }
+      }
+
+      // Use the first order as the basis for DisplayTrade properties
+      var baseOrder = positionOrders.first;
+      displayTrades.add(DisplayTrade(
+        openTime: baseOrder.time,  // Time of the first order in the position
+        symbol: baseOrder.symbol,                  // Symbol from the first order
+        direction: baseOrder.type == 'ORDER_TYPE_BUY' ? 'Buy' : 'Sell',
+        status: baseOrder.state == 'ORDER_STATE_FILLED' ? 'Closed' : 'Open',
+        netpl: netpl,
+        netroi: netroi,
+      ));
+    }
+
+    return displayTrades;
+  } else {
+    throw Exception(
+        'Failed to fetch order history - Error code: ${orderResponse.statusCode}');
+  }
   }
 
   /// Retrieves the list of open orders for the specified MetaTrader account.
@@ -169,11 +210,11 @@ class MetaApiEndpoint extends Endpoint {
       Session session, String accountId) async {
     await initializeClient(session);
 
-    final response =
-        await client.get('/users/current/accounts/$accountId/orders');
+    final response = await client.get(
+        '/users/current/accounts/$accountId/history-orders/time/:${DateTime(2021)}/:${DateTime.now()}');
     if (response.statusCode == 200) {
       return List<MetatraderOrder>.from(
-          response.data.map((x) => MetatraderPosition.fromJson(x)));
+          response.data.map((x) => MetatraderOrder.fromJson(x)));
     } else {
       throw Exception(
           'Failed to fetch orders - Error code: ${response.statusCode}');

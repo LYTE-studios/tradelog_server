@@ -26,6 +26,8 @@ class GlobalEndpoint extends Endpoint {
           try {
             var metaTrades =
                 await MetaApiEndpoint().getTrades(session, account.metaID!);
+            //await MetaApiEndpoint().getTrades(session, account.metaID!);
+            //print(metaTrades);
             trades.addAll(metaTrades);
           } catch (e) {
             session.log('Error fetching trades from MetaTrader: $e');
@@ -33,8 +35,7 @@ class GlobalEndpoint extends Endpoint {
           break;
         case Platform.Tradelocker:
           try {
-            var tlTrades =
-                await TradeLockerEndpoint().getAllTrades(session);
+            var tlTrades = await TradeLockerEndpoint().getAllTrades(session);
             trades.addAll(tlTrades);
           } catch (e) {
             session.log('Error fetching trades from Tradelocker: $e');
@@ -44,6 +45,23 @@ class GlobalEndpoint extends Endpoint {
     }
 
     trades.sort((a, b) => a.openTime.compareTo(b.openTime));
+    // Convert each DisplayTrade to JSON and store the JSON list in the cache
+    // Wrap the trades in DisplayTradeList and store in the cache
+    var tradeListWrapper = DisplayTradeList(trades: trades);
+    await session.caches.localPrio
+        .put('trades-${authenticated.userId}', tradeListWrapper);
     return trades;
+  }
+
+  Future<List<DisplayTrade>> getCachedTrades(Session session) async {
+    var authenticated = await session.authenticated;
+
+    var cachedData = await session.caches.localPrio
+        .get<DisplayTradeList>('trades-${authenticated!.userId}');
+    if (cachedData == null) {
+      return [];
+    }
+
+    return cachedData.trades;
   }
 }
