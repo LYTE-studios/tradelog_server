@@ -8,8 +8,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 
-// ignore_for_file: invalid_use_of_visible_for_testing_member
-
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'protocol.dart' as _i2;
@@ -302,7 +300,7 @@ class LinkedAccountRepository {
   const LinkedAccountRepository._();
 
   Future<List<LinkedAccount>> find(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<LinkedAccountTable>? where,
     int? limit,
     int? offset,
@@ -311,19 +309,19 @@ class LinkedAccountRepository {
     _i1.OrderByListBuilder<LinkedAccountTable>? orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.find<LinkedAccount>(
+    return databaseAccessor.db.find<LinkedAccount>(
       where: where?.call(LinkedAccount.t),
       orderBy: orderBy?.call(LinkedAccount.t),
       orderByList: orderByList?.call(LinkedAccount.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<LinkedAccount?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<LinkedAccountTable>? where,
     int? offset,
     _i1.OrderByBuilder<LinkedAccountTable>? orderBy,
@@ -331,118 +329,118 @@ class LinkedAccountRepository {
     _i1.OrderByListBuilder<LinkedAccountTable>? orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findFirstRow<LinkedAccount>(
+    return databaseAccessor.db.findFirstRow<LinkedAccount>(
       where: where?.call(LinkedAccount.t),
       orderBy: orderBy?.call(LinkedAccount.t),
       orderByList: orderByList?.call(LinkedAccount.t),
       orderDescending: orderDescending,
       offset: offset,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<LinkedAccount?> findById(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     int id, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findById<LinkedAccount>(
+    return databaseAccessor.db.findById<LinkedAccount>(
       id,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<LinkedAccount>> insert(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<LinkedAccount> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<LinkedAccount>(
+    return databaseAccessor.db.insert<LinkedAccount>(
       rows,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<LinkedAccount> insertRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     LinkedAccount row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<LinkedAccount>(
+    return databaseAccessor.db.insertRow<LinkedAccount>(
       row,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<LinkedAccount>> update(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<LinkedAccount> rows, {
     _i1.ColumnSelections<LinkedAccountTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<LinkedAccount>(
+    return databaseAccessor.db.update<LinkedAccount>(
       rows,
       columns: columns?.call(LinkedAccount.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<LinkedAccount> updateRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     LinkedAccount row, {
     _i1.ColumnSelections<LinkedAccountTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<LinkedAccount>(
+    return databaseAccessor.db.updateRow<LinkedAccount>(
       row,
       columns: columns?.call(LinkedAccount.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<LinkedAccount>> delete(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<LinkedAccount> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<LinkedAccount>(
+    return databaseAccessor.db.delete<LinkedAccount>(
       rows,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<LinkedAccount> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     LinkedAccount row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<LinkedAccount>(
+    return databaseAccessor.db.deleteRow<LinkedAccount>(
       row,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<LinkedAccount>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     required _i1.WhereExpressionBuilder<LinkedAccountTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<LinkedAccount>(
+    return databaseAccessor.db.deleteWhere<LinkedAccount>(
       where: where(LinkedAccount.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<LinkedAccountTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<LinkedAccount>(
+    return databaseAccessor.db.count<LinkedAccount>(
       where: where?.call(LinkedAccount.t),
       limit: limit,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 }

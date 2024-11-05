@@ -8,8 +8,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 
-// ignore_for_file: invalid_use_of_visible_for_testing_member
-
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i2;
@@ -291,7 +289,7 @@ class TradelockerCredentialsRepository {
   final attachRow = const TradelockerCredentialsAttachRowRepository._();
 
   Future<List<TradelockerCredentials>> find(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradelockerCredentialsTable>? where,
     int? limit,
     int? offset,
@@ -301,20 +299,20 @@ class TradelockerCredentialsRepository {
     _i1.Transaction? transaction,
     TradelockerCredentialsInclude? include,
   }) async {
-    return session.db.find<TradelockerCredentials>(
+    return databaseAccessor.db.find<TradelockerCredentials>(
       where: where?.call(TradelockerCredentials.t),
       orderBy: orderBy?.call(TradelockerCredentials.t),
       orderByList: orderByList?.call(TradelockerCredentials.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<TradelockerCredentials?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradelockerCredentialsTable>? where,
     int? offset,
     _i1.OrderByBuilder<TradelockerCredentialsTable>? orderBy,
@@ -323,121 +321,121 @@ class TradelockerCredentialsRepository {
     _i1.Transaction? transaction,
     TradelockerCredentialsInclude? include,
   }) async {
-    return session.db.findFirstRow<TradelockerCredentials>(
+    return databaseAccessor.db.findFirstRow<TradelockerCredentials>(
       where: where?.call(TradelockerCredentials.t),
       orderBy: orderBy?.call(TradelockerCredentials.t),
       orderByList: orderByList?.call(TradelockerCredentials.t),
       orderDescending: orderDescending,
       offset: offset,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<TradelockerCredentials?> findById(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     int id, {
     _i1.Transaction? transaction,
     TradelockerCredentialsInclude? include,
   }) async {
-    return session.db.findById<TradelockerCredentials>(
+    return databaseAccessor.db.findById<TradelockerCredentials>(
       id,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<List<TradelockerCredentials>> insert(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<TradelockerCredentials> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<TradelockerCredentials>(
+    return databaseAccessor.db.insert<TradelockerCredentials>(
       rows,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<TradelockerCredentials> insertRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     TradelockerCredentials row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<TradelockerCredentials>(
+    return databaseAccessor.db.insertRow<TradelockerCredentials>(
       row,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<TradelockerCredentials>> update(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<TradelockerCredentials> rows, {
     _i1.ColumnSelections<TradelockerCredentialsTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<TradelockerCredentials>(
+    return databaseAccessor.db.update<TradelockerCredentials>(
       rows,
       columns: columns?.call(TradelockerCredentials.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<TradelockerCredentials> updateRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     TradelockerCredentials row, {
     _i1.ColumnSelections<TradelockerCredentialsTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<TradelockerCredentials>(
+    return databaseAccessor.db.updateRow<TradelockerCredentials>(
       row,
       columns: columns?.call(TradelockerCredentials.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<TradelockerCredentials>> delete(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<TradelockerCredentials> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<TradelockerCredentials>(
+    return databaseAccessor.db.delete<TradelockerCredentials>(
       rows,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<TradelockerCredentials> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     TradelockerCredentials row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<TradelockerCredentials>(
+    return databaseAccessor.db.deleteRow<TradelockerCredentials>(
       row,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<TradelockerCredentials>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     required _i1.WhereExpressionBuilder<TradelockerCredentialsTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<TradelockerCredentials>(
+    return databaseAccessor.db.deleteWhere<TradelockerCredentials>(
       where: where(TradelockerCredentials.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradelockerCredentialsTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<TradelockerCredentials>(
+    return databaseAccessor.db.count<TradelockerCredentials>(
       where: where?.call(TradelockerCredentials.t),
       limit: limit,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 }
@@ -446,7 +444,7 @@ class TradelockerCredentialsAttachRowRepository {
   const TradelockerCredentialsAttachRowRepository._();
 
   Future<void> user(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     TradelockerCredentials tradelockerCredentials,
     _i2.UserInfo user, {
     _i1.Transaction? transaction,
@@ -460,10 +458,10 @@ class TradelockerCredentialsAttachRowRepository {
 
     var $tradelockerCredentials =
         tradelockerCredentials.copyWith(userId: user.id);
-    await session.db.updateRow<TradelockerCredentials>(
+    await databaseAccessor.db.updateRow<TradelockerCredentials>(
       $tradelockerCredentials,
       columns: [TradelockerCredentials.t.userId],
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 }

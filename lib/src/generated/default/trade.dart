@@ -8,8 +8,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 
-// ignore_for_file: invalid_use_of_visible_for_testing_member
-
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import '../protocol.dart' as _i2;
@@ -404,7 +402,7 @@ class TradeRepository {
   final attachRow = const TradeAttachRowRepository._();
 
   Future<List<Trade>> find(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradeTable>? where,
     int? limit,
     int? offset,
@@ -414,20 +412,20 @@ class TradeRepository {
     _i1.Transaction? transaction,
     TradeInclude? include,
   }) async {
-    return session.db.find<Trade>(
+    return databaseAccessor.db.find<Trade>(
       where: where?.call(Trade.t),
       orderBy: orderBy?.call(Trade.t),
       orderByList: orderByList?.call(Trade.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<Trade?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradeTable>? where,
     int? offset,
     _i1.OrderByBuilder<TradeTable>? orderBy,
@@ -436,121 +434,121 @@ class TradeRepository {
     _i1.Transaction? transaction,
     TradeInclude? include,
   }) async {
-    return session.db.findFirstRow<Trade>(
+    return databaseAccessor.db.findFirstRow<Trade>(
       where: where?.call(Trade.t),
       orderBy: orderBy?.call(Trade.t),
       orderByList: orderByList?.call(Trade.t),
       orderDescending: orderDescending,
       offset: offset,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<Trade?> findById(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     int id, {
     _i1.Transaction? transaction,
     TradeInclude? include,
   }) async {
-    return session.db.findById<Trade>(
+    return databaseAccessor.db.findById<Trade>(
       id,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
       include: include,
     );
   }
 
   Future<List<Trade>> insert(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<Trade> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<Trade>(
+    return databaseAccessor.db.insert<Trade>(
       rows,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<Trade> insertRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     Trade row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<Trade>(
+    return databaseAccessor.db.insertRow<Trade>(
       row,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<Trade>> update(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<Trade> rows, {
     _i1.ColumnSelections<TradeTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<Trade>(
+    return databaseAccessor.db.update<Trade>(
       rows,
       columns: columns?.call(Trade.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<Trade> updateRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     Trade row, {
     _i1.ColumnSelections<TradeTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<Trade>(
+    return databaseAccessor.db.updateRow<Trade>(
       row,
       columns: columns?.call(Trade.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<Trade>> delete(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<Trade> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<Trade>(
+    return databaseAccessor.db.delete<Trade>(
       rows,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<Trade> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     Trade row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<Trade>(
+    return databaseAccessor.db.deleteRow<Trade>(
       row,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<Trade>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     required _i1.WhereExpressionBuilder<TradeTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<Trade>(
+    return databaseAccessor.db.deleteWhere<Trade>(
       where: where(Trade.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradeTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<Trade>(
+    return databaseAccessor.db.count<Trade>(
       where: where?.call(Trade.t),
       limit: limit,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 }
@@ -559,7 +557,7 @@ class TradeAttachRowRepository {
   const TradeAttachRowRepository._();
 
   Future<void> user(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     Trade trade,
     _i3.UserInfo user, {
     _i1.Transaction? transaction,
@@ -572,10 +570,10 @@ class TradeAttachRowRepository {
     }
 
     var $trade = trade.copyWith(userId: user.id);
-    await session.db.updateRow<Trade>(
+    await databaseAccessor.db.updateRow<Trade>(
       $trade,
       columns: [Trade.t.userId],
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 }
