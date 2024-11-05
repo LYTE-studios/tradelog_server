@@ -23,6 +23,7 @@ abstract class LinkedAccount
     this.tradelockerAccountId,
     this.tradelockerAccounts,
     this.metaID,
+    this.title,
   });
 
   factory LinkedAccount({
@@ -34,6 +35,7 @@ abstract class LinkedAccount
     List<String>? tradelockerAccountId,
     List<String>? tradelockerAccounts,
     String? metaID,
+    String? title,
   }) = _LinkedAccountImpl;
 
   factory LinkedAccount.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -51,6 +53,7 @@ abstract class LinkedAccount
           ?.map((e) => e as String)
           .toList(),
       metaID: jsonSerialization['metaID'] as String?,
+      title: jsonSerialization['title'] as String?,
     );
   }
 
@@ -75,6 +78,8 @@ abstract class LinkedAccount
 
   String? metaID;
 
+  String? title;
+
   @override
   _i1.Table get table => t;
 
@@ -87,6 +92,7 @@ abstract class LinkedAccount
     List<String>? tradelockerAccountId,
     List<String>? tradelockerAccounts,
     String? metaID,
+    String? title,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -102,6 +108,7 @@ abstract class LinkedAccount
       if (tradelockerAccounts != null)
         'tradelockerAccounts': tradelockerAccounts?.toJson(),
       if (metaID != null) 'metaID': metaID,
+      if (title != null) 'title': title,
     };
   }
 
@@ -119,6 +126,7 @@ abstract class LinkedAccount
       if (tradelockerAccounts != null)
         'tradelockerAccounts': tradelockerAccounts?.toJson(),
       if (metaID != null) 'metaID': metaID,
+      if (title != null) 'title': title,
     };
   }
 
@@ -164,6 +172,7 @@ class _LinkedAccountImpl extends LinkedAccount {
     List<String>? tradelockerAccountId,
     List<String>? tradelockerAccounts,
     String? metaID,
+    String? title,
   }) : super._(
           id: id,
           userInfoId: userInfoId,
@@ -173,6 +182,7 @@ class _LinkedAccountImpl extends LinkedAccount {
           tradelockerAccountId: tradelockerAccountId,
           tradelockerAccounts: tradelockerAccounts,
           metaID: metaID,
+          title: title,
         );
 
   @override
@@ -185,6 +195,7 @@ class _LinkedAccountImpl extends LinkedAccount {
     Object? tradelockerAccountId = _Undefined,
     Object? tradelockerAccounts = _Undefined,
     Object? metaID = _Undefined,
+    Object? title = _Undefined,
   }) {
     return LinkedAccount(
       id: id is int? ? id : this.id,
@@ -201,6 +212,7 @@ class _LinkedAccountImpl extends LinkedAccount {
           ? tradelockerAccounts
           : this.tradelockerAccounts?.map((e0) => e0).toList(),
       metaID: metaID is String? ? metaID : this.metaID,
+      title: title is String? ? title : this.title,
     );
   }
 }
@@ -237,6 +249,10 @@ class LinkedAccountTable extends _i1.Table {
       'metaID',
       this,
     );
+    title = _i1.ColumnString(
+      'title',
+      this,
+    );
   }
 
   late final _i1.ColumnInt userInfoId;
@@ -253,6 +269,8 @@ class LinkedAccountTable extends _i1.Table {
 
   late final _i1.ColumnString metaID;
 
+  late final _i1.ColumnString title;
+
   @override
   List<_i1.Column> get columns => [
         id,
@@ -263,6 +281,7 @@ class LinkedAccountTable extends _i1.Table {
         tradelockerAccountId,
         tradelockerAccounts,
         metaID,
+        title,
       ];
 }
 

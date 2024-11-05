@@ -233,6 +233,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'title': _i1.ParameterDescription(
+              name: 'title',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
           },
           call: (
             _i1.Session session,
@@ -242,6 +247,7 @@ class Endpoints extends _i1.EndpointDispatch {
             session,
             params['apiKey'],
             params['metaId'],
+            title: params['title'],
           ),
         ),
         'getAccountInformation': _i1.MethodConnector(
@@ -568,6 +574,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'title': _i1.ParameterDescription(
+              name: 'title',
+              type: _i1.getType<String?>(),
+              nullable: true,
+            ),
           },
           call: (
             _i1.Session session,
@@ -579,6 +590,7 @@ class Endpoints extends _i1.EndpointDispatch {
             params['email'],
             params['password'],
             params['server'],
+            title: params['title'],
           ),
         ),
         'refresh': _i1.MethodConnector(

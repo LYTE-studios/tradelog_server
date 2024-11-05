@@ -3,14 +3,15 @@ class: LinkedAccount
 table: linked_account
 
 fields:
-    userInfoId: int, relation(parent=serverpod_user_info)
-    apiKey: String
-    platform: Platform
-    tradelockerCredentialsId: int?, relation(parent=tradelocker_credentials) 
-    tradelockerAccountId: List<String>?
-    tradelockerAccounts: List<String>?
-    metaID: String?
+  userInfoId: int, relation(parent=serverpod_user_info)
+  apiKey: String
+  platform: Platform
+  tradelockerCredentialsId: int?, relation(parent=tradelocker_credentials)
+  tradelockerAccountId: List<String>?
+  tradelockerAccounts: List<String>?
+  metaID: String?
+  title: String?
 indexes:
-    user_info_id_unique_idx:
-        fields: userInfoId
-        unique: false
+  user_info_id_unique_idx:
+    fields: userInfoId
+    unique: false

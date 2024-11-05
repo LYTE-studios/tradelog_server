@@ -1,11 +1,7 @@
-import 'dart:ffi';
-
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/metaapi_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
-import 'package:tradelog_server/src/models/trade_extension.dart'
-    show TradeExtension;
 
 class MetaApiEndpoint extends Endpoint {
   @override
@@ -55,7 +51,11 @@ class MetaApiEndpoint extends Endpoint {
   /// If a linked account exists, it updates the API key. Otherwise, it inserts a new linked account.
   /// Caches the access token after authentication.
   Future<void> authenticate(
-      Session session, String apiKey, String metaId) async {
+    Session session,
+    String apiKey,
+    String metaId, {
+    String? title,
+  }) async {
     var authenticated = await session.authenticated;
     var accessToken = AccessToken(token: apiKey);
 
@@ -80,13 +80,16 @@ class MetaApiEndpoint extends Endpoint {
           userInfoId: authenticated!.userId,
           apiKey: apiKey,
           platform: Platform.Metatrader,
-          metaID: metaId, // Set the metaId here
+          metaID: metaId,
+          // Set the metaId here
+          title: title,
         );
         await LinkedAccount.db.insertRow(session, linkedAccount);
       } else {
         checkLinked.apiKey = apiKey;
         checkLinked.metaID =
             metaId; // Update the metaId here if it already exists
+        checkLinked.title = title;
         await LinkedAccount.db.updateRow(session, checkLinked);
       }
     } catch (e) {
@@ -147,60 +150,63 @@ class MetaApiEndpoint extends Endpoint {
       Session session, String accountId) async {
     await initializeClient(session);
 
-  // Fetch orders for the specified account within a date range
-  final orderResponse = await client.get(
-      '/users/current/accounts/$accountId/history-orders/time/:${DateTime(2021)}/:${DateTime.now()}');
+    // Fetch orders for the specified account within a date range
+    final orderResponse = await client.get(
+        '/users/current/accounts/$accountId/history-orders/time/:${DateTime(2021)}/:${DateTime.now()}');
 
-  if (orderResponse.statusCode == 200) {
-    // Convert response data to a list of MetatraderOrder objects
-    var orders = List<MetatraderOrder>.from(
-        orderResponse.data.map((x) => MetatraderOrder.fromJson(x)));
+    if (orderResponse.statusCode == 200) {
+      // Convert response data to a list of MetatraderOrder objects
+      var orders = List<MetatraderOrder>.from(
+          orderResponse.data.map((x) => MetatraderOrder.fromJson(x)));
 
-    // Group orders by positionId
-    Map<String, List<MetatraderOrder>> ordersByPosition = {};
-    for (var order in orders) {
-      ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
-    }
-
-    // Calculate net profit/loss and convert to DisplayTrade objects
-    var displayTrades = <DisplayTrade>[];
-    for (var entry in ordersByPosition.entries) {
-      var positionOrders = entry.value;
-
-      double netpl = 0.0;
-      double netroi = 0.0;
-
-      // Process orders in pairs to calculate netpl based on buy/sell price differences
-      for (var i = 0; i < positionOrders.length - 1; i++) {
-        var buyOrder = positionOrders[i];
-        var sellOrder = positionOrders[i + 1];
-
-        // Calculate profit/loss only if we have a BUY followed by a SELL
-        if (buyOrder.type == 'ORDER_TYPE_BUY' &&
-            sellOrder.type == 'ORDER_TYPE_SELL') {
-          netpl += (sellOrder.openPrice! - buyOrder.openPrice!) * buyOrder.volume;
-          double investment = buyOrder.openPrice! * buyOrder.volume;
-          netroi += investment != 0 ? (netpl / investment) * 100 : 0.0;
-        }
+      // Group orders by positionId
+      Map<String, List<MetatraderOrder>> ordersByPosition = {};
+      for (var order in orders) {
+        ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
       }
 
-      // Use the first order as the basis for DisplayTrade properties
-      var baseOrder = positionOrders.first;
-      displayTrades.add(DisplayTrade(
-        openTime: baseOrder.time,  // Time of the first order in the position
-        symbol: baseOrder.symbol,                  // Symbol from the first order
-        direction: baseOrder.type == 'ORDER_TYPE_BUY' ? 'Buy' : 'Sell',
-        status: baseOrder.state == 'ORDER_STATE_FILLED' ? 'Closed' : 'Open',
-        netpl: netpl,
-        netroi: netroi,
-      ));
-    }
+      // Calculate net profit/loss and convert to DisplayTrade objects
+      var displayTrades = <DisplayTrade>[];
+      for (var entry in ordersByPosition.entries) {
+        var positionOrders = entry.value;
 
-    return displayTrades;
-  } else {
-    throw Exception(
-        'Failed to fetch order history - Error code: ${orderResponse.statusCode}');
-  }
+        double netpl = 0.0;
+        double netroi = 0.0;
+
+        // Process orders in pairs to calculate netpl based on buy/sell price differences
+        for (var i = 0; i < positionOrders.length - 1; i++) {
+          var buyOrder = positionOrders[i];
+          var sellOrder = positionOrders[i + 1];
+
+          // Calculate profit/loss only if we have a BUY followed by a SELL
+          if (buyOrder.type == 'ORDER_TYPE_BUY' &&
+              sellOrder.type == 'ORDER_TYPE_SELL') {
+            netpl +=
+                (sellOrder.openPrice! - buyOrder.openPrice!) * buyOrder.volume;
+            double investment = buyOrder.openPrice! * buyOrder.volume;
+            netroi += investment != 0 ? (netpl / investment) * 100 : 0.0;
+          }
+        }
+
+        // Use the first order as the basis for DisplayTrade properties
+        var baseOrder = positionOrders.first;
+        displayTrades.add(DisplayTrade(
+          openTime: baseOrder.time,
+          // Time of the first order in the position
+          symbol: baseOrder.symbol,
+          // Symbol from the first order
+          direction: baseOrder.type == 'ORDER_TYPE_BUY' ? 'Buy' : 'Sell',
+          status: baseOrder.state == 'ORDER_STATE_FILLED' ? 'Closed' : 'Open',
+          netpl: netpl,
+          netroi: netroi,
+        ));
+      }
+
+      return displayTrades;
+    } else {
+      throw Exception(
+          'Failed to fetch order history - Error code: ${orderResponse.statusCode}');
+    }
   }
 
   /// Retrieves the list of open orders for the specified MetaTrader account.

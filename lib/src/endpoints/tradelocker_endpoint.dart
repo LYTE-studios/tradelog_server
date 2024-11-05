@@ -4,7 +4,6 @@ import 'package:dio/dio.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/models/trade_extension.dart';
 import 'package:tradelog_server/src/models/tradelocker_extension.dart';
 import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
@@ -38,8 +37,9 @@ class TradeLockerEndpoint extends Endpoint {
     Session session,
     String email,
     String password,
-    String server,
-  ) async {
+    String server, {
+    String? title,
+  }) async {
     var authenticated = await session.authenticated;
     client = TradeLockerClient(
       Configuration.tradelockerURI,
@@ -58,7 +58,12 @@ class TradeLockerEndpoint extends Endpoint {
 
     // Step 3: Manage Linked Account
     await _manageLinkedAccount(
-        session, authenticated.userId, accessToken, email);
+      session,
+      authenticated.userId,
+      accessToken,
+      email,
+      title,
+    );
 
     return accessToken;
   }
@@ -80,44 +85,45 @@ class TradeLockerEndpoint extends Endpoint {
 
     // Iterate over each set of credentials and refresh tokens
     for (var creds in credentialsList) {
-      requestQueue.addRequest( 
+      requestQueue.addRequest(
         EndpointRequest(
-          priority: 1,
-          request: () async { 
-            try {
-              final response = await client.post(
-                '/auth/jwt/refresh',
-                {'refreshToken': creds.refreshToken},
-              );
-
-              if (response.statusCode == 201) {
-                final data = response.data as Map<String, dynamic>;
-                final newAccessToken = data['accessToken'] as String;
-
-                // Find linked accounts associated with the current credentials
-                var linkedAccount = await LinkedAccount.db.findFirstRow(
-                  session,
-                  where: (o) =>
-                      o.userInfoId.equals(authenticated!.userId) &
-                      o.tradelockerCredentialsId.equals(creds.id),
+            priority: 1,
+            request: () async {
+              try {
+                final response = await client.post(
+                  '/auth/jwt/refresh',
+                  {'refreshToken': creds.refreshToken},
                 );
 
-                if (linkedAccount == null) {
-                  throw Exception(
-                      'Linked account not found for credentials ID ${creds.id}');
+                if (response.statusCode == 201) {
+                  final data = response.data as Map<String, dynamic>;
+                  final newAccessToken = data['accessToken'] as String;
+
+                  // Find linked accounts associated with the current credentials
+                  var linkedAccount = await LinkedAccount.db.findFirstRow(
+                    session,
+                    where: (o) =>
+                        o.userInfoId.equals(authenticated!.userId) &
+                        o.tradelockerCredentialsId.equals(creds.id),
+                  );
+
+                  if (linkedAccount == null) {
+                    throw Exception(
+                        'Linked account not found for credentials ID ${creds.id}');
+                  } else {
+                    // Update the access token for each linked account related to the current credentials
+                    linkedAccount.apiKey = newAccessToken;
+                    await LinkedAccount.db.updateRow(session, linkedAccount);
+                  }
                 } else {
-                  // Update the access token for each linked account related to the current credentials
-                  linkedAccount.apiKey = newAccessToken;
-                  await LinkedAccount.db.updateRow(session, linkedAccount);
+                  print(
+                      'Failed to refresh token for credentials ID ${creds.id}');
                 }
-              } else {
-                print('Failed to refresh token for credentials ID ${creds.id}');
+              } catch (e) {
+                print(
+                    'Error refreshing token for credentials ID ${creds.id}: $e');
               }
-            } catch (e) {
-              print('Error refreshing token for credentials ID ${creds.id}: $e');
-            }
-          }
-        ),
+            }),
       );
     }
   }
@@ -476,7 +482,12 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Future<void> _manageLinkedAccount(
-      Session session, int userId, String accessToken, String email) async {
+    Session session,
+    int userId,
+    String accessToken,
+    String email,
+    String? title,
+  ) async {
     try {
       var checkLinked = await LinkedAccount.db.findFirstRow(
         session,
@@ -504,12 +515,14 @@ class TradeLockerEndpoint extends Endpoint {
           tradelockerCredentialsId: creds.id,
           tradelockerAccountId: accountIds,
           tradelockerAccounts: accountNumbers,
+          title: title,
         );
         await LinkedAccount.db.insertRow(session, linkedAccount);
       } else {
         checkLinked.apiKey = accessToken;
         checkLinked.tradelockerAccountId = accountIds;
         checkLinked.tradelockerAccounts = accountNumbers;
+        checkLinked.title = title;
         await LinkedAccount.db.updateRow(session, checkLinked);
       }
     } catch (e) {
