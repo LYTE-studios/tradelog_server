@@ -6,7 +6,7 @@
 
 # Configuration for the main API server.
 apiServer:
-  port: 443
+  port: 8080
   publicHost: api.tradely.lytestudios.be
   publicPort: 443
   publicScheme: https
