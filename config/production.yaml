@@ -13,7 +13,7 @@ apiServer:
 
 # Configuration for the Insights server.
 insightsServer:
-  port: 443
+  port: 8081
   publicHost: insights.tradely.lytestudios.be
   publicPort: 443
   publicScheme: https
