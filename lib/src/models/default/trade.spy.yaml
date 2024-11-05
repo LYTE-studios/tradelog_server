@@ -3,6 +3,7 @@ class: Trade
 table: trade
 
 fields:
+  platform: String
   option: Option
   user: module:auth:UserInfo?, relation
   currency: String

@@ -76,7 +76,7 @@ class MetaApiEndpoint extends Endpoint {
         var linkedAccount = LinkedAccount(
           userInfoId: authenticated!.userId,
           apiKey: apiKey,
-          platform: Platform.Tradelocker,
+          platform: Platform.Metatrader,
         );
         await LinkedAccount.db.insertRow(session, linkedAccount);
       } else {

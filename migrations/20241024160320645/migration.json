@@ -1,0 +1,75 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "linked_account",
+        "schema": "public",
+        "addColumns": [
+          {
+            "name": "tradelockerAccountId",
+            "columnType": 8,
+            "isNullable": true,
+            "dartType": "List<int>?"
+          },
+          {
+            "name": "tradelockerAccounts",
+            "columnType": 8,
+            "isNullable": true,
+            "dartType": "List<String>?"
+          }
+        ],
+        "deleteColumns": [
+          "tradelockerAccountId",
+          "tradelockerAccounts"
+        ],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": [
+          {
+            "type": "columnDropped",
+            "message": "Column tradelockerAccountId of table linked_account is modified in a way that it must be deleted and recreated.",
+            "table": "linked_account",
+            "columns": [
+              "tradelockerAccountId"
+            ],
+            "destrucive": true
+          },
+          {
+            "type": "columnDropped",
+            "message": "Column tradelockerAccounts of table linked_account is modified in a way that it must be deleted and recreated.",
+            "table": "linked_account",
+            "columns": [
+              "tradelockerAccounts"
+            ],
+            "destrucive": true
+          }
+        ]
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column tradelockerAccountId of table linked_account is modified in a way that it must be deleted and recreated.",
+      "table": "linked_account",
+      "columns": [
+        "tradelockerAccountId"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column tradelockerAccounts of table linked_account is modified in a way that it must be deleted and recreated.",
+      "table": "linked_account",
+      "columns": [
+        "tradelockerAccounts"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

@@ -16,6 +16,8 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   Trade._({
     this.id,
+    int? id,
+    required this.platform,
     required this.option,
     required this.userId,
     this.user,
@@ -31,6 +33,7 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
 
   factory Trade({
     int? id,
+    required String platform,
     required _i2.Option option,
     required int userId,
     _i3.UserInfo? user,
@@ -47,6 +50,7 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   factory Trade.fromJson(Map<String, dynamic> jsonSerialization) {
     return Trade(
       id: jsonSerialization['id'] as int?,
+      platform: jsonSerialization['platform'] as String,
       option: _i2.Option.fromJson((jsonSerialization['option'] as int)),
       userId: jsonSerialization['userId'] as int,
       user: jsonSerialization['user'] == null
@@ -68,8 +72,12 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
 
   static const db = TradeRepository._();
 
+
   @override
   int? id;
+  
+  String platform;
+
 
   _i2.Option option;
 
@@ -98,6 +106,7 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
 
   Trade copyWith({
     int? id,
+    String? platform,
     _i2.Option? option,
     int? userId,
     _i3.UserInfo? user,
@@ -114,6 +123,7 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
+      'platform': platform,
       'option': option.toJson(),
       'userId': userId,
       if (user != null) 'user': user?.toJson(),
@@ -132,6 +142,7 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (id != null) 'id': id,
+      'platform': platform,
       'option': option.toJson(),
       'userId': userId,
       if (user != null) 'user': user?.toJsonForProtocol(),
@@ -181,6 +192,7 @@ class _Undefined {}
 class _TradeImpl extends Trade {
   _TradeImpl({
     int? id,
+    required String platform,
     required _i2.Option option,
     required int userId,
     _i3.UserInfo? user,
@@ -194,6 +206,7 @@ class _TradeImpl extends Trade {
     required double amount,
   }) : super._(
           id: id,
+          platform: platform,
           option: option,
           userId: userId,
           user: user,
@@ -210,6 +223,7 @@ class _TradeImpl extends Trade {
   @override
   Trade copyWith({
     Object? id = _Undefined,
+    String? platform,
     _i2.Option? option,
     int? userId,
     Object? user = _Undefined,
@@ -224,6 +238,7 @@ class _TradeImpl extends Trade {
   }) {
     return Trade(
       id: id is int? ? id : this.id,
+      platform: platform ?? this.platform,
       option: option ?? this.option,
       userId: userId ?? this.userId,
       user: user is _i3.UserInfo? ? user : this.user?.copyWith(),
@@ -241,6 +256,10 @@ class _TradeImpl extends Trade {
 
 class TradeTable extends _i1.Table {
   TradeTable({super.tableRelation}) : super(tableName: 'trade') {
+    platform = _i1.ColumnString(
+      'platform',
+      this,
+    );
     option = _i1.ColumnEnum(
       'option',
       this,
@@ -284,6 +303,8 @@ class TradeTable extends _i1.Table {
     );
   }
 
+  late final _i1.ColumnString platform;
+
   late final _i1.ColumnEnum<_i2.Option> option;
 
   late final _i1.ColumnInt userId;
@@ -322,6 +343,7 @@ class TradeTable extends _i1.Table {
   @override
   List<_i1.Column> get columns => [
         id,
+        platform,
         option,
         userId,
         currency,

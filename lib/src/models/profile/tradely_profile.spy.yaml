@@ -1,0 +1,9 @@
+class: TradelyProfile
+
+table: tradely_profile
+
+fields:
+  userInfoId: int, relation(parent=serverpod_user_info)
+  firstName: String
+  lastName: String
+  dateOfBirth: DateTime?

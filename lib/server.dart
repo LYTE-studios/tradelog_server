@@ -1,5 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as auth;
+import 'package:serverpod_cloud_storage_s3/serverpod_cloud_storage_s3.dart'
+    as s3;
 import 'package:tradelog_server/src/clients/mail_client.dart';
 import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
 import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
@@ -22,24 +24,27 @@ void run(List<String> args) async {
   );
 
   // Configuration for sign in with email.
-  auth.AuthConfig.set(auth.AuthConfig(
-    sendValidationEmail: (session, email, validationCode) async {
-      final mailClient = MailClient(
-        session.serverpod.getPassword('mailjetApiKey')!,
-        session.serverpod.getPassword('mailjetSecretKey')!,
-      );
+  auth.AuthConfig.set(
+    auth.AuthConfig(
+      sendValidationEmail: (session, email, validationCode) async {
+        final mailClient = MailClient(
+          session.serverpod.getPassword('mailjetApiKey')!,
+          session.serverpod.getPassword('mailjetSecretKey')!,
+        );
 
-      return mailClient.sendVerificationEmail(email, validationCode);
-    },
-    sendPasswordResetEmail: (session, userInfo, validationCode) async {
-      final mailClient = MailClient(
-        session.serverpod.getPassword('mailjetApiKey')!,
-        session.serverpod.getPassword('mailjetSecretKey')!,
-      );
+        return mailClient.sendVerificationEmail(email, validationCode);
+      },
+      sendPasswordResetEmail: (session, userInfo, validationCode) async {
+        final mailClient = MailClient(
+          session.serverpod.getPassword('mailjetApiKey')!,
+          session.serverpod.getPassword('mailjetSecretKey')!,
+        );
 
-      return mailClient.sendPasswordResetEmail(userInfo.email!, validationCode);
-    },
-  ));
+        return mailClient.sendPasswordResetEmail(
+            userInfo.email!, validationCode);
+      },
+    ),
+  );
 
   final RequestQueue tradelockerRequestQueue =
       RequestQueue(maxRequestsPerSecond: 2);
@@ -55,6 +60,16 @@ void run(List<String> args) async {
   pod.webServer.addRoute(
     RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
     '/*',
+  );
+  pod.addCloudStorage(
+    s3.S3CloudStorage(
+      serverpod: pod,
+      storageId: 'public',
+      public: true,
+      region: 'us-east-1',
+      bucket: 'tradely',
+      publicHost: 'storage.tradely.lytestudios.be',
+    ),
   );
 
   // Start the server.
