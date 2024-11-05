@@ -57,48 +57,68 @@ class TradeLockerEndpoint extends Endpoint {
         refreshToken, email, password, server);
 
     // Step 3: Manage Linked Account
-    await _manageLinkedAccount(session, authenticated.userId, accessToken);
+    await _manageLinkedAccount(
+        session, authenticated.userId, accessToken, email);
 
     return accessToken;
   }
 
-  Future<String> refresh(Session session) async {
+  Future<void> refresh(Session session) async {
     var authenticated = await session.authenticated;
 
-    var creds = await TradelockerCredentials.db.findFirstRow(
+    // Retrieve all TradeLocker credentials for the authenticated user
+    var credentialsList = await TradelockerCredentials.db.find(
       session,
       where: (o) => o.userId.equals(authenticated!.userId),
     );
 
-    if (creds == null) {
-      throw Exception('Credentials not found');
+    if (credentialsList.isEmpty) {
+      throw Exception('No credentials found for this user');
     }
 
     await initializeClient(session, "");
 
-    final response = await client.post(
-      '/auth/jwt/refresh',
-      {'refreshToken': creds.refreshToken},
-    );
+    // Iterate over each set of credentials and refresh tokens
+    for (var creds in credentialsList) {
+      requestQueue.addRequest( 
+        EndpointRequest(
+          priority: 1,
+          request: () async { 
+            try {
+              final response = await client.post(
+                '/auth/jwt/refresh',
+                {'refreshToken': creds.refreshToken},
+              );
 
-    if (response.statusCode == 201) {
-      final data = response.data
-          as Map<String, dynamic>; // Ensure response data is a map
-      final accessToken = data['accessToken'] as String;
+              if (response.statusCode == 201) {
+                final data = response.data as Map<String, dynamic>;
+                final newAccessToken = data['accessToken'] as String;
 
-      var linkedAccount = await LinkedAccount.db.findFirstRow(
-        session,
-        where: (o) => o.userInfoId.equals(authenticated!.userId),
+                // Find linked accounts associated with the current credentials
+                var linkedAccount = await LinkedAccount.db.findFirstRow(
+                  session,
+                  where: (o) =>
+                      o.userInfoId.equals(authenticated!.userId) &
+                      o.tradelockerCredentialsId.equals(creds.id),
+                );
+
+                if (linkedAccount == null) {
+                  throw Exception(
+                      'Linked account not found for credentials ID ${creds.id}');
+                } else {
+                  // Update the access token for each linked account related to the current credentials
+                  linkedAccount.apiKey = newAccessToken;
+                  await LinkedAccount.db.updateRow(session, linkedAccount);
+                }
+              } else {
+                print('Failed to refresh token for credentials ID ${creds.id}');
+              }
+            } catch (e) {
+              print('Error refreshing token for credentials ID ${creds.id}: $e');
+            }
+          }
+        ),
       );
-
-      if (linkedAccount != null) {
-        linkedAccount.apiKey = accessToken;
-        await LinkedAccount.db.updateRow(session, linkedAccount);
-      }
-
-      return accessToken;
-    } else {
-      throw Exception('Failed to refresh token');
     }
   }
 
@@ -132,7 +152,7 @@ class TradeLockerEndpoint extends Endpoint {
       }
 
       for (int i = 0; i < accountIds.length; i++) {
-        var accountId = int.parse(accountIds[i]) ;
+        var accountId = int.parse(accountIds[i]);
         var accountNumber = int.parse(accountNumbers[i]);
 
         // Call getTrades for this account
@@ -456,12 +476,21 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Future<void> _manageLinkedAccount(
-      Session session, int userId, String accessToken) async {
+      Session session, int userId, String accessToken, String email) async {
     try {
       var checkLinked = await LinkedAccount.db.findFirstRow(
         session,
         where: (o) => o.userInfoId.equals(userId),
       );
+
+      var creds = await TradelockerCredentials.db.findFirstRow(
+        session,
+        where: (o) => o.email.equals(email),
+      );
+
+      if (creds == null) {
+        throw Exception('Credentials not found');
+      }
 
       final accounts = await getAccounts(session, accessToken);
       List<String> accountIds = accounts.map((x) => x.id).toList();
@@ -472,6 +501,7 @@ class TradeLockerEndpoint extends Endpoint {
           userInfoId: userId,
           apiKey: accessToken,
           platform: Platform.Tradelocker,
+          tradelockerCredentialsId: creds.id,
           tradelockerAccountId: accountIds,
           tradelockerAccounts: accountNumbers,
         );
@@ -489,7 +519,6 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<List<TradelockerAccountInformation>> getAccounts(
       Session session, String apiKey) async {
-
     await initializeClient(session, apiKey);
 
     final accountsFuture = Completer<List<TradelockerAccountInformation>>();
@@ -513,7 +542,6 @@ class TradeLockerEndpoint extends Endpoint {
             accountsFuture.complete(List<TradelockerAccountInformation>.from(
                 accountsData
                     .map((x) => TradelockerAccountInformation.fromJson(x))));
-
           } catch (e) {
             // Log the error before completing with an error
             print("Error occurred in getAccounts: $e");

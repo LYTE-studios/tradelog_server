@@ -5,6 +5,9 @@ account:
 file:
   - getUploadDescription:
   - verifyUpload:
+global:
+  - fetchFromAPIs:
+  - getCachedTrades:
 metaApi:
   - initializeClient:
   - authenticate:
@@ -24,6 +27,7 @@ profile:
 trade:
   - addTrade:
   - deleteTrade:
+  - fetchTrades:
   - importTrades:
 tradeLocker:
   - initializeClient:

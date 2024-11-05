@@ -15,9 +15,12 @@ class TradeEndpoint extends Endpoint {
     await Trade.db.deleteRow(session, trade);
   }
 
-  // Future<List<DisplayTrade>> fetchTrades(Session session) async { 
-  //   return await Trade.db.find(session);
-  // }
+
+
+  Future<List<Trade>> fetchTrades(Session session) async { 
+    
+    return await Trade.db.find(session);
+  }
 
   // Method to handle the file upload and process the CSV
   Future<String> importTrades(Session session, List<int> csvFile) async {
