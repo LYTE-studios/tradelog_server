@@ -8,14 +8,14 @@ services:
       - "8080"
       - "8081"
     restart: on-failure
-  postgres:
-    image: postgres:14.1
-    ports:
-      - '8090:5432'
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: tradelog
-      POSTGRES_PASSWORD: "-AAEF__HE-PZp9KcWPTRbTW4m8E6OQ9j"
+  #  postgres:
+  #    image: postgres:14.1
+  #    ports:
+  #      - '8090:5432'
+  #    environment:
+  #      POSTGRES_USER: postgres
+  #      POSTGRES_DB: tradelog
+  #      POSTGRES_PASSWORD: "-AAEF__HE-PZp9KcWPTRbTW4m8E6OQ9j"
   redis:
     image: redis:6.2.6
     ports:
