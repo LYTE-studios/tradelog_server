@@ -6,22 +6,22 @@
 
 # Configuration for the main API server.
 apiServer:
-  port: 8080
+  port: 443
   publicHost: api.tradely.lytestudios.be
   publicPort: 443
   publicScheme: https
 
 # Configuration for the Insights server.
 insightsServer:
-  port: 8081
+  port: 443
   publicHost: insights.tradely.lytestudios.be
   publicPort: 443
   publicScheme: https
 
 # Configuration for the web server.
 webServer:
-  port: 8082
-  publicHost: tradely.lytestudios.be
+  port: 443
+  publicHost: app.tradely.lytestudios.be
   publicPort: 443
   publicScheme: https
 
