@@ -8,8 +8,6 @@ git clone https://lyte-manager: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@github.c
 
 cd tradelog_server
 
-git checkout release/1.0.0/feature/extra-trade-calls
-
 sudo touch config/passwords.yaml
 sudo touch config/google_client_secret.json
 
