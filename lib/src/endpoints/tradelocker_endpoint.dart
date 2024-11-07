@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:sentry/sentry.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
@@ -290,14 +291,16 @@ class TradeLockerEndpoint extends Endpoint {
           'unknown'; // Default to 'unknown' if symbol not found
 
       // Create a DisplayTrade entry and add it to the list
-      trades.add(DisplayTrade(
-        openTime: position.openDate,
-        symbol: symbol,
-        direction: position.side,
-        status: status,
-        netpl: realizedPl,
-        netroi: netRoi,
-      ));
+      trades.add(
+        DisplayTrade(
+          openTime: position.openDate,
+          symbol: symbol,
+          direction: position.side,
+          status: status,
+          netpl: realizedPl,
+          netroi: netRoi,
+        ),
+      );
     }
 
     // print(trades);
@@ -348,6 +351,9 @@ class TradeLockerEndpoint extends Endpoint {
                     position as List<dynamic>))
                 .toList());
           } catch (e) {
+            // Send to Sentry for monitoring
+            Sentry.captureException(e);
+
             positionsFuture.completeError(
                 e); // Complete the future with an error if it fails
           }
@@ -390,6 +396,9 @@ class TradeLockerEndpoint extends Endpoint {
                     TradeLockerExtension.orderFromJson(order as List<dynamic>))
                 .toList());
           } catch (e) {
+            // Send to Sentry for monitoring
+            Sentry.captureException(e);
+
             // Complete the future with an error if anything fails
             ordersFuture.completeError(e);
             print('Error processing orders: $e');
