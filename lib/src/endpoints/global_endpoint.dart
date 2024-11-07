@@ -48,8 +48,10 @@ class GlobalEndpoint extends Endpoint {
     // Convert each DisplayTrade to JSON and store the JSON list in the cache
     // Wrap the trades in DisplayTradeList and store in the cache
     var tradeListWrapper = DisplayTradeList(trades: trades);
-    await session.caches.localPrio
-        .put('trades-${authenticated.userId}', tradeListWrapper);
+    await session.caches.localPrio.put(
+      'trades-${authenticated.userId}',
+      tradeListWrapper,
+    );
     return trades;
   }
 
@@ -59,7 +61,7 @@ class GlobalEndpoint extends Endpoint {
     var cachedData = await session.caches.localPrio
         .get<DisplayTradeList>('trades-${authenticated!.userId}');
     if (cachedData == null) {
-      return [];
+      return fetchFromAPIs(session);
     }
 
     return cachedData.trades;
