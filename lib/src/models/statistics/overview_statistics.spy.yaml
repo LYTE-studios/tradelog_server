@@ -1,0 +1,11 @@
+class: OverviewStatistics
+fields:
+
+  netProfitLossThisMonth: double
+  netProfitLossTrend: double?
+  tradeWinRateThisMonth: double
+  tradeWinRateTrend: double?
+  realizedReturnThisMonth: double
+  realizedReturnTrend: double?
+  shortTradesAmount: double
+  longTradesAmount: double

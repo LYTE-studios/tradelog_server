@@ -364,6 +364,21 @@ class TradeLockerEndpoint extends Endpoint {
     return await positionsFuture.future;
   }
 
+  Future<Map<String, dynamic>> getRawOrders(
+      Session session, LinkedAccount account) async {
+    Map<String, dynamic> map = {};
+
+    map['config'] = await client.get('/trade/config');
+
+    List<TradelockerAccountInformation> accounts =
+        await getAccounts(session, account.apiKey);
+
+    map['orders'] =
+        await client.get('/trade/accounts/${accounts.first.id}/ordersHistory');
+
+    return map;
+  }
+
   Future<List<TradelockerOrder>> getOrdersHistoryWithRateLimit(
       Session session, String apiKey, int accountId, int accNum) async {
     await initializeClient(session, apiKey, accNum: accNum);

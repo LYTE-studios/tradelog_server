@@ -35,5 +35,6 @@ tradeLocker:
   - refresh:
   - getAllTrades:
   - getTrades:
+  - getRawOrders:
   - getOrdersHistoryWithRateLimit:
   - getAccounts:

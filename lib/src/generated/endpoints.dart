@@ -643,6 +643,25 @@ class Endpoints extends _i1.EndpointDispatch {
             params['accNum'],
           ),
         ),
+        'getRawOrders': _i1.MethodConnector(
+          name: 'getRawOrders',
+          params: {
+            'account': _i1.ParameterDescription(
+              name: 'account',
+              type: _i1.getType<_i10.LinkedAccount>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['tradeLocker'] as _i9.TradeLockerEndpoint)
+                  .getRawOrders(
+            session,
+            params['account'],
+          ),
+        ),
         'getOrdersHistoryWithRateLimit': _i1.MethodConnector(
           name: 'getOrdersHistoryWithRateLimit',
           params: {
