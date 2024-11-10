@@ -7,7 +7,7 @@ class GlobalEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<List<DisplayTrade>> fetchFromAPIs(Session session) async {
+  Future<List<TradeDto>> fetchFromAPIs(Session session) async {
     var authenticated = await session.authenticated;
     if (authenticated == null) {
       throw Exception('User not authenticated');
@@ -18,7 +18,7 @@ class GlobalEndpoint extends Endpoint {
       where: (o) => o.userInfoId.equals(authenticated.userId),
     );
 
-    var trades = <DisplayTrade>[];
+    var trades = <TradeDto>[];
 
     for (var account in linkedAccounts) {
       switch (account.platform) {
@@ -47,7 +47,9 @@ class GlobalEndpoint extends Endpoint {
     trades.sort((a, b) => a.openTime.compareTo(b.openTime));
     // Convert each DisplayTrade to JSON and store the JSON list in the cache
     // Wrap the trades in DisplayTradeList and store in the cache
-    var tradeListWrapper = DisplayTradeList(trades: trades);
+
+    var tradeListWrapper = TradeListDto(trades: trades);
+
     await session.caches.localPrio.put(
       'trades-${authenticated.userId}',
       tradeListWrapper,
@@ -55,11 +57,11 @@ class GlobalEndpoint extends Endpoint {
     return trades;
   }
 
-  Future<List<DisplayTrade>> getCachedTrades(Session session) async {
+  Future<List<TradeDto>> getCachedTrades(Session session) async {
     var authenticated = await session.authenticated;
 
     var cachedData = await session.caches.localPrio
-        .get<DisplayTradeList>('trades-${authenticated!.userId}');
+        .get<TradeListDto>('trades-${authenticated!.userId}');
     if (cachedData == null) {
       return fetchFromAPIs(session);
     }

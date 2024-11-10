@@ -146,8 +146,7 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
-  Future<List<DisplayTrade>> getTrades(
-      Session session, String accountId) async {
+  Future<List<TradeDto>> getTrades(Session session, String accountId) async {
     await initializeClient(session);
 
     // Fetch orders for the specified account within a date range
@@ -166,7 +165,7 @@ class MetaApiEndpoint extends Endpoint {
       }
 
       // Calculate net profit/loss and convert to DisplayTrade objects
-      var displayTrades = <DisplayTrade>[];
+      var displayTrades = <TradeDto>[];
       for (var entry in ordersByPosition.entries) {
         var positionOrders = entry.value;
 
@@ -190,16 +189,10 @@ class MetaApiEndpoint extends Endpoint {
 
         // Use the first order as the basis for DisplayTrade properties
         var baseOrder = positionOrders.first;
-        displayTrades.add(DisplayTrade(
-          openTime: baseOrder.time,
-          // Time of the first order in the position
-          symbol: baseOrder.symbol,
-          // Symbol from the first order
-          direction: baseOrder.type == 'ORDER_TYPE_BUY' ? 'Buy' : 'Sell',
-          status: baseOrder.state == 'ORDER_STATE_FILLED' ? 'Closed' : 'Open',
-          netpl: netpl,
-          netroi: netroi,
-        ));
+
+        // displayTrades.add(
+        //   TradeExtension.fromMetaTrader(),
+        // );
       }
 
       return displayTrades;

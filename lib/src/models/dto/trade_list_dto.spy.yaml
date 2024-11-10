@@ -1,0 +1,4 @@
+class: TradeListDto
+
+fields:
+  trades: List<TradeDto>

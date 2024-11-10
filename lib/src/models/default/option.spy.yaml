@@ -1,4 +1,4 @@
 enum: Option
 values:
-    - Buy
-    - Sell
+  - long
+  - short

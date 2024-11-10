@@ -5,10 +5,10 @@ import 'package:sentry/sentry.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
+import 'package:tradelog_server/src/models/trade_extension.dart';
 import 'package:tradelog_server/src/models/tradelocker_extension.dart';
 import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
-import 'package:tradelog_server/src/util/instruments.dart';
 
 class TradeLockerEndpoint extends Endpoint {
   @override
@@ -129,7 +129,7 @@ class TradeLockerEndpoint extends Endpoint {
     }
   }
 
-  Future<List<DisplayTrade>> getAllTrades(Session session) async {
+  Future<List<TradeDto>> getAllTrades(Session session) async {
     // Ensure the user is authenticated
     var authenticated = await session.authenticated;
 
@@ -141,7 +141,7 @@ class TradeLockerEndpoint extends Endpoint {
           o.platform.equals(Platform.Tradelocker),
     );
 
-    List<DisplayTrade> allTrades = [];
+    List<TradeDto> allTrades = [];
 
     for (var linkedAccount in linkedAccounts) {
       if (linkedAccount.tradelockerAccountId == null ||
@@ -164,8 +164,12 @@ class TradeLockerEndpoint extends Endpoint {
 
         // Call getTrades for this account
         try {
-          List<DisplayTrade> trades =
-              await getTrades(session, apiKey, accountId, accountNumber);
+          List<TradeDto> trades = await getTrades(
+            session,
+            apiKey,
+            accountId,
+            accountNumber,
+          );
           allTrades.addAll(trades);
         } catch (e) {
           // Handle errors for this account and continue
@@ -181,7 +185,7 @@ class TradeLockerEndpoint extends Endpoint {
     return allTrades;
   }
 
-  Future<List<DisplayTrade>> getTrades(
+  Future<List<TradeDto>> getTrades(
       Session session, String apiKey, int accountId, int accNum) async {
     // Initialize client for the current session
     await initializeClient(session, apiKey, accNum: accNum);
@@ -199,108 +203,31 @@ class TradeLockerEndpoint extends Endpoint {
     // Set of position IDs from open positions
     final openPositionIds = positions.map((position) => position.id).toSet();
 
-    // Wait for both open and closed trades to complete
-    final List<DisplayTrade> openTrades =
-        await _processPositions(session, positions, ordersByPosition, accNum);
-    final List<DisplayTrade> closedTrades = await _processClosedPositions(
-        session, ordersByPosition, openPositionIds, accNum);
+    final List<TradeDto> trades = await _processPositions(
+      session,
+      positions,
+      ordersByPosition,
+      accNum,
+    );
 
     // Return the combined list of open and closed trades
-    return [...openTrades, ...closedTrades];
+    return trades;
   }
 
   /// Private Helper Functions
 
-  Future<List<DisplayTrade>> _processClosedPositions(
-      Session session,
-      Map<String, List<TradelockerOrder>> ordersByPosition,
-      Set<String> openPositionIds,
-      int accNum) async {
-    final List<DisplayTrade> trades = [];
+  Future<List<TradeDto>> _processPositions(
+    Session session,
+    List<TradelockerPosition> positions,
+    Map<String, List<TradelockerOrder>> ordersByPosition,
+    int accNum,
+  ) async {
+    final List<TradeDto> trades = [];
 
-    // Process closed positions (positions not present in openPositionIds)
-    for (var orderGroup in ordersByPosition.entries) {
-      final positionId = orderGroup.key;
-      final associatedOrders = orderGroup.value;
+    for (TradelockerPosition position in positions) {
+      TradeDto dto = TradeExtension.fromTradeLocker(position, ordersByPosition);
 
-      // If the position is not in the set of open positions, it's closed
-      if (!openPositionIds.contains(positionId)) {
-        final firstOrder = associatedOrders.first;
-        double totalQty = 0.0;
-        double avgPrice = 0.0;
-        double realizedPl = 0.0;
-
-        // Calculate realized P&L and the average price of the closed position
-        for (var order in associatedOrders) {
-          if (order.status == 'Filled' && order.filledQty > 0) {
-            totalQty += order.filledQty;
-            avgPrice += order.avgPrice * order.filledQty;
-            realizedPl += order.filledQty * (order.avgPrice - firstOrder.price);
-          }
-        }
-
-        if (totalQty > 0) {
-          avgPrice = avgPrice / totalQty; // Weighted average price
-        }
-
-        // Calculate net ROI
-        final totalInvestment = totalQty * avgPrice;
-        final netRoi =
-            totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
-
-        // Fetch symbol for closed position
-        final symbol =
-            Instrument.instrumentMap[firstOrder.tradableInstrumentId] ??
-                'unknown';
-
-        // Create a DisplayTrade object for the closed position
-        trades.add(DisplayTrade(
-          openTime: firstOrder.createdDate,
-          symbol: symbol,
-          direction: firstOrder.side,
-          status: 'Closed',
-          netpl: realizedPl,
-          netroi: netRoi,
-        ));
-      }
-    }
-
-    // print(trades);
-    return trades;
-  }
-
-  Future<List<DisplayTrade>> _processPositions(
-      Session session,
-      List<TradelockerPosition> positions,
-      Map<String, List<TradelockerOrder>> ordersByPosition,
-      int accNum) async {
-    final List<DisplayTrade> trades = [];
-
-    for (var position in positions) {
-      final associatedOrders = ordersByPosition[position.id] ?? [];
-
-      // Calculate realized P&L and ROI for the position
-      final realizedPl = _calculateRealizedPl(position, associatedOrders);
-      final totalInvestment = position.quantity * position.avgPrice;
-      final netRoi =
-          totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
-      final status = position.quantity == 0 ? 'Closed' : 'Open';
-
-      // Sub-request: Fetch symbol for each position, queued and rate-limited
-      final symbol = Instrument.instrumentMap[position.tradableInstrumentId] ??
-          'unknown'; // Default to 'unknown' if symbol not found
-
-      // Create a DisplayTrade entry and add it to the list
-      trades.add(
-        DisplayTrade(
-          openTime: position.openDate,
-          symbol: symbol,
-          direction: position.side,
-          status: status,
-          netpl: realizedPl,
-          netroi: netRoi,
-        ),
-      );
+      trades.add(dto);
     }
 
     // print(trades);
@@ -318,19 +245,6 @@ class TradeLockerEndpoint extends Endpoint {
     }
 
     return ordersByPosition;
-  }
-
-  double _calculateRealizedPl(
-      TradelockerPosition position, List<TradelockerOrder> orders) {
-    double realizedPl = 0.0;
-
-    for (var order in orders) {
-      if (order.status == 'Filled' && order.filledQty > 0) {
-        realizedPl += (order.filledQty * (order.avgPrice - position.avgPrice));
-      }
-    }
-
-    return realizedPl;
   }
 
   Future<List<TradelockerPosition>> _getPositionsWithRateLimit(

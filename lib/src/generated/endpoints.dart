@@ -19,12 +19,12 @@ import '../endpoints/profile_endpoint.dart' as _i7;
 import '../endpoints/statistics_endpoint.dart' as _i8;
 import '../endpoints/trade_endpoint.dart' as _i9;
 import '../endpoints/tradelocker_endpoint.dart' as _i10;
-import 'package:tradelog_server/src/generated/linked_accounts.dart' as _i11;
-import 'package:tradelog_server/src/generated/default/note.dart' as _i12;
+import 'package:tradelog_server/src/generated/default/note.dart' as _i11;
 import 'package:tradelog_server/src/generated/profile/tradely_profile.dart'
-    as _i13;
-import 'package:tradelog_server/src/generated/dto/trade_dto.dart' as _i14;
-import 'package:tradelog_server/src/generated/default/trade.dart' as _i15;
+    as _i12;
+import 'package:tradelog_server/src/generated/dto/trade_dto.dart' as _i13;
+import 'package:tradelog_server/src/generated/default/trade.dart' as _i14;
+import 'package:tradelog_server/src/generated/linked_accounts.dart' as _i15;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i16;
 
 class Endpoints extends _i1.EndpointDispatch {
@@ -99,43 +99,7 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['account'] as _i2.AccountEndpoint)
                   .fetchAccounts(session),
-        ),
-        'linkAccount': _i1.MethodConnector(
-          name: 'linkAccount',
-          params: {
-            'account': _i1.ParameterDescription(
-              name: 'account',
-              type: _i1.getType<_i11.LinkedAccount>(),
-              nullable: false,
-            )
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['account'] as _i2.AccountEndpoint).linkAccount(
-            session,
-            params['account'],
-          ),
-        ),
-        'unlinkAccount': _i1.MethodConnector(
-          name: 'unlinkAccount',
-          params: {
-            'account': _i1.ParameterDescription(
-              name: 'account',
-              type: _i1.getType<_i11.LinkedAccount>(),
-              nullable: false,
-            )
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['account'] as _i2.AccountEndpoint).unlinkAccount(
-            session,
-            params['account'],
-          ),
-        ),
+        )
       },
     );
     connectors['file'] = _i1.EndpointConnector(
@@ -391,7 +355,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'note': _i1.ParameterDescription(
               name: 'note',
-              type: _i1.getType<_i12.Note>(),
+              type: _i1.getType<_i11.Note>(),
               nullable: false,
             )
           },
@@ -409,7 +373,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'note': _i1.ParameterDescription(
               name: 'note',
-              type: _i1.getType<_i12.Note>(),
+              type: _i1.getType<_i11.Note>(),
               nullable: false,
             )
           },
@@ -442,7 +406,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'profile': _i1.ParameterDescription(
               name: 'profile',
-              type: _i1.getType<_i13.TradelyProfile>(),
+              type: _i1.getType<_i12.TradelyProfile>(),
               nullable: false,
             )
           },
@@ -491,7 +455,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'dto': _i1.ParameterDescription(
               name: 'dto',
-              type: _i1.getType<_i14.TradeDto>(),
+              type: _i1.getType<_i13.TradeDto>(),
               nullable: false,
             )
           },
@@ -509,7 +473,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'trade': _i1.ParameterDescription(
               name: 'trade',
-              type: _i1.getType<_i15.Trade>(),
+              type: _i1.getType<_i14.Trade>(),
               nullable: false,
             )
           },
@@ -672,7 +636,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'account': _i1.ParameterDescription(
               name: 'account',
-              type: _i1.getType<_i11.LinkedAccount>(),
+              type: _i1.getType<_i15.LinkedAccount>(),
               nullable: false,
             )
           },

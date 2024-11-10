@@ -6,12 +6,21 @@ fields:
   linkedAccount: LinkedAccount?, relation
   user: module:auth:UserInfo?, relation
 
+  realizedPl: double?
+
+  status: TradeStatus
+
+  symbol: String
+
   option: Option
-  currency: String
-  fee: double
-  date: DateTime
+
+  feeCurrency: String?
+  fee: double?
+
+  openTime: DateTime
+  closeTime: DateTime?
+
   lotSize: double
-  takeProfit: double
-  stoploss: double
-  profitLoss: String
-  amount: double
+
+  takeProfit: double?
+  stopLoss: double?

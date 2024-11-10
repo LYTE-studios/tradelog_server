@@ -1,7 +1,5 @@
 account:
   - fetchAccounts:
-  - linkAccount:
-  - unlinkAccount:
 file:
   - getUploadDescription:
   - verifyUpload:

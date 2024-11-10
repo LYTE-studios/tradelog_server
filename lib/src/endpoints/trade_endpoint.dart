@@ -17,14 +17,14 @@ class TradeEndpoint extends Endpoint {
       linkedAccountId: dto.linkedAccountId ?? 0,
       userId: userId!,
       option: dto.option,
-      currency: dto.currency,
+      feeCurrency: dto.feeCurrency,
       fee: dto.fee,
-      date: dto.date,
       lotSize: dto.lotSize,
       takeProfit: dto.takeProfit,
-      stoploss: dto.stoploss,
-      profitLoss: dto.profitLoss,
-      amount: dto.amount,
+      stopLoss: dto.stopLoss,
+      symbol: dto.symbol,
+      status: dto.status,
+      openTime: dto.openTime,
     );
 
     await Trade.db.insertRow(session, trade);

@@ -16,90 +16,107 @@ abstract class TradeDto
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
   TradeDto._({
     this.linkedAccountId,
+    required this.status,
+    this.realizedPl,
+    required this.symbol,
     required this.option,
-    required this.currency,
-    required this.fee,
-    required this.date,
+    this.feeCurrency,
+    this.fee,
+    required this.openTime,
+    this.closeTime,
     required this.lotSize,
-    required this.takeProfit,
-    required this.stoploss,
-    required this.profitLoss,
-    required this.amount,
+    this.takeProfit,
+    this.stopLoss,
   });
 
   factory TradeDto({
     int? linkedAccountId,
+    required _i2.TradeStatus status,
+    double? realizedPl,
+    required String symbol,
     required _i2.Option option,
-    required String currency,
-    required double fee,
-    required DateTime date,
+    String? feeCurrency,
+    double? fee,
+    required DateTime openTime,
+    DateTime? closeTime,
     required double lotSize,
-    required double takeProfit,
-    required double stoploss,
-    required String profitLoss,
-    required double amount,
+    double? takeProfit,
+    double? stopLoss,
   }) = _TradeDtoImpl;
 
   factory TradeDto.fromJson(Map<String, dynamic> jsonSerialization) {
     return TradeDto(
       linkedAccountId: jsonSerialization['linkedAccountId'] as int?,
+      status: _i2.TradeStatus.fromJson((jsonSerialization['status'] as int)),
+      realizedPl: (jsonSerialization['realizedPl'] as num?)?.toDouble(),
+      symbol: jsonSerialization['symbol'] as String,
       option: _i2.Option.fromJson((jsonSerialization['option'] as int)),
-      currency: jsonSerialization['currency'] as String,
-      fee: (jsonSerialization['fee'] as num).toDouble(),
-      date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
+      feeCurrency: jsonSerialization['feeCurrency'] as String?,
+      fee: (jsonSerialization['fee'] as num?)?.toDouble(),
+      openTime:
+          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['openTime']),
+      closeTime: jsonSerialization['closeTime'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['closeTime']),
       lotSize: (jsonSerialization['lotSize'] as num).toDouble(),
-      takeProfit: (jsonSerialization['takeProfit'] as num).toDouble(),
-      stoploss: (jsonSerialization['stoploss'] as num).toDouble(),
-      profitLoss: jsonSerialization['profitLoss'] as String,
-      amount: (jsonSerialization['amount'] as num).toDouble(),
+      takeProfit: (jsonSerialization['takeProfit'] as num?)?.toDouble(),
+      stopLoss: (jsonSerialization['stopLoss'] as num?)?.toDouble(),
     );
   }
 
   int? linkedAccountId;
 
+  _i2.TradeStatus status;
+
+  double? realizedPl;
+
+  String symbol;
+
   _i2.Option option;
 
-  String currency;
+  String? feeCurrency;
 
-  double fee;
+  double? fee;
 
-  DateTime date;
+  DateTime openTime;
+
+  DateTime? closeTime;
 
   double lotSize;
 
-  double takeProfit;
+  double? takeProfit;
 
-  double stoploss;
-
-  String profitLoss;
-
-  double amount;
+  double? stopLoss;
 
   TradeDto copyWith({
     int? linkedAccountId,
+    _i2.TradeStatus? status,
+    double? realizedPl,
+    String? symbol,
     _i2.Option? option,
-    String? currency,
+    String? feeCurrency,
     double? fee,
-    DateTime? date,
+    DateTime? openTime,
+    DateTime? closeTime,
     double? lotSize,
     double? takeProfit,
-    double? stoploss,
-    String? profitLoss,
-    double? amount,
+    double? stopLoss,
   });
   @override
   Map<String, dynamic> toJson() {
     return {
       if (linkedAccountId != null) 'linkedAccountId': linkedAccountId,
+      'status': status.toJson(),
+      if (realizedPl != null) 'realizedPl': realizedPl,
+      'symbol': symbol,
       'option': option.toJson(),
-      'currency': currency,
-      'fee': fee,
-      'date': date.toJson(),
+      if (feeCurrency != null) 'feeCurrency': feeCurrency,
+      if (fee != null) 'fee': fee,
+      'openTime': openTime.toJson(),
+      if (closeTime != null) 'closeTime': closeTime?.toJson(),
       'lotSize': lotSize,
-      'takeProfit': takeProfit,
-      'stoploss': stoploss,
-      'profitLoss': profitLoss,
-      'amount': amount,
+      if (takeProfit != null) 'takeProfit': takeProfit,
+      if (stopLoss != null) 'stopLoss': stopLoss,
     };
   }
 
@@ -107,15 +124,17 @@ abstract class TradeDto
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (linkedAccountId != null) 'linkedAccountId': linkedAccountId,
+      'status': status.toJson(),
+      if (realizedPl != null) 'realizedPl': realizedPl,
+      'symbol': symbol,
       'option': option.toJson(),
-      'currency': currency,
-      'fee': fee,
-      'date': date.toJson(),
+      if (feeCurrency != null) 'feeCurrency': feeCurrency,
+      if (fee != null) 'fee': fee,
+      'openTime': openTime.toJson(),
+      if (closeTime != null) 'closeTime': closeTime?.toJson(),
       'lotSize': lotSize,
-      'takeProfit': takeProfit,
-      'stoploss': stoploss,
-      'profitLoss': profitLoss,
-      'amount': amount,
+      if (takeProfit != null) 'takeProfit': takeProfit,
+      if (stopLoss != null) 'stopLoss': stopLoss,
     };
   }
 
@@ -130,53 +149,61 @@ class _Undefined {}
 class _TradeDtoImpl extends TradeDto {
   _TradeDtoImpl({
     int? linkedAccountId,
+    required _i2.TradeStatus status,
+    double? realizedPl,
+    required String symbol,
     required _i2.Option option,
-    required String currency,
-    required double fee,
-    required DateTime date,
+    String? feeCurrency,
+    double? fee,
+    required DateTime openTime,
+    DateTime? closeTime,
     required double lotSize,
-    required double takeProfit,
-    required double stoploss,
-    required String profitLoss,
-    required double amount,
+    double? takeProfit,
+    double? stopLoss,
   }) : super._(
           linkedAccountId: linkedAccountId,
+          status: status,
+          realizedPl: realizedPl,
+          symbol: symbol,
           option: option,
-          currency: currency,
+          feeCurrency: feeCurrency,
           fee: fee,
-          date: date,
+          openTime: openTime,
+          closeTime: closeTime,
           lotSize: lotSize,
           takeProfit: takeProfit,
-          stoploss: stoploss,
-          profitLoss: profitLoss,
-          amount: amount,
+          stopLoss: stopLoss,
         );
 
   @override
   TradeDto copyWith({
     Object? linkedAccountId = _Undefined,
+    _i2.TradeStatus? status,
+    Object? realizedPl = _Undefined,
+    String? symbol,
     _i2.Option? option,
-    String? currency,
-    double? fee,
-    DateTime? date,
+    Object? feeCurrency = _Undefined,
+    Object? fee = _Undefined,
+    DateTime? openTime,
+    Object? closeTime = _Undefined,
     double? lotSize,
-    double? takeProfit,
-    double? stoploss,
-    String? profitLoss,
-    double? amount,
+    Object? takeProfit = _Undefined,
+    Object? stopLoss = _Undefined,
   }) {
     return TradeDto(
       linkedAccountId:
           linkedAccountId is int? ? linkedAccountId : this.linkedAccountId,
+      status: status ?? this.status,
+      realizedPl: realizedPl is double? ? realizedPl : this.realizedPl,
+      symbol: symbol ?? this.symbol,
       option: option ?? this.option,
-      currency: currency ?? this.currency,
-      fee: fee ?? this.fee,
-      date: date ?? this.date,
+      feeCurrency: feeCurrency is String? ? feeCurrency : this.feeCurrency,
+      fee: fee is double? ? fee : this.fee,
+      openTime: openTime ?? this.openTime,
+      closeTime: closeTime is DateTime? ? closeTime : this.closeTime,
       lotSize: lotSize ?? this.lotSize,
-      takeProfit: takeProfit ?? this.takeProfit,
-      stoploss: stoploss ?? this.stoploss,
-      profitLoss: profitLoss ?? this.profitLoss,
-      amount: amount ?? this.amount,
+      takeProfit: takeProfit is double? ? takeProfit : this.takeProfit,
+      stopLoss: stopLoss is double? ? stopLoss : this.stopLoss,
     );
   }
 }

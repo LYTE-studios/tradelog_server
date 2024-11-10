@@ -1,4 +1,0 @@
-class: DisplayTradeList
-
-fields:
-    trades: List<DisplayTrade>

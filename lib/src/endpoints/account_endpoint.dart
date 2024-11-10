@@ -17,12 +17,4 @@ class AccountEndpoint extends Endpoint {
       where: (t) => t.userInfoId.equals(authInfo.userId),
     );
   }
-
-  Future<void> linkAccount(Session session, LinkedAccount account) async {
-    await LinkedAccount.db.insertRow(session, account);
-  }
-
-  Future<void> unlinkAccount(Session session, LinkedAccount account) async {
-    await LinkedAccount.db.deleteRow(session, account);
-  }
 }

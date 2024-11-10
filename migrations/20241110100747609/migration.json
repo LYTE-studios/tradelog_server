@@ -1,0 +1,204 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "trade"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "trade",
+        "dartName": "Trade",
+        "module": "tradelog",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('trade_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "linkedAccountId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "userId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "realizedPl",
+            "columnType": 3,
+            "isNullable": true,
+            "dartType": "double?"
+          },
+          {
+            "name": "status",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:TradeStatus"
+          },
+          {
+            "name": "symbol",
+            "columnType": 0,
+            "isNullable": false,
+            "dartType": "String"
+          },
+          {
+            "name": "option",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:Option"
+          },
+          {
+            "name": "feeCurrency",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "fee",
+            "columnType": 3,
+            "isNullable": true,
+            "dartType": "double?"
+          },
+          {
+            "name": "openTime",
+            "columnType": 4,
+            "isNullable": false,
+            "dartType": "DateTime"
+          },
+          {
+            "name": "closeTime",
+            "columnType": 4,
+            "isNullable": true,
+            "dartType": "DateTime?"
+          },
+          {
+            "name": "lotSize",
+            "columnType": 3,
+            "isNullable": false,
+            "dartType": "double"
+          },
+          {
+            "name": "takeProfit",
+            "columnType": 3,
+            "isNullable": true,
+            "dartType": "double?"
+          },
+          {
+            "name": "stopLoss",
+            "columnType": 3,
+            "isNullable": true,
+            "dartType": "double?"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "trade_fk_0",
+            "columns": [
+              "linkedAccountId"
+            ],
+            "referenceTable": "linked_account",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          },
+          {
+            "constraintName": "trade_fk_1",
+            "columns": [
+              "userId"
+            ],
+            "referenceTable": "serverpod_user_info",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "trade_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column \"currency\" of table \"trade\" will be dropped.",
+      "table": "trade",
+      "columns": [
+        "currency"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"date\" of table \"trade\" will be dropped.",
+      "table": "trade",
+      "columns": [
+        "date"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"stoploss\" of table \"trade\" will be dropped.",
+      "table": "trade",
+      "columns": [
+        "stoploss"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"profitLoss\" of table \"trade\" will be dropped.",
+      "table": "trade",
+      "columns": [
+        "profitLoss"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"amount\" of table \"trade\" will be dropped.",
+      "table": "trade",
+      "columns": [
+        "amount"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"trade\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "trade",
+      "columns": [
+        "status"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

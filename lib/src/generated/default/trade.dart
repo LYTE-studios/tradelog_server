@@ -20,15 +20,17 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
     this.linkedAccount,
     required this.userId,
     this.user,
+    this.realizedPl,
+    required this.status,
+    required this.symbol,
     required this.option,
-    required this.currency,
-    required this.fee,
-    required this.date,
+    this.feeCurrency,
+    this.fee,
+    required this.openTime,
+    this.closeTime,
     required this.lotSize,
-    required this.takeProfit,
-    required this.stoploss,
-    required this.profitLoss,
-    required this.amount,
+    this.takeProfit,
+    this.stopLoss,
   });
 
   factory Trade({
@@ -37,15 +39,17 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
     _i2.LinkedAccount? linkedAccount,
     required int userId,
     _i3.UserInfo? user,
+    double? realizedPl,
+    required _i2.TradeStatus status,
+    required String symbol,
     required _i2.Option option,
-    required String currency,
-    required double fee,
-    required DateTime date,
+    String? feeCurrency,
+    double? fee,
+    required DateTime openTime,
+    DateTime? closeTime,
     required double lotSize,
-    required double takeProfit,
-    required double stoploss,
-    required String profitLoss,
-    required double amount,
+    double? takeProfit,
+    double? stopLoss,
   }) = _TradeImpl;
 
   factory Trade.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -61,15 +65,20 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
           ? null
           : _i3.UserInfo.fromJson(
               (jsonSerialization['user'] as Map<String, dynamic>)),
+      realizedPl: (jsonSerialization['realizedPl'] as num?)?.toDouble(),
+      status: _i2.TradeStatus.fromJson((jsonSerialization['status'] as int)),
+      symbol: jsonSerialization['symbol'] as String,
       option: _i2.Option.fromJson((jsonSerialization['option'] as int)),
-      currency: jsonSerialization['currency'] as String,
-      fee: (jsonSerialization['fee'] as num).toDouble(),
-      date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
+      feeCurrency: jsonSerialization['feeCurrency'] as String?,
+      fee: (jsonSerialization['fee'] as num?)?.toDouble(),
+      openTime:
+          _i1.DateTimeJsonExtension.fromJson(jsonSerialization['openTime']),
+      closeTime: jsonSerialization['closeTime'] == null
+          ? null
+          : _i1.DateTimeJsonExtension.fromJson(jsonSerialization['closeTime']),
       lotSize: (jsonSerialization['lotSize'] as num).toDouble(),
-      takeProfit: (jsonSerialization['takeProfit'] as num).toDouble(),
-      stoploss: (jsonSerialization['stoploss'] as num).toDouble(),
-      profitLoss: jsonSerialization['profitLoss'] as String,
-      amount: (jsonSerialization['amount'] as num).toDouble(),
+      takeProfit: (jsonSerialization['takeProfit'] as num?)?.toDouble(),
+      stopLoss: (jsonSerialization['stopLoss'] as num?)?.toDouble(),
     );
   }
 
@@ -88,23 +97,27 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
 
   _i3.UserInfo? user;
 
+  double? realizedPl;
+
+  _i2.TradeStatus status;
+
+  String symbol;
+
   _i2.Option option;
 
-  String currency;
+  String? feeCurrency;
 
-  double fee;
+  double? fee;
 
-  DateTime date;
+  DateTime openTime;
+
+  DateTime? closeTime;
 
   double lotSize;
 
-  double takeProfit;
+  double? takeProfit;
 
-  double stoploss;
-
-  String profitLoss;
-
-  double amount;
+  double? stopLoss;
 
   @override
   _i1.Table get table => t;
@@ -115,15 +128,17 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
     _i2.LinkedAccount? linkedAccount,
     int? userId,
     _i3.UserInfo? user,
+    double? realizedPl,
+    _i2.TradeStatus? status,
+    String? symbol,
     _i2.Option? option,
-    String? currency,
+    String? feeCurrency,
     double? fee,
-    DateTime? date,
+    DateTime? openTime,
+    DateTime? closeTime,
     double? lotSize,
     double? takeProfit,
-    double? stoploss,
-    String? profitLoss,
-    double? amount,
+    double? stopLoss,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -133,15 +148,17 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
       if (linkedAccount != null) 'linkedAccount': linkedAccount?.toJson(),
       'userId': userId,
       if (user != null) 'user': user?.toJson(),
+      if (realizedPl != null) 'realizedPl': realizedPl,
+      'status': status.toJson(),
+      'symbol': symbol,
       'option': option.toJson(),
-      'currency': currency,
-      'fee': fee,
-      'date': date.toJson(),
+      if (feeCurrency != null) 'feeCurrency': feeCurrency,
+      if (fee != null) 'fee': fee,
+      'openTime': openTime.toJson(),
+      if (closeTime != null) 'closeTime': closeTime?.toJson(),
       'lotSize': lotSize,
-      'takeProfit': takeProfit,
-      'stoploss': stoploss,
-      'profitLoss': profitLoss,
-      'amount': amount,
+      if (takeProfit != null) 'takeProfit': takeProfit,
+      if (stopLoss != null) 'stopLoss': stopLoss,
     };
   }
 
@@ -154,15 +171,17 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
         'linkedAccount': linkedAccount?.toJsonForProtocol(),
       'userId': userId,
       if (user != null) 'user': user?.toJsonForProtocol(),
+      if (realizedPl != null) 'realizedPl': realizedPl,
+      'status': status.toJson(),
+      'symbol': symbol,
       'option': option.toJson(),
-      'currency': currency,
-      'fee': fee,
-      'date': date.toJson(),
+      if (feeCurrency != null) 'feeCurrency': feeCurrency,
+      if (fee != null) 'fee': fee,
+      'openTime': openTime.toJson(),
+      if (closeTime != null) 'closeTime': closeTime?.toJson(),
       'lotSize': lotSize,
-      'takeProfit': takeProfit,
-      'stoploss': stoploss,
-      'profitLoss': profitLoss,
-      'amount': amount,
+      if (takeProfit != null) 'takeProfit': takeProfit,
+      if (stopLoss != null) 'stopLoss': stopLoss,
     };
   }
 
@@ -211,30 +230,34 @@ class _TradeImpl extends Trade {
     _i2.LinkedAccount? linkedAccount,
     required int userId,
     _i3.UserInfo? user,
+    double? realizedPl,
+    required _i2.TradeStatus status,
+    required String symbol,
     required _i2.Option option,
-    required String currency,
-    required double fee,
-    required DateTime date,
+    String? feeCurrency,
+    double? fee,
+    required DateTime openTime,
+    DateTime? closeTime,
     required double lotSize,
-    required double takeProfit,
-    required double stoploss,
-    required String profitLoss,
-    required double amount,
+    double? takeProfit,
+    double? stopLoss,
   }) : super._(
           id: id,
           linkedAccountId: linkedAccountId,
           linkedAccount: linkedAccount,
           userId: userId,
           user: user,
+          realizedPl: realizedPl,
+          status: status,
+          symbol: symbol,
           option: option,
-          currency: currency,
+          feeCurrency: feeCurrency,
           fee: fee,
-          date: date,
+          openTime: openTime,
+          closeTime: closeTime,
           lotSize: lotSize,
           takeProfit: takeProfit,
-          stoploss: stoploss,
-          profitLoss: profitLoss,
-          amount: amount,
+          stopLoss: stopLoss,
         );
 
   @override
@@ -244,15 +267,17 @@ class _TradeImpl extends Trade {
     Object? linkedAccount = _Undefined,
     int? userId,
     Object? user = _Undefined,
+    Object? realizedPl = _Undefined,
+    _i2.TradeStatus? status,
+    String? symbol,
     _i2.Option? option,
-    String? currency,
-    double? fee,
-    DateTime? date,
+    Object? feeCurrency = _Undefined,
+    Object? fee = _Undefined,
+    DateTime? openTime,
+    Object? closeTime = _Undefined,
     double? lotSize,
-    double? takeProfit,
-    double? stoploss,
-    String? profitLoss,
-    double? amount,
+    Object? takeProfit = _Undefined,
+    Object? stopLoss = _Undefined,
   }) {
     return Trade(
       id: id is int? ? id : this.id,
@@ -262,15 +287,17 @@ class _TradeImpl extends Trade {
           : this.linkedAccount?.copyWith(),
       userId: userId ?? this.userId,
       user: user is _i3.UserInfo? ? user : this.user?.copyWith(),
+      realizedPl: realizedPl is double? ? realizedPl : this.realizedPl,
+      status: status ?? this.status,
+      symbol: symbol ?? this.symbol,
       option: option ?? this.option,
-      currency: currency ?? this.currency,
-      fee: fee ?? this.fee,
-      date: date ?? this.date,
+      feeCurrency: feeCurrency is String? ? feeCurrency : this.feeCurrency,
+      fee: fee is double? ? fee : this.fee,
+      openTime: openTime ?? this.openTime,
+      closeTime: closeTime is DateTime? ? closeTime : this.closeTime,
       lotSize: lotSize ?? this.lotSize,
-      takeProfit: takeProfit ?? this.takeProfit,
-      stoploss: stoploss ?? this.stoploss,
-      profitLoss: profitLoss ?? this.profitLoss,
-      amount: amount ?? this.amount,
+      takeProfit: takeProfit is double? ? takeProfit : this.takeProfit,
+      stopLoss: stopLoss is double? ? stopLoss : this.stopLoss,
     );
   }
 }
@@ -285,21 +312,38 @@ class TradeTable extends _i1.Table {
       'userId',
       this,
     );
+    realizedPl = _i1.ColumnDouble(
+      'realizedPl',
+      this,
+    );
+    status = _i1.ColumnEnum(
+      'status',
+      this,
+      _i1.EnumSerialization.byIndex,
+    );
+    symbol = _i1.ColumnString(
+      'symbol',
+      this,
+    );
     option = _i1.ColumnEnum(
       'option',
       this,
       _i1.EnumSerialization.byIndex,
     );
-    currency = _i1.ColumnString(
-      'currency',
+    feeCurrency = _i1.ColumnString(
+      'feeCurrency',
       this,
     );
     fee = _i1.ColumnDouble(
       'fee',
       this,
     );
-    date = _i1.ColumnDateTime(
-      'date',
+    openTime = _i1.ColumnDateTime(
+      'openTime',
+      this,
+    );
+    closeTime = _i1.ColumnDateTime(
+      'closeTime',
       this,
     );
     lotSize = _i1.ColumnDouble(
@@ -310,16 +354,8 @@ class TradeTable extends _i1.Table {
       'takeProfit',
       this,
     );
-    stoploss = _i1.ColumnDouble(
-      'stoploss',
-      this,
-    );
-    profitLoss = _i1.ColumnString(
-      'profitLoss',
-      this,
-    );
-    amount = _i1.ColumnDouble(
-      'amount',
+    stopLoss = _i1.ColumnDouble(
+      'stopLoss',
       this,
     );
   }
@@ -332,23 +368,27 @@ class TradeTable extends _i1.Table {
 
   _i3.UserInfoTable? _user;
 
+  late final _i1.ColumnDouble realizedPl;
+
+  late final _i1.ColumnEnum<_i2.TradeStatus> status;
+
+  late final _i1.ColumnString symbol;
+
   late final _i1.ColumnEnum<_i2.Option> option;
 
-  late final _i1.ColumnString currency;
+  late final _i1.ColumnString feeCurrency;
 
   late final _i1.ColumnDouble fee;
 
-  late final _i1.ColumnDateTime date;
+  late final _i1.ColumnDateTime openTime;
+
+  late final _i1.ColumnDateTime closeTime;
 
   late final _i1.ColumnDouble lotSize;
 
   late final _i1.ColumnDouble takeProfit;
 
-  late final _i1.ColumnDouble stoploss;
-
-  late final _i1.ColumnString profitLoss;
-
-  late final _i1.ColumnDouble amount;
+  late final _i1.ColumnDouble stopLoss;
 
   _i2.LinkedAccountTable get linkedAccount {
     if (_linkedAccount != null) return _linkedAccount!;
@@ -381,15 +421,17 @@ class TradeTable extends _i1.Table {
         id,
         linkedAccountId,
         userId,
+        realizedPl,
+        status,
+        symbol,
         option,
-        currency,
+        feeCurrency,
         fee,
-        date,
+        openTime,
+        closeTime,
         lotSize,
         takeProfit,
-        stoploss,
-        profitLoss,
-        amount,
+        stopLoss,
       ];
 
   @override

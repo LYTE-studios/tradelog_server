@@ -11,18 +11,19 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-enum Option implements _i1.SerializableModel {
-  long,
-  short;
+enum TradeStatus implements _i1.SerializableModel {
+  open,
+  closed;
 
-  static Option fromJson(int index) {
+  static TradeStatus fromJson(int index) {
     switch (index) {
       case 0:
-        return long;
+        return open;
       case 1:
-        return short;
+        return closed;
       default:
-        throw ArgumentError('Value "$index" cannot be converted to "Option"');
+        throw ArgumentError(
+            'Value "$index" cannot be converted to "TradeStatus"');
     }
   }
 

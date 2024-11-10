@@ -1,8 +1,0 @@
-class: DisplayTrade 
-fields:
-  openTime: DateTime
-  symbol: String
-  direction: String
-  status: String
-  netpl: double
-  netroi: double
