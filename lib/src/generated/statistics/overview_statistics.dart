@@ -14,63 +14,63 @@ import 'package:serverpod/serverpod.dart' as _i1;
 abstract class OverviewStatistics
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
   OverviewStatistics._({
-    required this.netProfitLossThisMonth,
+    this.netProfitLossThisMonth,
     this.netProfitLossTrend,
-    required this.tradeWinRateThisMonth,
+    this.tradeWinRateThisMonth,
     this.tradeWinRateTrend,
-    required this.realizedReturnThisMonth,
+    this.realizedReturnThisMonth,
     this.realizedReturnTrend,
-    required this.shortTradesAmount,
-    required this.longTradesAmount,
+    this.shortTradesAmount,
+    this.longTradesAmount,
   });
 
   factory OverviewStatistics({
-    required double netProfitLossThisMonth,
+    double? netProfitLossThisMonth,
     double? netProfitLossTrend,
-    required double tradeWinRateThisMonth,
+    double? tradeWinRateThisMonth,
     double? tradeWinRateTrend,
-    required double realizedReturnThisMonth,
+    double? realizedReturnThisMonth,
     double? realizedReturnTrend,
-    required double shortTradesAmount,
-    required double longTradesAmount,
+    double? shortTradesAmount,
+    double? longTradesAmount,
   }) = _OverviewStatisticsImpl;
 
   factory OverviewStatistics.fromJson(Map<String, dynamic> jsonSerialization) {
     return OverviewStatistics(
       netProfitLossThisMonth:
-          (jsonSerialization['netProfitLossThisMonth'] as num).toDouble(),
+          (jsonSerialization['netProfitLossThisMonth'] as num?)?.toDouble(),
       netProfitLossTrend:
           (jsonSerialization['netProfitLossTrend'] as num?)?.toDouble(),
       tradeWinRateThisMonth:
-          (jsonSerialization['tradeWinRateThisMonth'] as num).toDouble(),
+          (jsonSerialization['tradeWinRateThisMonth'] as num?)?.toDouble(),
       tradeWinRateTrend:
           (jsonSerialization['tradeWinRateTrend'] as num?)?.toDouble(),
       realizedReturnThisMonth:
-          (jsonSerialization['realizedReturnThisMonth'] as num).toDouble(),
+          (jsonSerialization['realizedReturnThisMonth'] as num?)?.toDouble(),
       realizedReturnTrend:
           (jsonSerialization['realizedReturnTrend'] as num?)?.toDouble(),
       shortTradesAmount:
-          (jsonSerialization['shortTradesAmount'] as num).toDouble(),
+          (jsonSerialization['shortTradesAmount'] as num?)?.toDouble(),
       longTradesAmount:
-          (jsonSerialization['longTradesAmount'] as num).toDouble(),
+          (jsonSerialization['longTradesAmount'] as num?)?.toDouble(),
     );
   }
 
-  double netProfitLossThisMonth;
+  double? netProfitLossThisMonth;
 
   double? netProfitLossTrend;
 
-  double tradeWinRateThisMonth;
+  double? tradeWinRateThisMonth;
 
   double? tradeWinRateTrend;
 
-  double realizedReturnThisMonth;
+  double? realizedReturnThisMonth;
 
   double? realizedReturnTrend;
 
-  double shortTradesAmount;
+  double? shortTradesAmount;
 
-  double longTradesAmount;
+  double? longTradesAmount;
 
   OverviewStatistics copyWith({
     double? netProfitLossThisMonth,
@@ -85,30 +85,36 @@ abstract class OverviewStatistics
   @override
   Map<String, dynamic> toJson() {
     return {
-      'netProfitLossThisMonth': netProfitLossThisMonth,
+      if (netProfitLossThisMonth != null)
+        'netProfitLossThisMonth': netProfitLossThisMonth,
       if (netProfitLossTrend != null) 'netProfitLossTrend': netProfitLossTrend,
-      'tradeWinRateThisMonth': tradeWinRateThisMonth,
+      if (tradeWinRateThisMonth != null)
+        'tradeWinRateThisMonth': tradeWinRateThisMonth,
       if (tradeWinRateTrend != null) 'tradeWinRateTrend': tradeWinRateTrend,
-      'realizedReturnThisMonth': realizedReturnThisMonth,
+      if (realizedReturnThisMonth != null)
+        'realizedReturnThisMonth': realizedReturnThisMonth,
       if (realizedReturnTrend != null)
         'realizedReturnTrend': realizedReturnTrend,
-      'shortTradesAmount': shortTradesAmount,
-      'longTradesAmount': longTradesAmount,
+      if (shortTradesAmount != null) 'shortTradesAmount': shortTradesAmount,
+      if (longTradesAmount != null) 'longTradesAmount': longTradesAmount,
     };
   }
 
   @override
   Map<String, dynamic> toJsonForProtocol() {
     return {
-      'netProfitLossThisMonth': netProfitLossThisMonth,
+      if (netProfitLossThisMonth != null)
+        'netProfitLossThisMonth': netProfitLossThisMonth,
       if (netProfitLossTrend != null) 'netProfitLossTrend': netProfitLossTrend,
-      'tradeWinRateThisMonth': tradeWinRateThisMonth,
+      if (tradeWinRateThisMonth != null)
+        'tradeWinRateThisMonth': tradeWinRateThisMonth,
       if (tradeWinRateTrend != null) 'tradeWinRateTrend': tradeWinRateTrend,
-      'realizedReturnThisMonth': realizedReturnThisMonth,
+      if (realizedReturnThisMonth != null)
+        'realizedReturnThisMonth': realizedReturnThisMonth,
       if (realizedReturnTrend != null)
         'realizedReturnTrend': realizedReturnTrend,
-      'shortTradesAmount': shortTradesAmount,
-      'longTradesAmount': longTradesAmount,
+      if (shortTradesAmount != null) 'shortTradesAmount': shortTradesAmount,
+      if (longTradesAmount != null) 'longTradesAmount': longTradesAmount,
     };
   }
 
@@ -122,14 +128,14 @@ class _Undefined {}
 
 class _OverviewStatisticsImpl extends OverviewStatistics {
   _OverviewStatisticsImpl({
-    required double netProfitLossThisMonth,
+    double? netProfitLossThisMonth,
     double? netProfitLossTrend,
-    required double tradeWinRateThisMonth,
+    double? tradeWinRateThisMonth,
     double? tradeWinRateTrend,
-    required double realizedReturnThisMonth,
+    double? realizedReturnThisMonth,
     double? realizedReturnTrend,
-    required double shortTradesAmount,
-    required double longTradesAmount,
+    double? shortTradesAmount,
+    double? longTradesAmount,
   }) : super._(
           netProfitLossThisMonth: netProfitLossThisMonth,
           netProfitLossTrend: netProfitLossTrend,
@@ -143,33 +149,40 @@ class _OverviewStatisticsImpl extends OverviewStatistics {
 
   @override
   OverviewStatistics copyWith({
-    double? netProfitLossThisMonth,
+    Object? netProfitLossThisMonth = _Undefined,
     Object? netProfitLossTrend = _Undefined,
-    double? tradeWinRateThisMonth,
+    Object? tradeWinRateThisMonth = _Undefined,
     Object? tradeWinRateTrend = _Undefined,
-    double? realizedReturnThisMonth,
+    Object? realizedReturnThisMonth = _Undefined,
     Object? realizedReturnTrend = _Undefined,
-    double? shortTradesAmount,
-    double? longTradesAmount,
+    Object? shortTradesAmount = _Undefined,
+    Object? longTradesAmount = _Undefined,
   }) {
     return OverviewStatistics(
-      netProfitLossThisMonth:
-          netProfitLossThisMonth ?? this.netProfitLossThisMonth,
+      netProfitLossThisMonth: netProfitLossThisMonth is double?
+          ? netProfitLossThisMonth
+          : this.netProfitLossThisMonth,
       netProfitLossTrend: netProfitLossTrend is double?
           ? netProfitLossTrend
           : this.netProfitLossTrend,
-      tradeWinRateThisMonth:
-          tradeWinRateThisMonth ?? this.tradeWinRateThisMonth,
+      tradeWinRateThisMonth: tradeWinRateThisMonth is double?
+          ? tradeWinRateThisMonth
+          : this.tradeWinRateThisMonth,
       tradeWinRateTrend: tradeWinRateTrend is double?
           ? tradeWinRateTrend
           : this.tradeWinRateTrend,
-      realizedReturnThisMonth:
-          realizedReturnThisMonth ?? this.realizedReturnThisMonth,
+      realizedReturnThisMonth: realizedReturnThisMonth is double?
+          ? realizedReturnThisMonth
+          : this.realizedReturnThisMonth,
       realizedReturnTrend: realizedReturnTrend is double?
           ? realizedReturnTrend
           : this.realizedReturnTrend,
-      shortTradesAmount: shortTradesAmount ?? this.shortTradesAmount,
-      longTradesAmount: longTradesAmount ?? this.longTradesAmount,
+      shortTradesAmount: shortTradesAmount is double?
+          ? shortTradesAmount
+          : this.shortTradesAmount,
+      longTradesAmount: longTradesAmount is double?
+          ? longTradesAmount
+          : this.longTradesAmount,
     );
   }
 }

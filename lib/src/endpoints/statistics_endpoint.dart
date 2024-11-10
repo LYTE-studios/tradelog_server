@@ -8,11 +8,11 @@ class StatisticsEndpoint extends Endpoint {
   Future<OverviewStatistics> getOverviewStatistics(Session session) async {
     // TODO
     return OverviewStatistics(
-      netProfitLossThisMonth: 0,
-      tradeWinRateThisMonth: 0,
-      realizedReturnThisMonth: 0,
-      shortTradesAmount: 0,
-      longTradesAmount: 0,
+      netProfitLossThisMonth: null,
+      tradeWinRateThisMonth: null,
+      realizedReturnThisMonth: null,
+      shortTradesAmount: null,
+      longTradesAmount: null,
     );
   }
 }
