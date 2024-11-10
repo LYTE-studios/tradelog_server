@@ -16,10 +16,11 @@ import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i3;
 abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   Trade._({
     this.id,
-    required this.platform,
-    required this.option,
+    required this.linkedAccountId,
+    this.linkedAccount,
     required this.userId,
     this.user,
+    required this.option,
     required this.currency,
     required this.fee,
     required this.date,
@@ -32,10 +33,11 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
 
   factory Trade({
     int? id,
-    required String platform,
-    required _i2.Option option,
+    required int linkedAccountId,
+    _i2.LinkedAccount? linkedAccount,
     required int userId,
     _i3.UserInfo? user,
+    required _i2.Option option,
     required String currency,
     required double fee,
     required DateTime date,
@@ -49,13 +51,17 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   factory Trade.fromJson(Map<String, dynamic> jsonSerialization) {
     return Trade(
       id: jsonSerialization['id'] as int?,
-      platform: jsonSerialization['platform'] as String,
-      option: _i2.Option.fromJson((jsonSerialization['option'] as int)),
+      linkedAccountId: jsonSerialization['linkedAccountId'] as int,
+      linkedAccount: jsonSerialization['linkedAccount'] == null
+          ? null
+          : _i2.LinkedAccount.fromJson(
+              (jsonSerialization['linkedAccount'] as Map<String, dynamic>)),
       userId: jsonSerialization['userId'] as int,
       user: jsonSerialization['user'] == null
           ? null
           : _i3.UserInfo.fromJson(
               (jsonSerialization['user'] as Map<String, dynamic>)),
+      option: _i2.Option.fromJson((jsonSerialization['option'] as int)),
       currency: jsonSerialization['currency'] as String,
       fee: (jsonSerialization['fee'] as num).toDouble(),
       date: _i1.DateTimeJsonExtension.fromJson(jsonSerialization['date']),
@@ -74,13 +80,15 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   @override
   int? id;
 
-  String platform;
+  int linkedAccountId;
 
-  _i2.Option option;
+  _i2.LinkedAccount? linkedAccount;
 
   int userId;
 
   _i3.UserInfo? user;
+
+  _i2.Option option;
 
   String currency;
 
@@ -103,10 +111,11 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
 
   Trade copyWith({
     int? id,
-    String? platform,
-    _i2.Option? option,
+    int? linkedAccountId,
+    _i2.LinkedAccount? linkedAccount,
     int? userId,
     _i3.UserInfo? user,
+    _i2.Option? option,
     String? currency,
     double? fee,
     DateTime? date,
@@ -120,10 +129,11 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   Map<String, dynamic> toJson() {
     return {
       if (id != null) 'id': id,
-      'platform': platform,
-      'option': option.toJson(),
+      'linkedAccountId': linkedAccountId,
+      if (linkedAccount != null) 'linkedAccount': linkedAccount?.toJson(),
       'userId': userId,
       if (user != null) 'user': user?.toJson(),
+      'option': option.toJson(),
       'currency': currency,
       'fee': fee,
       'date': date.toJson(),
@@ -139,10 +149,12 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
   Map<String, dynamic> toJsonForProtocol() {
     return {
       if (id != null) 'id': id,
-      'platform': platform,
-      'option': option.toJson(),
+      'linkedAccountId': linkedAccountId,
+      if (linkedAccount != null)
+        'linkedAccount': linkedAccount?.toJsonForProtocol(),
       'userId': userId,
       if (user != null) 'user': user?.toJsonForProtocol(),
+      'option': option.toJson(),
       'currency': currency,
       'fee': fee,
       'date': date.toJson(),
@@ -154,8 +166,14 @@ abstract class Trade implements _i1.TableRow, _i1.ProtocolSerialization {
     };
   }
 
-  static TradeInclude include({_i3.UserInfoInclude? user}) {
-    return TradeInclude._(user: user);
+  static TradeInclude include({
+    _i2.LinkedAccountInclude? linkedAccount,
+    _i3.UserInfoInclude? user,
+  }) {
+    return TradeInclude._(
+      linkedAccount: linkedAccount,
+      user: user,
+    );
   }
 
   static TradeIncludeList includeList({
@@ -189,10 +207,11 @@ class _Undefined {}
 class _TradeImpl extends Trade {
   _TradeImpl({
     int? id,
-    required String platform,
-    required _i2.Option option,
+    required int linkedAccountId,
+    _i2.LinkedAccount? linkedAccount,
     required int userId,
     _i3.UserInfo? user,
+    required _i2.Option option,
     required String currency,
     required double fee,
     required DateTime date,
@@ -203,10 +222,11 @@ class _TradeImpl extends Trade {
     required double amount,
   }) : super._(
           id: id,
-          platform: platform,
-          option: option,
+          linkedAccountId: linkedAccountId,
+          linkedAccount: linkedAccount,
           userId: userId,
           user: user,
+          option: option,
           currency: currency,
           fee: fee,
           date: date,
@@ -220,10 +240,11 @@ class _TradeImpl extends Trade {
   @override
   Trade copyWith({
     Object? id = _Undefined,
-    String? platform,
-    _i2.Option? option,
+    int? linkedAccountId,
+    Object? linkedAccount = _Undefined,
     int? userId,
     Object? user = _Undefined,
+    _i2.Option? option,
     String? currency,
     double? fee,
     DateTime? date,
@@ -235,10 +256,13 @@ class _TradeImpl extends Trade {
   }) {
     return Trade(
       id: id is int? ? id : this.id,
-      platform: platform ?? this.platform,
-      option: option ?? this.option,
+      linkedAccountId: linkedAccountId ?? this.linkedAccountId,
+      linkedAccount: linkedAccount is _i2.LinkedAccount?
+          ? linkedAccount
+          : this.linkedAccount?.copyWith(),
       userId: userId ?? this.userId,
       user: user is _i3.UserInfo? ? user : this.user?.copyWith(),
+      option: option ?? this.option,
       currency: currency ?? this.currency,
       fee: fee ?? this.fee,
       date: date ?? this.date,
@@ -253,18 +277,18 @@ class _TradeImpl extends Trade {
 
 class TradeTable extends _i1.Table {
   TradeTable({super.tableRelation}) : super(tableName: 'trade') {
-    platform = _i1.ColumnString(
-      'platform',
+    linkedAccountId = _i1.ColumnInt(
+      'linkedAccountId',
+      this,
+    );
+    userId = _i1.ColumnInt(
+      'userId',
       this,
     );
     option = _i1.ColumnEnum(
       'option',
       this,
       _i1.EnumSerialization.byIndex,
-    );
-    userId = _i1.ColumnInt(
-      'userId',
-      this,
     );
     currency = _i1.ColumnString(
       'currency',
@@ -300,13 +324,15 @@ class TradeTable extends _i1.Table {
     );
   }
 
-  late final _i1.ColumnString platform;
+  late final _i1.ColumnInt linkedAccountId;
 
-  late final _i1.ColumnEnum<_i2.Option> option;
+  _i2.LinkedAccountTable? _linkedAccount;
 
   late final _i1.ColumnInt userId;
 
   _i3.UserInfoTable? _user;
+
+  late final _i1.ColumnEnum<_i2.Option> option;
 
   late final _i1.ColumnString currency;
 
@@ -324,6 +350,19 @@ class TradeTable extends _i1.Table {
 
   late final _i1.ColumnDouble amount;
 
+  _i2.LinkedAccountTable get linkedAccount {
+    if (_linkedAccount != null) return _linkedAccount!;
+    _linkedAccount = _i1.createRelationTable(
+      relationFieldName: 'linkedAccount',
+      field: Trade.t.linkedAccountId,
+      foreignField: _i2.LinkedAccount.t.id,
+      tableRelation: tableRelation,
+      createTable: (foreignTableRelation) =>
+          _i2.LinkedAccountTable(tableRelation: foreignTableRelation),
+    );
+    return _linkedAccount!;
+  }
+
   _i3.UserInfoTable get user {
     if (_user != null) return _user!;
     _user = _i1.createRelationTable(
@@ -340,9 +379,9 @@ class TradeTable extends _i1.Table {
   @override
   List<_i1.Column> get columns => [
         id,
-        platform,
-        option,
+        linkedAccountId,
         userId,
+        option,
         currency,
         fee,
         date,
@@ -355,6 +394,9 @@ class TradeTable extends _i1.Table {
 
   @override
   _i1.Table? getRelationTable(String relationField) {
+    if (relationField == 'linkedAccount') {
+      return linkedAccount;
+    }
     if (relationField == 'user') {
       return user;
     }
@@ -363,14 +405,23 @@ class TradeTable extends _i1.Table {
 }
 
 class TradeInclude extends _i1.IncludeObject {
-  TradeInclude._({_i3.UserInfoInclude? user}) {
+  TradeInclude._({
+    _i2.LinkedAccountInclude? linkedAccount,
+    _i3.UserInfoInclude? user,
+  }) {
+    _linkedAccount = linkedAccount;
     _user = user;
   }
+
+  _i2.LinkedAccountInclude? _linkedAccount;
 
   _i3.UserInfoInclude? _user;
 
   @override
-  Map<String, _i1.Include?> get includes => {'user': _user};
+  Map<String, _i1.Include?> get includes => {
+        'linkedAccount': _linkedAccount,
+        'user': _user,
+      };
 
   @override
   _i1.Table get table => Trade.t;
@@ -555,6 +606,27 @@ class TradeRepository {
 
 class TradeAttachRowRepository {
   const TradeAttachRowRepository._();
+
+  Future<void> linkedAccount(
+    _i1.DatabaseAccessor databaseAccessor,
+    Trade trade,
+    _i2.LinkedAccount linkedAccount, {
+    _i1.Transaction? transaction,
+  }) async {
+    if (trade.id == null) {
+      throw ArgumentError.notNull('trade.id');
+    }
+    if (linkedAccount.id == null) {
+      throw ArgumentError.notNull('linkedAccount.id');
+    }
+
+    var $trade = trade.copyWith(linkedAccountId: linkedAccount.id);
+    await databaseAccessor.db.updateRow<Trade>(
+      $trade,
+      columns: [Trade.t.linkedAccountId],
+      transaction: transaction ?? databaseAccessor.transaction,
+    );
+  }
 
   Future<void> user(
     _i1.DatabaseAccessor databaseAccessor,

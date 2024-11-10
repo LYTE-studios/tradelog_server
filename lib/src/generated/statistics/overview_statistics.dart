@@ -22,6 +22,8 @@ abstract class OverviewStatistics
     this.realizedReturnTrend,
     this.shortTradesAmount,
     this.longTradesAmount,
+    this.averageHoldingTime,
+    this.profitFactor,
   });
 
   factory OverviewStatistics({
@@ -31,8 +33,10 @@ abstract class OverviewStatistics
     double? tradeWinRateTrend,
     double? realizedReturnThisMonth,
     double? realizedReturnTrend,
-    double? shortTradesAmount,
-    double? longTradesAmount,
+    int? shortTradesAmount,
+    int? longTradesAmount,
+    double? averageHoldingTime,
+    double? profitFactor,
   }) = _OverviewStatisticsImpl;
 
   factory OverviewStatistics.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -49,10 +53,11 @@ abstract class OverviewStatistics
           (jsonSerialization['realizedReturnThisMonth'] as num?)?.toDouble(),
       realizedReturnTrend:
           (jsonSerialization['realizedReturnTrend'] as num?)?.toDouble(),
-      shortTradesAmount:
-          (jsonSerialization['shortTradesAmount'] as num?)?.toDouble(),
-      longTradesAmount:
-          (jsonSerialization['longTradesAmount'] as num?)?.toDouble(),
+      shortTradesAmount: jsonSerialization['shortTradesAmount'] as int?,
+      longTradesAmount: jsonSerialization['longTradesAmount'] as int?,
+      averageHoldingTime:
+          (jsonSerialization['averageHoldingTime'] as num?)?.toDouble(),
+      profitFactor: (jsonSerialization['profitFactor'] as num?)?.toDouble(),
     );
   }
 
@@ -68,9 +73,13 @@ abstract class OverviewStatistics
 
   double? realizedReturnTrend;
 
-  double? shortTradesAmount;
+  int? shortTradesAmount;
 
-  double? longTradesAmount;
+  int? longTradesAmount;
+
+  double? averageHoldingTime;
+
+  double? profitFactor;
 
   OverviewStatistics copyWith({
     double? netProfitLossThisMonth,
@@ -79,8 +88,10 @@ abstract class OverviewStatistics
     double? tradeWinRateTrend,
     double? realizedReturnThisMonth,
     double? realizedReturnTrend,
-    double? shortTradesAmount,
-    double? longTradesAmount,
+    int? shortTradesAmount,
+    int? longTradesAmount,
+    double? averageHoldingTime,
+    double? profitFactor,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -97,6 +108,8 @@ abstract class OverviewStatistics
         'realizedReturnTrend': realizedReturnTrend,
       if (shortTradesAmount != null) 'shortTradesAmount': shortTradesAmount,
       if (longTradesAmount != null) 'longTradesAmount': longTradesAmount,
+      if (averageHoldingTime != null) 'averageHoldingTime': averageHoldingTime,
+      if (profitFactor != null) 'profitFactor': profitFactor,
     };
   }
 
@@ -115,6 +128,8 @@ abstract class OverviewStatistics
         'realizedReturnTrend': realizedReturnTrend,
       if (shortTradesAmount != null) 'shortTradesAmount': shortTradesAmount,
       if (longTradesAmount != null) 'longTradesAmount': longTradesAmount,
+      if (averageHoldingTime != null) 'averageHoldingTime': averageHoldingTime,
+      if (profitFactor != null) 'profitFactor': profitFactor,
     };
   }
 
@@ -134,8 +149,10 @@ class _OverviewStatisticsImpl extends OverviewStatistics {
     double? tradeWinRateTrend,
     double? realizedReturnThisMonth,
     double? realizedReturnTrend,
-    double? shortTradesAmount,
-    double? longTradesAmount,
+    int? shortTradesAmount,
+    int? longTradesAmount,
+    double? averageHoldingTime,
+    double? profitFactor,
   }) : super._(
           netProfitLossThisMonth: netProfitLossThisMonth,
           netProfitLossTrend: netProfitLossTrend,
@@ -145,6 +162,8 @@ class _OverviewStatisticsImpl extends OverviewStatistics {
           realizedReturnTrend: realizedReturnTrend,
           shortTradesAmount: shortTradesAmount,
           longTradesAmount: longTradesAmount,
+          averageHoldingTime: averageHoldingTime,
+          profitFactor: profitFactor,
         );
 
   @override
@@ -157,6 +176,8 @@ class _OverviewStatisticsImpl extends OverviewStatistics {
     Object? realizedReturnTrend = _Undefined,
     Object? shortTradesAmount = _Undefined,
     Object? longTradesAmount = _Undefined,
+    Object? averageHoldingTime = _Undefined,
+    Object? profitFactor = _Undefined,
   }) {
     return OverviewStatistics(
       netProfitLossThisMonth: netProfitLossThisMonth is double?
@@ -177,12 +198,15 @@ class _OverviewStatisticsImpl extends OverviewStatistics {
       realizedReturnTrend: realizedReturnTrend is double?
           ? realizedReturnTrend
           : this.realizedReturnTrend,
-      shortTradesAmount: shortTradesAmount is double?
+      shortTradesAmount: shortTradesAmount is int?
           ? shortTradesAmount
           : this.shortTradesAmount,
-      longTradesAmount: longTradesAmount is double?
-          ? longTradesAmount
-          : this.longTradesAmount,
+      longTradesAmount:
+          longTradesAmount is int? ? longTradesAmount : this.longTradesAmount,
+      averageHoldingTime: averageHoldingTime is double?
+          ? averageHoldingTime
+          : this.averageHoldingTime,
+      profitFactor: profitFactor is double? ? profitFactor : this.profitFactor,
     );
   }
 }

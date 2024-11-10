@@ -23,8 +23,9 @@ import 'package:tradelog_server/src/generated/linked_accounts.dart' as _i11;
 import 'package:tradelog_server/src/generated/default/note.dart' as _i12;
 import 'package:tradelog_server/src/generated/profile/tradely_profile.dart'
     as _i13;
-import 'package:tradelog_server/src/generated/default/trade.dart' as _i14;
-import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i15;
+import 'package:tradelog_server/src/generated/dto/trade_dto.dart' as _i14;
+import 'package:tradelog_server/src/generated/default/trade.dart' as _i15;
+import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i16;
 
 class Endpoints extends _i1.EndpointDispatch {
   @override
@@ -488,9 +489,9 @@ class Endpoints extends _i1.EndpointDispatch {
         'addTrade': _i1.MethodConnector(
           name: 'addTrade',
           params: {
-            'trade': _i1.ParameterDescription(
-              name: 'trade',
-              type: _i1.getType<_i14.Trade>(),
+            'dto': _i1.ParameterDescription(
+              name: 'dto',
+              type: _i1.getType<_i14.TradeDto>(),
               nullable: false,
             )
           },
@@ -500,7 +501,7 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['trade'] as _i9.TradeEndpoint).addTrade(
             session,
-            params['trade'],
+            params['dto'],
           ),
         ),
         'deleteTrade': _i1.MethodConnector(
@@ -508,7 +509,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'trade': _i1.ParameterDescription(
               name: 'trade',
-              type: _i1.getType<_i14.Trade>(),
+              type: _i1.getType<_i15.Trade>(),
               nullable: false,
             )
           },
@@ -737,6 +738,6 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
       },
     );
-    modules['serverpod_auth'] = _i15.Endpoints()..initializeEndpoints(server);
+    modules['serverpod_auth'] = _i16.Endpoints()..initializeEndpoints(server);
   }
 }

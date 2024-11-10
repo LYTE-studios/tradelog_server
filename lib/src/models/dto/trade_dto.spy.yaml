@@ -1,11 +1,6 @@
-class: Trade
-
-table: trade
-
+class: TradeDto
 fields:
-  linkedAccount: LinkedAccount?, relation
-  user: module:auth:UserInfo?, relation
-
+  linkedAccountId: int?
   option: Option
   currency: String
   fee: double

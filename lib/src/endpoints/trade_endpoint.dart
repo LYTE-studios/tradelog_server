@@ -1,25 +1,45 @@
+import 'dart:convert'; // For converting file data to string
+
+import 'package:csv/csv.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'dart:convert'; // For converting file data to string
-import 'package:csv/csv.dart';
 
-class TradeEndpoint extends Endpoint { 
+class TradeEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<void> addTrade(Session session, Trade trade) async { 
+  Future<void> addTrade(Session session, TradeDto dto) async {
+    int? userId = (await session.authenticated)?.userId;
+
+    assert(userId != null);
+
+    Trade trade = Trade(
+      linkedAccountId: dto.linkedAccountId ?? 0,
+      userId: userId!,
+      option: dto.option,
+      currency: dto.currency,
+      fee: dto.fee,
+      date: dto.date,
+      lotSize: dto.lotSize,
+      takeProfit: dto.takeProfit,
+      stoploss: dto.stoploss,
+      profitLoss: dto.profitLoss,
+      amount: dto.amount,
+    );
+
     await Trade.db.insertRow(session, trade);
   }
 
-  Future<void> deleteTrade(Session session, Trade trade) async { 
+  Future<void> deleteTrade(Session session, Trade trade) async {
     await Trade.db.deleteRow(session, trade);
   }
 
+  Future<List<Trade>> fetchTrades(Session session) async {
+    int? userId = (await session.authenticated)?.userId;
 
+    assert(userId != null);
 
-  Future<List<Trade>> fetchTrades(Session session) async { 
-    
-    return await Trade.db.find(session);
+    return await Trade.db.find(session, where: (t) => t.userId.equals(userId));
   }
 
   // Method to handle the file upload and process the CSV
@@ -42,8 +62,10 @@ class TradeEndpoint extends Endpoint {
   }
 
   // Helper function to process CSV data and store it in the database
-  Future<void> _processTradeData(Session session, List<List<dynamic>> csvData) async {
-    for (var row in csvData.skip(1)) { // Skip header row
+  Future<void> _processTradeData(
+      Session session, List<List<dynamic>> csvData) async {
+    for (var row in csvData.skip(1)) {
+      // Skip header row
       try {
         // Assuming the CSV has columns: tradeId, symbol, direction, quantity, price
         final tradeId = row[0] as int;

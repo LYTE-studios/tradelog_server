@@ -7,5 +7,7 @@ fields:
   tradeWinRateTrend: double?
   realizedReturnThisMonth: double?
   realizedReturnTrend: double?
-  shortTradesAmount: double?
-  longTradesAmount: double?
+  shortTradesAmount: int?
+  longTradesAmount: int?
+  averageHoldingTime: double? # Expressed in minutes
+  profitFactor: double?
