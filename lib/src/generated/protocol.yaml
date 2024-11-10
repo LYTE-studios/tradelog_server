@@ -24,6 +24,8 @@ note:
 profile:
   - updateProfile:
   - getProfile:
+statistics:
+  - getOverviewStatistics:
 trade:
   - addTrade:
   - deleteTrade:
