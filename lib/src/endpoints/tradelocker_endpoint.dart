@@ -507,11 +507,6 @@ class TradeLockerEndpoint extends Endpoint {
     required String? title,
   }) async {
     try {
-      var checkLinked = await LinkedAccount.db.findFirstRow(
-        session,
-        where: (o) => o.userInfoId.equals(userId),
-      );
-
       var creds = await TradelockerCredentials.db.findFirstRow(
         session,
         where: (o) => o.email.equals(email),
@@ -530,25 +525,18 @@ class TradeLockerEndpoint extends Endpoint {
       List<String> accountIds = accounts.map((x) => x.id).toList();
       List<String> accountNumbers = accounts.map((x) => x.accNum).toList();
 
-      if (checkLinked == null) {
-        var linkedAccount = LinkedAccount(
-          userInfoId: userId,
-          apiKey: apiKey,
-          refreshToken: creds.refreshToken ?? "",
-          platform: Platform.Tradelocker,
-          tradelockerCredentialsId: creds.id,
-          tradelockerAccountId: accountIds,
-          tradelockerAccounts: accountNumbers,
-          title: title,
-        );
-        await LinkedAccount.db.insertRow(session, linkedAccount);
-      } else {
-        checkLinked.apiKey = apiKey;
-        checkLinked.tradelockerAccountId = accountIds;
-        checkLinked.tradelockerAccounts = accountNumbers;
-        checkLinked.title = title;
-        await LinkedAccount.db.updateRow(session, checkLinked);
-      }
+      var linkedAccount = LinkedAccount(
+        userInfoId: userId,
+        apiKey: apiKey,
+        refreshToken: creds.refreshToken ?? "",
+        platform: Platform.Tradelocker,
+        tradelockerCredentialsId: creds.id,
+        tradelockerAccountId: accountIds,
+        tradelockerAccounts: accountNumbers,
+        title: title,
+      );
+
+      await LinkedAccount.db.insertRow(session, linkedAccount);
     } catch (e) {
       throw Exception('Failed to manage linked account: $e');
     }
