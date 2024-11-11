@@ -20,7 +20,7 @@ services:
     image: redis:6.2.6
     ports:
       - '6379'
-    command: redis-server --requirepass "A1VvFRBq9GCCPsYnkRhCz_BDASxgTS2L"
+    command: redis-server --requirepass "hofIyHiTky9LGICaZgrlFPWx76VMwpEx"
     environment:
       - REDIS_REPLICATION_MODE=master
 
