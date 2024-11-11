@@ -307,6 +307,11 @@ class TradeLockerEndpoint extends Endpoint {
         '/trade/accounts/$accountId/positions',
         accNum: accNum,
       );
+
+      if (response.data == null || response.data['d'] == null) {
+        throw Exception('Trade response invalid: ${response.statusMessage}');
+      }
+
       final positions = response.data['d']['positions'] as List<dynamic>;
       return positions
           .map(
