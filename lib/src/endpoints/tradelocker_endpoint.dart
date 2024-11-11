@@ -46,15 +46,27 @@ class TradeLockerEndpoint extends Endpoint {
     );
 
     // Step 1: Perform authentication
-    final data =
-        await _performAuthentication(session, client, email, password, server);
+    final data = await _performAuthentication(
+      session,
+      client,
+      email,
+      password,
+      server,
+    );
 
     final accessToken = data['accessToken'] as String;
     final refreshToken = data['refreshToken'] as String;
 
     // Step 2: Store tokens and update credentials in the database
-    await _storeTokens(session, authenticated!.userId, accessToken,
-        refreshToken, email, password, server);
+    await _storeTokens(
+      session,
+      authenticated!.userId,
+      accessToken,
+      refreshToken,
+      email,
+      password,
+      server,
+    );
 
     // Step 3: Manage Linked Account
     await _manageLinkedAccount(
@@ -68,8 +80,6 @@ class TradeLockerEndpoint extends Endpoint {
 
     return accessToken;
   }
-
-  // TODO Deprecate
 
   Future<void> refresh(Session session) async {
     var authenticated = await session.authenticated;
