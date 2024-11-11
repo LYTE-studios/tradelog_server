@@ -26,6 +26,10 @@ class TradeLockerClient {
         );
 
   Future<void> _checkTokenValidity(Session session) async {
+    if (apiKey.isEmpty) {
+      return;
+    }
+
     try {
       final jwt = JWT.decode(apiKey);
       final expiry = jwt.payload['exp'];
@@ -46,6 +50,10 @@ class TradeLockerClient {
   }
 
   Future<void> _checkRefreshValidity(Session session) async {
+    if (refreshToken.isEmpty) {
+      return;
+    }
+
     try {
       final jwt = JWT.decode(refreshToken);
       final expiry = jwt.payload['exp'];

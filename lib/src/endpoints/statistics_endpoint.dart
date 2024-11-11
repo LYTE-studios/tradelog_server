@@ -35,7 +35,9 @@ class StatisticsEndpoint extends Endpoint {
   }
 
   List<TradeDto> _filterTradesForCurrentMonth(
-      List<TradeDto> trades, DateTime now) {
+    List<TradeDto> trades,
+    DateTime now,
+  ) {
     return trades
         .where((trade) =>
             trade.status == TradeStatus.closed &&
