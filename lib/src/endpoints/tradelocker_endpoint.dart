@@ -301,37 +301,26 @@ class TradeLockerEndpoint extends Endpoint {
       refreshToken: refreshToken,
     );
 
-    final positionsFuture = Completer<List<TradelockerPosition>>();
-    requestQueue.addRequest(
-      EndpointRequest(
-        priority: 1,
-        request: () async {
-          try {
-            final response = await client.get(
-              session,
-              '/trade/accounts/$accountId/positions',
-              accNum: accNum,
-            );
-            final positions = response.data['d']['positions'] as List<dynamic>;
-            positionsFuture.complete(positions
-                .map(
-                  (position) => TradeLockerExtension.positionFromJson(
-                    position as List<dynamic>,
-                  ),
-                )
-                .toList());
-          } catch (e) {
-            // Send to Sentry for monitoring
-            Sentry.captureException(e);
+    try {
+      final response = await client.get(
+        session,
+        '/trade/accounts/$accountId/positions',
+        accNum: accNum,
+      );
+      final positions = response.data['d']['positions'] as List<dynamic>;
+      return positions
+          .map(
+            (position) => TradeLockerExtension.positionFromJson(
+              position as List<dynamic>,
+            ),
+          )
+          .toList();
+    } catch (e) {
+      // Send to Sentry for monitoring
+      Sentry.captureException(e);
 
-            positionsFuture.completeError(
-                e); // Complete the future with an error if it fails
-          }
-        },
-      ),
-    );
-
-    return await positionsFuture.future;
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> getRawOrders(
@@ -367,49 +356,34 @@ class TradeLockerEndpoint extends Endpoint {
       refreshToken: refreshToken,
     );
 
-    final ordersFuture = Completer<List<TradelockerOrder>>();
-    requestQueue.addRequest(
-      EndpointRequest(
-        priority: 1,
-        request: () async {
-          try {
-            final response = await client.get(
-              session,
-              '/trade/accounts/$accountId/ordersHistory',
-              accNum: accNum,
-            );
+    try {
+      final response = await client.get(
+        session,
+        '/trade/accounts/$accountId/ordersHistory',
+        accNum: accNum,
+      );
 
-            // Check if the response is valid and contains the expected data
-            if (response.data == null || response.data['d'] == null) {
-              // print(response.data); // uncomment if random error
-              throw Exception('Invalid response or no data found.');
-            }
+      // Check if the response is valid and contains the expected data
+      if (response.data == null || response.data['d'] == null) {
+        // print(response.data); // uncomment if random error
+        throw Exception('Invalid response or no data found.');
+      }
 
-            // Extract and process the orders
-            final orders =
-                response.data['d']['ordersHistory'] as List<dynamic>?;
-            if (orders == null) {
-              throw Exception('No orders found in the response.');
-            }
+      // Extract and process the orders
+      final orders = response.data['d']['ordersHistory'] as List<dynamic>?;
+      if (orders == null) {
+        throw Exception('No orders found in the response.');
+      }
 
-            // Complete the future with the list of processed orders
-            ordersFuture.complete(orders
-                .map((order) =>
-                    TradeLockerExtension.orderFromJson(order as List<dynamic>))
-                .toList());
-          } catch (e) {
-            // Send to Sentry for monitoring
-            Sentry.captureException(e);
-
-            // Complete the future with an error if anything fails
-            ordersFuture.completeError(e);
-            print('Error processing orders: $e');
-          }
-        },
-      ),
-    );
-
-    return await ordersFuture.future;
+      return orders
+          .map((order) =>
+              TradeLockerExtension.orderFromJson(order as List<dynamic>))
+          .toList();
+    } catch (e) {
+      // Send to Sentry for monitoring
+      Sentry.captureException(e);
+      rethrow;
+    }
   }
 
   Future<Map<String, dynamic>> _performAuthentication(
@@ -507,6 +481,11 @@ class TradeLockerEndpoint extends Endpoint {
     required String? title,
   }) async {
     try {
+      var checkLinked = await LinkedAccount.db.findFirstRow(
+        session,
+        where: (o) => o.userInfoId.equals(userId),
+      );
+
       var creds = await TradelockerCredentials.db.findFirstRow(
         session,
         where: (o) => o.email.equals(email),
@@ -525,18 +504,25 @@ class TradeLockerEndpoint extends Endpoint {
       List<String> accountIds = accounts.map((x) => x.id).toList();
       List<String> accountNumbers = accounts.map((x) => x.accNum).toList();
 
-      var linkedAccount = LinkedAccount(
-        userInfoId: userId,
-        apiKey: apiKey,
-        refreshToken: creds.refreshToken ?? "",
-        platform: Platform.Tradelocker,
-        tradelockerCredentialsId: creds.id,
-        tradelockerAccountId: accountIds,
-        tradelockerAccounts: accountNumbers,
-        title: title,
-      );
-
-      await LinkedAccount.db.insertRow(session, linkedAccount);
+      if (checkLinked == null) {
+        var linkedAccount = LinkedAccount(
+          userInfoId: userId,
+          apiKey: apiKey,
+          refreshToken: creds.refreshToken ?? "",
+          platform: Platform.Tradelocker,
+          tradelockerCredentialsId: creds.id,
+          tradelockerAccountId: accountIds,
+          tradelockerAccounts: accountNumbers,
+          title: title,
+        );
+        await LinkedAccount.db.insertRow(session, linkedAccount);
+      } else {
+        checkLinked.apiKey = apiKey;
+        checkLinked.tradelockerAccountId = accountIds;
+        checkLinked.tradelockerAccounts = accountNumbers;
+        checkLinked.title = title;
+        await LinkedAccount.db.updateRow(session, checkLinked);
+      }
     } catch (e) {
       throw Exception('Failed to manage linked account: $e');
     }
