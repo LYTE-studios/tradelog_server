@@ -5,6 +5,7 @@ table: linked_account
 fields:
   userInfoId: int, relation(parent=serverpod_user_info)
   apiKey: String
+  refreshToken: String
   platform: Platform
   tradelockerCredentialsId: int?, relation(parent=tradelocker_credentials)
   tradelockerAccountId: List<String>?

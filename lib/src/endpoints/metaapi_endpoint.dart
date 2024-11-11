@@ -79,6 +79,8 @@ class MetaApiEndpoint extends Endpoint {
         var linkedAccount = LinkedAccount(
           userInfoId: authenticated!.userId,
           apiKey: apiKey,
+          // TODO: check refresh token logic with METAPI
+          refreshToken: "",
           platform: Platform.Metatrader,
           metaID: metaId,
           // Set the metaId here

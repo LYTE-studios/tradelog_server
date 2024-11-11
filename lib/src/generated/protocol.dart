@@ -20,7 +20,7 @@ import 'default/trade.dart' as _i7;
 import 'default/trade_status.dart' as _i8;
 import 'dto/trade_dto.dart' as _i9;
 import 'dto/trade_list_dto.dart' as _i10;
-import 'linked_accounts.dart' as _i11;
+import 'linked_account.dart' as _i11;
 import 'meta/distance_trailing_stop_loss.dart' as _i12;
 import 'meta/meta_account_information.dart' as _i13;
 import 'meta/meta_trader_order.dart' as _i14;
@@ -42,7 +42,7 @@ import 'tradelocker/tradelocker_order.dart' as _i29;
 import 'tradelocker/tradelocker_position.dart' as _i30;
 import 'tradelocker/trading_rules.dart' as _i31;
 import 'protocol.dart' as _i32;
-import 'package:tradelog_server/src/generated/linked_accounts.dart' as _i33;
+import 'package:tradelog_server/src/generated/linked_account.dart' as _i33;
 import 'package:tradelog_server/src/generated/dto/trade_dto.dart' as _i34;
 import 'package:tradelog_server/src/generated/meta/meta_trader_position.dart'
     as _i35;
@@ -61,7 +61,7 @@ export 'default/trade.dart';
 export 'default/trade_status.dart';
 export 'dto/trade_dto.dart';
 export 'dto/trade_list_dto.dart';
-export 'linked_accounts.dart';
+export 'linked_account.dart';
 export 'meta/distance_trailing_stop_loss.dart';
 export 'meta/meta_account_information.dart';
 export 'meta/meta_trader_order.dart';
@@ -112,6 +112,12 @@ class Protocol extends _i1.SerializationManagerServer {
         ),
         _i2.ColumnDefinition(
           name: 'apiKey',
+          columnType: _i2.ColumnType.text,
+          isNullable: false,
+          dartType: 'String',
+        ),
+        _i2.ColumnDefinition(
+          name: 'refreshToken',
           columnType: _i2.ColumnType.text,
           isNullable: false,
           dartType: 'String',

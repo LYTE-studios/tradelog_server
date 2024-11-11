@@ -7,7 +7,65 @@ class GlobalEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<List<TradeDto>> fetchFromAPIs(Session session) async {
+  /// Gets the trades from a session
+  /// If the trades are already stored in cache, they get pulled from the session cache
+  /// If they are not, they get fetched from their respective API's
+  Future<List<TradeDto>> getTrades(
+    Session session,
+  ) async {
+    List<TradeDto>? cachedTrades = await _getCachedTrades(session);
+
+    if (cachedTrades == null) {
+      List<TradeDto> trades = await _fetchFromAPIs(session);
+
+      await _setCachedTrades(session, trades);
+
+      return trades;
+    }
+
+    return cachedTrades;
+  }
+
+  /// Fetches the cached trades. Returns [null] if none are found
+  static Future<List<TradeDto>?> _getCachedTrades(
+    Session session,
+  ) async {
+    var authenticated = await session.authenticated;
+
+    TradeListDto? dto = await session.caches.localPrio.get<TradeListDto>(
+      'trades-${authenticated!.userId}',
+    );
+
+    return dto?.trades;
+  }
+
+  /// Sets the cached trades to the serverpod cache
+  static Future<void> _setCachedTrades(
+    Session session,
+    List<TradeDto> trades,
+  ) async {
+    var authenticated = await session.authenticated;
+
+    assert(authenticated != null);
+
+    // Convert each DisplayTrade to JSON and store the JSON list in the cache
+    // Wrap the trades in DisplayTradeList and store in the cache
+    var tradeListWrapper = TradeListDto(trades: trades);
+
+    await session.caches.localPrio.put(
+      'trades-${authenticated!.userId}',
+      tradeListWrapper,
+      lifetime: Duration(
+        minutes: 2,
+      ),
+    );
+  }
+
+  // -- PRIVATE --
+
+  /// Fetches the trades from the API
+  /// This function is PRIVATE since no other endpoint needs this method without checknig the cached trades first.
+  Future<List<TradeDto>> _fetchFromAPIs(Session session) async {
     var authenticated = await session.authenticated;
     if (authenticated == null) {
       throw Exception('User not authenticated');
@@ -24,8 +82,11 @@ class GlobalEndpoint extends Endpoint {
       switch (account.platform) {
         case Platform.Metatrader:
           try {
-            var metaTrades =
-                await MetaApiEndpoint().getTrades(session, account.metaID!);
+            var metaTrades = await MetaApiEndpoint().getTrades(
+              session,
+              account.metaID!,
+            );
+
             //await MetaApiEndpoint().getTrades(session, account.metaID!);
             //print(metaTrades);
             trades.addAll(metaTrades);
@@ -45,27 +106,7 @@ class GlobalEndpoint extends Endpoint {
     }
 
     trades.sort((a, b) => a.openTime.compareTo(b.openTime));
-    // Convert each DisplayTrade to JSON and store the JSON list in the cache
-    // Wrap the trades in DisplayTradeList and store in the cache
 
-    var tradeListWrapper = TradeListDto(trades: trades);
-
-    await session.caches.localPrio.put(
-      'trades-${authenticated.userId}',
-      tradeListWrapper,
-    );
     return trades;
-  }
-
-  Future<List<TradeDto>> getCachedTrades(Session session) async {
-    var authenticated = await session.authenticated;
-
-    var cachedData = await session.caches.localPrio
-        .get<TradeListDto>('trades-${authenticated!.userId}');
-    if (cachedData == null) {
-      return fetchFromAPIs(session);
-    }
-
-    return cachedData.trades;
   }
 }

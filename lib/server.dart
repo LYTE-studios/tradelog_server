@@ -10,6 +10,12 @@ import 'package:tradelog_server/src/web/routes/root.dart';
 import 'src/generated/endpoints.dart';
 import 'src/generated/protocol.dart';
 
+// TODO
+// - Fix the token refresh system
+// - Add calls for necessary Statistics functionality
+// - Fix the trade fetch calls and manage the cache  DONE
+// - Test on platform
+
 // This is the starting point of your Serverpod server. In most cases, you will
 // only need to make additions to this file if you add future calls,  are
 // configuring Relic (Serverpod's web-server), or need custom setup work.

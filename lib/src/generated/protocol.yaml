@@ -4,8 +4,7 @@ file:
   - getUploadDescription:
   - verifyUpload:
 global:
-  - fetchFromAPIs:
-  - getCachedTrades:
+  - getTrades:
 metaApi:
   - initializeClient:
   - authenticate:
@@ -34,7 +33,7 @@ tradeLocker:
   - authenticate:
   - refresh:
   - getAllTrades:
-  - getTrades:
   - getRawOrders:
   - getOrdersHistoryWithRateLimit:
   - getAccounts:
+  - reauthenticate:

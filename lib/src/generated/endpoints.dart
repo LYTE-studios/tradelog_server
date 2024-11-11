@@ -24,7 +24,7 @@ import 'package:tradelog_server/src/generated/profile/tradely_profile.dart'
     as _i12;
 import 'package:tradelog_server/src/generated/dto/trade_dto.dart' as _i13;
 import 'package:tradelog_server/src/generated/default/trade.dart' as _i14;
-import 'package:tradelog_server/src/generated/linked_accounts.dart' as _i15;
+import 'package:tradelog_server/src/generated/linked_account.dart' as _i15;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i16;
 
 class Endpoints extends _i1.EndpointDispatch {
@@ -148,26 +148,15 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'global',
       endpoint: endpoints['global']!,
       methodConnectors: {
-        'fetchFromAPIs': _i1.MethodConnector(
-          name: 'fetchFromAPIs',
+        'getTrades': _i1.MethodConnector(
+          name: 'getTrades',
           params: {},
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['global'] as _i4.GlobalEndpoint)
-                  .fetchFromAPIs(session),
-        ),
-        'getCachedTrades': _i1.MethodConnector(
-          name: 'getCachedTrades',
-          params: {},
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['global'] as _i4.GlobalEndpoint)
-                  .getCachedTrades(session),
-        ),
+              (endpoints['global'] as _i4.GlobalEndpoint).getTrades(session),
+        )
       },
     );
     connectors['metaApi'] = _i1.EndpointConnector(
@@ -527,9 +516,9 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
+            'refreshToken': _i1.ParameterDescription(
+              name: 'refreshToken',
+              type: _i1.getType<String>(),
               nullable: false,
             ),
           },
@@ -540,8 +529,8 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
                   .initializeClient(
             session,
-            params['apiKey'],
-            accNum: params['accNum'],
+            apiKey: params['apiKey'],
+            refreshToken: params['refreshToken'],
           ),
         ),
         'authenticate': _i1.MethodConnector(
@@ -601,36 +590,6 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
                   .getAllTrades(session),
         ),
-        'getTrades': _i1.MethodConnector(
-          name: 'getTrades',
-          params: {
-            'apiKey': _i1.ParameterDescription(
-              name: 'apiKey',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint).getTrades(
-            session,
-            params['apiKey'],
-            params['accountId'],
-            params['accNum'],
-          ),
-        ),
         'getRawOrders': _i1.MethodConnector(
           name: 'getRawOrders',
           params: {
@@ -658,6 +617,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String>(),
               nullable: false,
             ),
+            'refreshToken': _i1.ParameterDescription(
+              name: 'refreshToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'accountId': _i1.ParameterDescription(
               name: 'accountId',
               type: _i1.getType<int>(),
@@ -676,9 +640,10 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
                   .getOrdersHistoryWithRateLimit(
             session,
-            params['apiKey'],
-            params['accountId'],
-            params['accNum'],
+            apiKey: params['apiKey'],
+            refreshToken: params['refreshToken'],
+            accountId: params['accountId'],
+            accNum: params['accNum'],
           ),
         ),
         'getAccounts': _i1.MethodConnector(
@@ -688,7 +653,12 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'apiKey',
               type: _i1.getType<String>(),
               nullable: false,
-            )
+            ),
+            'refreshToken': _i1.ParameterDescription(
+              name: 'refreshToken',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
           },
           call: (
             _i1.Session session,
@@ -697,8 +667,19 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
                   .getAccounts(
             session,
-            params['apiKey'],
+            apiKey: params['apiKey'],
+            refreshToken: params['refreshToken'],
           ),
+        ),
+        'reauthenticate': _i1.MethodConnector(
+          name: 'reauthenticate',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
+                  .reauthenticate(session),
         ),
       },
     );
