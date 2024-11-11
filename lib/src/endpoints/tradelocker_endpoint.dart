@@ -420,41 +420,35 @@ class TradeLockerEndpoint extends Endpoint {
     String server,
   ) async {
     final authFuture = Completer<Map<String, dynamic>>();
-    requestQueue.addRequest(
-      EndpointRequest(
-          priority: 1,
-          request: () async {
-            try {
-              final response = await client.post(
-                session,
-                '/auth/jwt/token',
-                {
-                  'email': email,
-                  'password': password,
-                  'server': server,
-                },
-              );
 
-              if (response.statusCode == 201) {
-                final data = response.data as Map<String, dynamic>;
-                authFuture.complete(data);
-              } else {
-                throw Exception(
-                    'Failed to authenticate: ${response.statusCode}');
-              }
-            } catch (e) {
-              if (e is DioException) {
-                if (e.response?.statusCode == 500) {
-                  throw Exception('Internal server error: ${e.response?.data}');
-                } else {
-                  throw Exception('Failed to authenticate: ${e.message}');
-                }
-              } else {
-                throw Exception('Unexpected error: $e');
-              }
-            }
-          }),
-    );
+    try {
+      final response = await client.post(
+        session,
+        '/auth/jwt/token',
+        {
+          'email': email,
+          'password': password,
+          'server': server,
+        },
+      );
+
+      if (response.statusCode == 201) {
+        final data = response.data as Map<String, dynamic>;
+        authFuture.complete(data);
+      } else {
+        throw Exception('Failed to authenticate: ${response.statusCode}');
+      }
+    } catch (e) {
+      if (e is DioException) {
+        if (e.response?.statusCode == 500) {
+          throw Exception('Internal server error: ${e.response?.data}');
+        } else {
+          throw Exception('Failed to authenticate: ${e.message}');
+        }
+      } else {
+        throw Exception('Unexpected error: $e');
+      }
+    }
 
     return await authFuture.future;
   }

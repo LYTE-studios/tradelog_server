@@ -19,8 +19,6 @@ services:
   redis:
     image: redis:6.2.6
     network_mode: "host"
-    ports:
-      - '6379'
     command: redis-server
     environment:
       - REDIS_REPLICATION_MODE=master
