@@ -18,9 +18,10 @@ services:
   #      POSTGRES_PASSWORD: "-AAEF__HE-PZp9KcWPTRbTW4m8E6OQ9j"
   redis:
     image: redis:6.2.6
+    network_mode: "host"
     ports:
       - '6379'
-    command: redis-server --requirepass "hofIyHiTky9LGICaZgrlFPWx76VMwpEx"
+    command: redis-server
     environment:
       - REDIS_REPLICATION_MODE=master
 
