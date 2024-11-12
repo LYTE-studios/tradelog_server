@@ -105,7 +105,7 @@ class TradeLockerClient {
       extraHeaders["accNum"] = accNum;
     }
 
-    return await _dio.get(
+    Response response = await _dio.get(
       endpoint,
       options: Options(
         headers: {
@@ -114,6 +114,18 @@ class TradeLockerClient {
         },
       ),
     );
+
+    if (response.statusCode == 429) {
+      await Future.delayed(Duration(milliseconds: 500));
+      return get(
+        session,
+        endpoint,
+        accNum: accNum,
+        extraHeaders: extraHeaders,
+      );
+    }
+
+    return response;
   }
 
   Future<Response> post(
@@ -125,6 +137,17 @@ class TradeLockerClient {
 
     await _checkTokenValidity(session);
 
-    return await _dio.post(endpoint, data: data);
+    Response response = await _dio.post(endpoint, data: data);
+
+    if (response.statusCode == 429) {
+      await Future.delayed(Duration(milliseconds: 500));
+      return post(
+        session,
+        endpoint,
+        data,
+      );
+    }
+
+    return response;
   }
 }
