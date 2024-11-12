@@ -124,7 +124,11 @@ class TradeLockerEndpoint extends Endpoint {
     }
   }
 
-  Future<List<TradeDto>> getAllTrades(Session session) async {
+  Future<List<TradeDto>> getAllTrades(
+    Session session, {
+    DateTime? from,
+    DateTime? to,
+  }) async {
     // Ensure the user is authenticated
     var authenticated = await session.authenticated;
 
@@ -167,6 +171,8 @@ class TradeLockerEndpoint extends Endpoint {
             refreshToken: refreshToken,
             accountId: accountId,
             accNum: accountNumber,
+            from: from,
+            to: to,
           );
 
           allTrades.addAll(trades);
@@ -190,6 +196,8 @@ class TradeLockerEndpoint extends Endpoint {
     required refreshToken,
     required int accountId,
     required int accNum,
+    DateTime? from,
+    DateTime? to,
   }) async {
     // Initialize client for the current session
     await initializeClient(
@@ -205,14 +213,18 @@ class TradeLockerEndpoint extends Endpoint {
       refreshToken: refreshToken,
       accountId: accountId,
       accNum: accNum,
+      from: from,
+      to: to,
     );
 
-    final orders = await getOrdersHistoryWithRateLimit(
+    final orders = await _getOrdersHistoryWithRateLimit(
       session,
       apiKey: apiKey,
       refreshToken: refreshToken,
       accountId: accountId,
       accNum: accNum,
+      from: from,
+      to: to,
     );
 
     // Map orders to their respective positions
@@ -254,7 +266,8 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
-      List<TradelockerOrder> orders) {
+    List<TradelockerOrder> orders,
+  ) {
     final Map<String, List<TradelockerOrder>> ordersByPosition = {};
 
     for (var order in orders) {
@@ -272,6 +285,8 @@ class TradeLockerEndpoint extends Endpoint {
     required String refreshToken,
     required int accountId,
     required int accNum,
+    DateTime? from,
+    DateTime? to,
   }) async {
     await initializeClient(
       session,
@@ -284,6 +299,10 @@ class TradeLockerEndpoint extends Endpoint {
         session,
         '/trade/accounts/$accountId/positions',
         accNum: accNum,
+        extraHeaders: {
+          "from": from?.millisecondsSinceEpoch,
+          "to": to?.millisecondsSinceEpoch,
+        },
       );
 
       if (response.data == null || response.data['d'] == null) {
@@ -307,7 +326,9 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Future<Map<String, dynamic>> getRawOrders(
-      Session session, LinkedAccount account) async {
+    Session session,
+    LinkedAccount account,
+  ) async {
     Map<String, dynamic> map = {};
 
     map['config'] = await client.get(session, '/trade/config');
@@ -326,12 +347,14 @@ class TradeLockerEndpoint extends Endpoint {
     return map;
   }
 
-  Future<List<TradelockerOrder>> getOrdersHistoryWithRateLimit(
+  Future<List<TradelockerOrder>> _getOrdersHistoryWithRateLimit(
     Session session, {
     required String apiKey,
     required String refreshToken,
     required int accountId,
     required int accNum,
+    DateTime? from,
+    DateTime? to,
   }) async {
     await initializeClient(
       session,
@@ -344,6 +367,10 @@ class TradeLockerEndpoint extends Endpoint {
         session,
         '/trade/accounts/$accountId/ordersHistory',
         accNum: accNum,
+        extraHeaders: {
+          "from": from?.millisecondsSinceEpoch,
+          "to": to?.millisecondsSinceEpoch,
+        },
       );
 
       // Check if the response is valid and contains the expected data

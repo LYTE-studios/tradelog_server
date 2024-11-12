@@ -93,6 +93,7 @@ class TradeLockerClient {
     Session session,
     String endpoint, {
     int? accNum,
+    Map<String, dynamic>? extraHeaders,
   }) async {
     await _checkRefreshValidity(session);
 

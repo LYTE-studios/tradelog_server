@@ -150,12 +150,27 @@ class Endpoints extends _i1.EndpointDispatch {
       methodConnectors: {
         'getTrades': _i1.MethodConnector(
           name: 'getTrades',
-          params: {},
+          params: {
+            'from': _i1.ParameterDescription(
+              name: 'from',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'to': _i1.ParameterDescription(
+              name: 'to',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+          },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['global'] as _i4.GlobalEndpoint).getTrades(session),
+              (endpoints['global'] as _i4.GlobalEndpoint).getTrades(
+            session,
+            from: params['from'],
+            to: params['to'],
+          ),
         )
       },
     );
@@ -590,13 +605,28 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
         'getAllTrades': _i1.MethodConnector(
           name: 'getAllTrades',
-          params: {},
+          params: {
+            'from': _i1.ParameterDescription(
+              name: 'from',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'to': _i1.ParameterDescription(
+              name: 'to',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+          },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
               (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
-                  .getAllTrades(session),
+                  .getAllTrades(
+            session,
+            from: params['from'],
+            to: params['to'],
+          ),
         ),
         'getRawOrders': _i1.MethodConnector(
           name: 'getRawOrders',
@@ -615,43 +645,6 @@ class Endpoints extends _i1.EndpointDispatch {
                   .getRawOrders(
             session,
             params['account'],
-          ),
-        ),
-        'getOrdersHistoryWithRateLimit': _i1.MethodConnector(
-          name: 'getOrdersHistoryWithRateLimit',
-          params: {
-            'apiKey': _i1.ParameterDescription(
-              name: 'apiKey',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'refreshToken': _i1.ParameterDescription(
-              name: 'refreshToken',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'accountId': _i1.ParameterDescription(
-              name: 'accountId',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-            'accNum': _i1.ParameterDescription(
-              name: 'accNum',
-              type: _i1.getType<int>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
-                  .getOrdersHistoryWithRateLimit(
-            session,
-            apiKey: params['apiKey'],
-            refreshToken: params['refreshToken'],
-            accountId: params['accountId'],
-            accNum: params['accNum'],
           ),
         ),
         'getAccounts': _i1.MethodConnector(

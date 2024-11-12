@@ -11,8 +11,18 @@ class GlobalEndpoint extends Endpoint {
   /// If the trades are already stored in cache, they get pulled from the session cache
   /// If they are not, they get fetched from their respective API's
   Future<List<TradeDto>> getTrades(
-    Session session,
-  ) async {
+    Session session, {
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    if (from != null || to != null) {
+      return _fetchFromAPIs(
+        session,
+        from: from,
+        to: to,
+      );
+    }
+
     List<TradeDto>? cachedTrades = await _getCachedTrades(session);
 
     if (cachedTrades == null) {
@@ -65,7 +75,11 @@ class GlobalEndpoint extends Endpoint {
 
   /// Fetches the trades from the API
   /// This function is PRIVATE since no other endpoint needs this method without checknig the cached trades first.
-  Future<List<TradeDto>> _fetchFromAPIs(Session session) async {
+  Future<List<TradeDto>> _fetchFromAPIs(
+    Session session, {
+    DateTime? from,
+    DateTime? to,
+  }) async {
     var authenticated = await session.authenticated;
     if (authenticated == null) {
       throw Exception('User not authenticated');
