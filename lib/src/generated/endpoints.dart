@@ -572,13 +572,21 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
         'refresh': _i1.MethodConnector(
           name: 'refresh',
-          params: {},
+          params: {
+            'apiKey': _i1.ParameterDescription(
+              name: 'apiKey',
+              type: _i1.getType<String>(),
+              nullable: false,
+            )
+          },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
-              (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
-                  .refresh(session),
+              (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint).refresh(
+            session,
+            apiKey: params['apiKey'],
+          ),
         ),
         'getAllTrades': _i1.MethodConnector(
           name: 'getAllTrades',

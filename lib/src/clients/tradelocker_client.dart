@@ -2,16 +2,19 @@ import 'package:dio/dio.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
+import 'package:tradelog_server/src/generated/protocol.dart';
 
 class TradeLockerClient {
-  final Dio _dio;
+  Dio _dio;
 
-  final String apiKey;
+  final String baseUrl;
 
-  final String refreshToken;
+  String apiKey;
+
+  String refreshToken;
 
   TradeLockerClient(
-    String baseUrl, {
+    this.baseUrl, {
     required this.apiKey,
     required this.refreshToken,
   }) : _dio = Dio(
@@ -41,8 +44,21 @@ class TradeLockerClient {
       final expirationDate = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
 
       if (DateTime.now().isAfter(expirationDate)) {
-        throw Exception('Authentication token has expired');
-        // await TradeLockerEndpoint().refresh(session);
+        LinkedAccount account =
+            await TradeLockerEndpoint().refresh(session, apiKey: apiKey);
+
+        apiKey = account.apiKey;
+
+        _dio = Dio(
+          BaseOptions(
+            baseUrl: baseUrl,
+            validateStatus: (status) => true,
+            headers: {
+              'Authorization': 'Bearer $apiKey',
+              'Content-Type': 'application/json',
+            },
+          ),
+        );
       }
     } catch (e) {
       throw Exception('Error decoding token: $e');
@@ -78,8 +94,9 @@ class TradeLockerClient {
     String endpoint, {
     int? accNum,
   }) async {
-    await _checkTokenValidity(session);
     await _checkRefreshValidity(session);
+
+    await _checkTokenValidity(session);
 
     Map<String, dynamic> extraHeaders = {};
 
@@ -99,9 +116,13 @@ class TradeLockerClient {
   }
 
   Future<Response> post(
-      Session session, String endpoint, Map<String, dynamic> data) async {
-    await _checkTokenValidity(session);
+    Session session,
+    String endpoint,
+    Map<String, dynamic> data,
+  ) async {
     await _checkRefreshValidity(session);
+
+    await _checkTokenValidity(session);
 
     return await _dio.post(endpoint, data: data);
   }

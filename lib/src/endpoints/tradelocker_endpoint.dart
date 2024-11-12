@@ -81,68 +81,46 @@ class TradeLockerEndpoint extends Endpoint {
     return accessToken;
   }
 
-  Future<void> refresh(Session session) async {
+  Future<LinkedAccount> refresh(
+    Session session, {
+    required String apiKey,
+  }) async {
     var authenticated = await session.authenticated;
-
-    // Retrieve all TradeLocker credentials for the authenticated user
-    var credentialsList = await TradelockerCredentials.db.find(
-      session,
-      where: (o) => o.userId.equals(authenticated!.userId),
-    );
-
-    if (credentialsList.isEmpty) {
-      throw Exception('No credentials found for this user');
-    }
 
     await initializeClient(
       session,
       apiKey: "",
       refreshToken: "",
     );
+    // Find linked accounts associated with the current credentials
+    var linkedAccount = await LinkedAccount.db.findFirstRow(
+      session,
+      where: (o) =>
+          o.apiKey.equals(apiKey) & o.userInfoId.equals(authenticated!.userId),
+    );
 
-    // Iterate over each set of credentials and refresh tokens
-    for (var creds in credentialsList) {
-      requestQueue.addRequest(
-        EndpointRequest(
-            priority: 1,
-            request: () async {
-              try {
-                final response = await client.post(
-                  session,
-                  '/auth/jwt/refresh',
-                  {'refreshToken': creds.refreshToken},
-                );
+    if (linkedAccount == null) {
+      throw Exception('Linked account not found for credentials');
+    }
 
-                if (response.statusCode == 201) {
-                  final data = response.data as Map<String, dynamic>;
-                  final newAccessToken = data['accessToken'] as String;
+    final response = await client.post(
+      session,
+      '/auth/jwt/refresh',
+      {
+        'refreshToken': linkedAccount.refreshToken,
+      },
+    );
 
-                  // Find linked accounts associated with the current credentials
-                  var linkedAccount = await LinkedAccount.db.findFirstRow(
-                    session,
-                    where: (o) =>
-                        o.userInfoId.equals(authenticated!.userId) &
-                        o.tradelockerCredentialsId.equals(creds.id),
-                  );
+    if (response.statusCode == 201) {
+      final data = response.data as Map<String, dynamic>;
+      final newAccessToken = data['accessToken'] as String;
+      // Update the access token for each linked account related to the current credentials
+      linkedAccount.apiKey = newAccessToken;
+      await LinkedAccount.db.updateRow(session, linkedAccount);
 
-                  if (linkedAccount == null) {
-                    throw Exception(
-                        'Linked account not found for credentials ID ${creds.id}');
-                  } else {
-                    // Update the access token for each linked account related to the current credentials
-                    linkedAccount.apiKey = newAccessToken;
-                    await LinkedAccount.db.updateRow(session, linkedAccount);
-                  }
-                } else {
-                  print(
-                      'Failed to refresh token for credentials ID ${creds.id}');
-                }
-              } catch (e) {
-                print(
-                    'Error refreshing token for credentials ID ${creds.id}: $e');
-              }
-            }),
-      );
+      return linkedAccount;
+    } else {
+      throw Exception('Could not refresh token');
     }
   }
 
