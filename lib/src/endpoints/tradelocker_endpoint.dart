@@ -306,7 +306,9 @@ class TradeLockerEndpoint extends Endpoint {
       );
 
       if (response.data == null || response.data['d'] == null) {
-        throw Exception('Trade response invalid: ${response.statusMessage}');
+        throw Exception(
+          'Trade response invalid: ${response.statusCode} - ${response.statusMessage}: ${response.data}',
+        );
       }
 
       final positions = response.data['d']['positions'] as List<dynamic>;
