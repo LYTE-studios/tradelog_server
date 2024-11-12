@@ -2,3 +2,4 @@ enum: Platform
 values:
     - Metatrader
     - Tradelocker
+    - TradelockerDemo

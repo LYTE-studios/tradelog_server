@@ -20,11 +20,12 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<void> initializeClient(
     Session session, {
+    required String url,
     required String apiKey,
     required String refreshToken,
   }) async {
     client = TradeLockerClient(
-      Configuration.tradelockerURI,
+      url,
       apiKey: apiKey,
       refreshToken: refreshToken,
     );
@@ -36,6 +37,7 @@ class TradeLockerEndpoint extends Endpoint {
     String password,
     String server, {
     String? title,
+    required bool isDemo,
   }) async {
     var authenticated = await session.authenticated;
 
@@ -71,6 +73,9 @@ class TradeLockerEndpoint extends Endpoint {
     // Step 3: Manage Linked Account
     await _manageLinkedAccount(
       session,
+      url: isDemo
+          ? Configuration.tradelockerDemoURI
+          : Configuration.tradelockerURI,
       userId: authenticated.userId,
       apiKey: accessToken,
       refreshToken: refreshToken,
@@ -87,11 +92,6 @@ class TradeLockerEndpoint extends Endpoint {
   }) async {
     var authenticated = await session.authenticated;
 
-    await initializeClient(
-      session,
-      apiKey: "",
-      refreshToken: "",
-    );
     // Find linked accounts associated with the current credentials
     var linkedAccount = await LinkedAccount.db.findFirstRow(
       session,
@@ -102,6 +102,13 @@ class TradeLockerEndpoint extends Endpoint {
     if (linkedAccount == null) {
       throw Exception('Linked account not found for credentials');
     }
+
+    await initializeClient(
+      session,
+      url: linkedAccount.apiUrl,
+      apiKey: "",
+      refreshToken: "",
+    );
 
     final response = await client.post(
       session,
@@ -167,6 +174,7 @@ class TradeLockerEndpoint extends Endpoint {
         try {
           List<TradeDto> trades = await _getTrades(
             session,
+            apiUrl: linkedAccount.apiUrl,
             apiKey: apiKey,
             refreshToken: refreshToken,
             accountId: accountId,
@@ -192,6 +200,7 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<List<TradeDto>> _getTrades(
     Session session, {
+    required String apiUrl,
     required String apiKey,
     required refreshToken,
     required int accountId,
@@ -202,6 +211,7 @@ class TradeLockerEndpoint extends Endpoint {
     // Initialize client for the current session
     await initializeClient(
       session,
+      url: apiUrl,
       apiKey: apiKey,
       refreshToken: refreshToken,
     );
@@ -209,6 +219,7 @@ class TradeLockerEndpoint extends Endpoint {
     // Fetch positions and orders from the external API (rate-limited)
     final positions = await _getPositionsWithRateLimit(
       session,
+      apiUrl: apiUrl,
       apiKey: apiKey,
       refreshToken: refreshToken,
       accountId: accountId,
@@ -219,6 +230,7 @@ class TradeLockerEndpoint extends Endpoint {
 
     final orders = await _getOrdersHistoryWithRateLimit(
       session,
+      apiUrl: apiUrl,
       apiKey: apiKey,
       refreshToken: refreshToken,
       accountId: accountId,
@@ -281,6 +293,7 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<List<TradelockerPosition>> _getPositionsWithRateLimit(
     Session session, {
+    required String apiUrl,
     required String apiKey,
     required String refreshToken,
     required int accountId,
@@ -290,6 +303,7 @@ class TradeLockerEndpoint extends Endpoint {
   }) async {
     await initializeClient(
       session,
+      url: apiUrl,
       apiKey: apiKey,
       refreshToken: refreshToken,
     );
@@ -337,6 +351,7 @@ class TradeLockerEndpoint extends Endpoint {
 
     List<TradelockerAccountInformation> accounts = await getAccounts(
       session,
+      apiUrl: account.apiUrl,
       apiKey: account.apiKey,
       refreshToken: account.refreshToken,
     );
@@ -351,6 +366,7 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<List<TradelockerOrder>> _getOrdersHistoryWithRateLimit(
     Session session, {
+    required String apiUrl,
     required String apiKey,
     required String refreshToken,
     required int accountId,
@@ -360,6 +376,7 @@ class TradeLockerEndpoint extends Endpoint {
   }) async {
     await initializeClient(
       session,
+      url: apiUrl,
       apiKey: apiKey,
       refreshToken: refreshToken,
     );
@@ -486,6 +503,7 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<void> _manageLinkedAccount(
     Session session, {
+    required String url,
     required int userId,
     required String apiKey,
     required String refreshToken,
@@ -509,6 +527,7 @@ class TradeLockerEndpoint extends Endpoint {
 
       final accounts = await getAccounts(
         session,
+        apiUrl: checkLinked?.apiUrl ?? "",
         apiKey: apiKey,
         refreshToken: refreshToken,
       );
@@ -519,6 +538,7 @@ class TradeLockerEndpoint extends Endpoint {
       if (checkLinked == null) {
         var linkedAccount = LinkedAccount(
           userInfoId: userId,
+          apiUrl: url,
           apiKey: apiKey,
           refreshToken: creds.refreshToken ?? "",
           platform: Platform.Tradelocker,
@@ -542,11 +562,13 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<List<TradelockerAccountInformation>> getAccounts(
     Session session, {
+    required String apiUrl,
     required String apiKey,
     required String refreshToken,
   }) async {
     await initializeClient(
       session,
+      url: apiUrl,
       apiKey: apiKey,
       refreshToken: refreshToken,
     );
@@ -639,6 +661,7 @@ class TradeLockerEndpoint extends Endpoint {
       // Step 3: Manage Linked Account
       await _manageLinkedAccount(
         session,
+        url: account.apiUrl,
         userId: authenticated.userId,
         apiKey: accessToken,
         refreshToken: refreshToken,

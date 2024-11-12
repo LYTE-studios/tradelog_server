@@ -526,6 +526,11 @@ class Endpoints extends _i1.EndpointDispatch {
         'initializeClient': _i1.MethodConnector(
           name: 'initializeClient',
           params: {
+            'url': _i1.ParameterDescription(
+              name: 'url',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'apiKey': _i1.ParameterDescription(
               name: 'apiKey',
               type: _i1.getType<String>(),
@@ -544,6 +549,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
                   .initializeClient(
             session,
+            url: params['url'],
             apiKey: params['apiKey'],
             refreshToken: params['refreshToken'],
           ),
@@ -571,6 +577,11 @@ class Endpoints extends _i1.EndpointDispatch {
               type: _i1.getType<String?>(),
               nullable: true,
             ),
+            'isDemo': _i1.ParameterDescription(
+              name: 'isDemo',
+              type: _i1.getType<bool>(),
+              nullable: false,
+            ),
           },
           call: (
             _i1.Session session,
@@ -583,6 +594,7 @@ class Endpoints extends _i1.EndpointDispatch {
             params['password'],
             params['server'],
             title: params['title'],
+            isDemo: params['isDemo'],
           ),
         ),
         'refresh': _i1.MethodConnector(
@@ -650,6 +662,11 @@ class Endpoints extends _i1.EndpointDispatch {
         'getAccounts': _i1.MethodConnector(
           name: 'getAccounts',
           params: {
+            'apiUrl': _i1.ParameterDescription(
+              name: 'apiUrl',
+              type: _i1.getType<String>(),
+              nullable: false,
+            ),
             'apiKey': _i1.ParameterDescription(
               name: 'apiKey',
               type: _i1.getType<String>(),
@@ -668,6 +685,7 @@ class Endpoints extends _i1.EndpointDispatch {
               (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
                   .getAccounts(
             session,
+            apiUrl: params['apiUrl'],
             apiKey: params['apiKey'],
             refreshToken: params['refreshToken'],
           ),

@@ -81,42 +81,32 @@ class GlobalEndpoint extends Endpoint {
     DateTime? to,
   }) async {
     var authenticated = await session.authenticated;
+
     if (authenticated == null) {
       throw Exception('User not authenticated');
     }
 
-    var linkedAccounts = await LinkedAccount.db.find(
-      session,
-      where: (o) => o.userInfoId.equals(authenticated.userId),
-    );
-
     var trades = <TradeDto>[];
 
-    for (var account in linkedAccounts) {
-      switch (account.platform) {
-        case Platform.Metatrader:
-          try {
-            var metaTrades = await MetaApiEndpoint().getTrades(
-              session,
-              account.metaID!,
-            );
+    try {
+      // TODO enable meta trades
+      // var metaTrades = await MetaApiEndpoint().getTrades(
+      //   session,
+      //   account.metaID!,
+      // );
 
-            //await MetaApiEndpoint().getTrades(session, account.metaID!);
-            //print(metaTrades);
-            trades.addAll(metaTrades);
-          } catch (e) {
-            session.log('Error fetching trades from MetaTrader: $e');
-          }
-          break;
-        case Platform.Tradelocker:
-          try {
-            var tlTrades = await TradeLockerEndpoint().getAllTrades(session);
-            trades.addAll(tlTrades);
-          } catch (e) {
-            session.log('Error fetching trades from Tradelocker: $e');
-          }
-          break;
-      }
+      //await MetaApiEndpoint().getTrades(session, account.metaID!);
+      //print(metaTrades);
+      // trades.addAll(metaTrades);
+    } catch (e) {
+      session.log('Error fetching trades from MetaTrader: $e');
+    }
+
+    try {
+      var tlTrades = await TradeLockerEndpoint().getAllTrades(session);
+      trades.addAll(tlTrades);
+    } catch (e) {
+      session.log('Error fetching trades from Tradelocker: $e');
     }
 
     trades.sort((a, b) => a.openTime.compareTo(b.openTime));
