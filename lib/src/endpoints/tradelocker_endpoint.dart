@@ -164,14 +164,11 @@ class TradeLockerEndpoint extends Endpoint {
         throw GeneralTradelyException('No subaccounts found');
       }
 
-      String apiKey = linkedAccount.apiKey;
-      String refreshToken = linkedAccount.refreshToken;
-
       initializeClient(
         session,
         url: linkedAccount.apiUrl,
-        apiKey: apiKey,
-        refreshToken: refreshToken,
+        apiKey: linkedAccount.apiKey,
+        refreshToken: linkedAccount.refreshToken,
       );
 
       final accountIds = linkedAccount.tradelockerAccountId!;
