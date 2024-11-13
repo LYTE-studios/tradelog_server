@@ -20,3 +20,5 @@ fields:
 
   takeProfit: double?
   stopLoss: double?
+
+  netRoi: double?

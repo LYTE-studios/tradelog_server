@@ -11,10 +11,13 @@ extension TradeExtension on TradeDto {
 
     // Calculate realized P&L and ROI for the position
     final realizedPl = position.calculateRealizedPl(associatedOrders);
-    // final totalInvestment = position.quantity * position.avgPrice;
 
-    // final netRoi =
-    //     totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
+    final Option option = position.side == 'long' ? Option.long : Option.short;
+
+    final totalInvestment = position.quantity * position.avgPrice;
+
+    final netRoi =
+        totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
 
     TradeStatus status =
         position.quantity == 0 ? TradeStatus.closed : TradeStatus.open;
@@ -26,16 +29,10 @@ extension TradeExtension on TradeDto {
     return TradeDto(
       status: status,
       symbol: symbol,
-
-      // TODO: Option
-      option: Option.long,
-
-      // TODO FEE
-
+      option: option,
+      netRoi: netRoi,
       realizedPl: realizedPl,
-
       openTime: position.openDate,
-
       lotSize: position.quantity,
     );
   }
