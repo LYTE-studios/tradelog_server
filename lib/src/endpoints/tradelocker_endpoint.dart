@@ -41,8 +41,12 @@ class TradeLockerEndpoint extends Endpoint {
   }) async {
     var authenticated = await session.authenticated;
 
+    String url = isDemo
+        ? Configuration.tradelockerDemoURI
+        : Configuration.tradelockerURI;
+
     client = TradeLockerClient(
-      Configuration.tradelockerURI,
+      url,
       apiKey: '',
       refreshToken: '',
     );
