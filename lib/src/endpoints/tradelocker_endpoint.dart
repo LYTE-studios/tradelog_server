@@ -180,7 +180,8 @@ class TradeLockerEndpoint extends Endpoint {
       // Ensure accountIds and accountNumbers have the same length
       if (accountIds.length != accountNumbers.length) {
         throw GeneralTradelyException(
-            'Mismatch between account IDs and account numbers');
+          'Mismatch between account IDs and account numbers',
+        );
       }
 
       for (int i = 0; i < accountIds.length; i++) {
@@ -188,21 +189,15 @@ class TradeLockerEndpoint extends Endpoint {
         var accountNumber = int.parse(accountNumbers[i]);
 
         // Call getTrades for this account
-        try {
-          List<TradeDto> trades = await _getTrades(
-            session,
-            accountId: accountId,
-            accNum: accountNumber,
-            from: from,
-            to: to,
-          );
+        List<TradeDto> trades = await _getTrades(
+          session,
+          accountId: accountId,
+          accNum: accountNumber,
+          from: from,
+          to: to,
+        );
 
-          allTrades.addAll(trades);
-        } catch (e) {
-          // Handle errors for this account and continue
-          print('Error fetching trades for account $accountId: $e');
-          continue;
-        }
+        allTrades.addAll(trades);
       }
     }
 

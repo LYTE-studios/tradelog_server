@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/endpoints/metaapi_endpoint.dart';
 import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
@@ -102,12 +104,8 @@ class GlobalEndpoint extends Endpoint {
       session.log('Error fetching trades from MetaTrader: $e');
     }
 
-    try {
-      var tlTrades = await TradeLockerEndpoint().getAllTrades(session);
-      trades.addAll(tlTrades);
-    } catch (e) {
-      session.log('Error fetching trades from Tradelocker: $e');
-    }
+    var tlTrades = await TradeLockerEndpoint().getAllTrades(session);
+    trades.addAll(tlTrades);
 
     trades.sort((a, b) => a.openTime.compareTo(b.openTime));
 
