@@ -199,7 +199,7 @@ class TradeLockerEndpoint extends Endpoint {
     }
 
     // Optionally, sort the trades by openTime
-    allTrades.sort((a, b) => a.openTime.compareTo(b.openTime));
+    allTrades.sort((a, b) => b.openTime.compareTo(a.openTime));
 
     return allTrades;
   }

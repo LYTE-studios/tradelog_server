@@ -108,7 +108,7 @@ class GlobalEndpoint extends Endpoint {
     var tlTrades = await TradeLockerEndpoint().getAllTrades(session);
     trades.addAll(tlTrades);
 
-    trades.sort((a, b) => a.openTime.compareTo(b.openTime));
+    trades.sort((a, b) => b.openTime.compareTo(a.openTime));
 
     return trades;
   }
