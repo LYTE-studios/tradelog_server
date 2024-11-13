@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
+import 'package:tradelog_server/src/exceptions/general_tradely_exception.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/util/request_queue.dart';
 
@@ -131,22 +132,27 @@ class TradeLockerClient {
           }
 
           Future<Response> makeRequest() async {
-            Response response = await performGet();
+            try {
+              Response response = await performGet();
+              if (response.statusCode == 429) {
+                // If the client has already tried twice, return the faulty response
+                if (retries > 2) {
+                  return response;
+                }
 
-            if (response.statusCode == 429) {
-              // If the client has already tried twice, return the faulty response
-              if (retries > 3) {
-                return response;
+                retries += 1;
+
+                await Future.delayed(Duration(milliseconds: 500));
+
+                return makeRequest();
               }
 
-              retries += 1;
-
-              await Future.delayed(Duration(milliseconds: 500));
-
-              return makeRequest();
+              return response;
+            } catch (e) {
+              throw GeneralTradelyException(
+                'Something went wrong while processing request: ${e.toString()}',
+              );
             }
-
-            return response;
           }
 
           Response response = await makeRequest();
@@ -181,22 +187,28 @@ class TradeLockerClient {
           }
 
           Future<Response> makeRequest() async {
-            Response response = await performPost();
+            try {
+              Response response = await performPost();
 
-            if (response.statusCode == 429) {
-              // If the client has already tried twice, return the faulty response
-              if (retries > 3) {
-                return response;
+              if (response.statusCode == 429) {
+                // If the client has already tried twice, return the faulty response
+                if (retries > 3) {
+                  return response;
+                }
+
+                retries += 1;
+
+                await Future.delayed(Duration(milliseconds: 500));
+
+                return makeRequest();
               }
 
-              retries += 1;
-
-              await Future.delayed(Duration(milliseconds: 500));
-
-              return makeRequest();
+              return response;
+            } catch (e) {
+              throw GeneralTradelyException(
+                'Something went wrong while processing request: ${e.toString()}',
+              );
             }
-
-            return response;
           }
 
           Response response = await makeRequest();
