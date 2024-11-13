@@ -79,10 +79,8 @@ class GlobalEndpoint extends Endpoint {
   /// Fetches the trades from the API
   /// This function is PRIVATE since no other endpoint needs this method without checknig the cached trades first.
   Future<List<TradeDto>> _fetchFromAPIs(
-    Session session, {
-    DateTime? from,
-    DateTime? to,
-  }) async {
+    Session session,
+  ) async {
     var authenticated = await session.authenticated;
 
     if (authenticated == null) {
