@@ -401,8 +401,6 @@ class TradeLockerEndpoint extends Endpoint {
     String password,
     String server,
   ) async {
-    final authFuture = Completer<Map<String, dynamic>>();
-
     final response = await client.post(
       session,
       '/auth/jwt/token',
@@ -414,13 +412,10 @@ class TradeLockerEndpoint extends Endpoint {
     );
 
     if (response.statusCode == 201) {
-      final data = response.data as Map<String, dynamic>;
-      authFuture.complete(data);
+      return response.data as Map<String, dynamic>;
     } else {
       throw NetworkTradelyException(response);
     }
-
-    return await authFuture.future;
   }
 
   Future<void> _storeTokens(
