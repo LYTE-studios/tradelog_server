@@ -570,7 +570,8 @@ class TradeLockerEndpoint extends Endpoint {
 
       if (creds == null) {
         throw Exception(
-            'Credentials not found for linked account ${account.id}');
+          'Credentials not found for linked account ${account.id}',
+        );
       }
 
       final data = await _performAuthentication(

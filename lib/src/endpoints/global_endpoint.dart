@@ -18,14 +18,6 @@ class GlobalEndpoint extends Endpoint {
     DateTime? from,
     DateTime? to,
   }) async {
-    if (from != null || to != null) {
-      return _fetchFromAPIs(
-        session,
-        from: from,
-        to: to,
-      );
-    }
-
     List<TradeDto>? cachedTrades = await _getCachedTrades(session);
 
     if (cachedTrades == null) {
@@ -33,7 +25,15 @@ class GlobalEndpoint extends Endpoint {
 
       await _setCachedTrades(session, trades);
 
-      return trades;
+      cachedTrades = trades;
+    }
+
+    if (from != null && to != null) {
+      return cachedTrades
+          .where(
+            (e) => e.openTime.isAfter(from) && e.openTime.isBefore(to),
+          )
+          .toList();
     }
 
     return cachedTrades;
