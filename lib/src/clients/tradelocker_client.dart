@@ -155,9 +155,12 @@ class TradeLockerClient {
             }
           }
 
-          Response response = await makeRequest();
-
-          getFuture.complete(response);
+          try {
+            Response response = await makeRequest();
+            getFuture.complete(response);
+          } catch (e) {
+            getFuture.completeError(e);
+          }
         },
       ),
     );
@@ -211,9 +214,12 @@ class TradeLockerClient {
             }
           }
 
-          Response response = await makeRequest();
-
-          getFuture.complete(response);
+          try {
+            Response response = await makeRequest();
+            getFuture.complete(response);
+          } catch (e) {
+            getFuture.completeError(e);
+          }
         },
       ),
     );
