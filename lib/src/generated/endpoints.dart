@@ -617,6 +617,25 @@ class Endpoints extends _i1.EndpointDispatch {
             apiKey: params['apiKey'],
           ),
         ),
+        'getAccountDto': _i1.MethodConnector(
+          name: 'getAccountDto',
+          params: {
+            'linkedAccount': _i1.ParameterDescription(
+              name: 'linkedAccount',
+              type: _i1.getType<_i15.LinkedAccount>(),
+              nullable: false,
+            )
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
+                  .getAccountDto(
+            session,
+            params['linkedAccount'],
+          ),
+        ),
         'getAllTrades': _i1.MethodConnector(
           name: 'getAllTrades',
           params: {

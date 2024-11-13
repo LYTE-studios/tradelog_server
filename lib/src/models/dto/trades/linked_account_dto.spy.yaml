@@ -1,0 +1,13 @@
+class: LinkedAccountDto
+fields:
+  linkedAccountId: int?
+
+  platform: Platform?
+
+  title: String?
+
+  status: List<String>?
+
+  currency: List<String>?
+
+  balance: List<double>?

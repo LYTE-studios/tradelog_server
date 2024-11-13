@@ -12,7 +12,9 @@ fields:
   # Example: JPY
 
   accNum: String
-  # Account number.
+  # Account status.
 
   accountBalance: String
-  # Current account balance.
+  # Account number.
+
+  status: String?
