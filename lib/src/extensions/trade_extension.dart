@@ -3,6 +3,36 @@ import 'package:tradelog_server/src/extensions/tradelocker_extension.dart';
 import 'package:tradelog_server/src/util/instruments.dart';
 
 extension TradeExtension on TradeDto {
+  static TradeDto fromTradeLockerOrder(
+    TradelockerOrder order,
+  ) {
+    // Calculate realized P&L and ROI for the position
+    final double realizedPl = 0;
+
+    final Option option = order.side == 'long' ? Option.long : Option.short;
+
+    final totalInvestment = order.filledQty * order.avgPrice;
+
+    final netRoi =
+        totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
+
+    TradeStatus status = !order.isOpen ? TradeStatus.closed : TradeStatus.open;
+
+    // Sub-request: Fetch symbol for each position, queued and rate-limited
+    final String symbol =
+        Instrument.instrumentMap[order.tradableInstrumentId] ?? 'unknown';
+
+    return TradeDto(
+      status: status,
+      symbol: symbol,
+      option: option,
+      netRoi: netRoi,
+      realizedPl: realizedPl,
+      openTime: order.createdDate,
+      lotSize: order.filledQty,
+    );
+  }
+
   static TradeDto fromTradeLocker(
     TradelockerPosition position,
     Map<String, List<TradelockerOrder>> ordersByPosition,

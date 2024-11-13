@@ -212,7 +212,7 @@ class TradeLockerEndpoint extends Endpoint {
     DateTime? to,
   }) async {
     // Fetch positions and orders from the external API (rate-limited)
-    final positions = await _getPositionsWithRateLimit(
+    List<TradelockerPosition> positions = await _getPositionsWithRateLimit(
       session,
       accountId: accountId,
       accNum: accNum,
@@ -220,7 +220,7 @@ class TradeLockerEndpoint extends Endpoint {
       to: to,
     );
 
-    final orders = await _getOrdersHistoryWithRateLimit(
+    List<TradelockerOrder> orders = await _getOrdersHistoryWithRateLimit(
       session,
       accountId: accountId,
       accNum: accNum,
@@ -232,29 +232,13 @@ class TradeLockerEndpoint extends Endpoint {
     final Map<String, List<TradelockerOrder>> ordersByPosition =
         _groupOrdersByPosition(orders);
 
-    // Set of position IDs from open positions
-    final openPositionIds = positions.map((position) => position.id).toSet();
-
-    final List<TradeDto> trades = await _processPositions(
-      session,
-      positions,
-      ordersByPosition,
-      accNum,
-    );
-
-    // Return the combined list of open and closed trades
-    return trades;
-  }
-
-  /// Private Helper Functions
-
-  Future<List<TradeDto>> _processPositions(
-    Session session,
-    List<TradelockerPosition> positions,
-    Map<String, List<TradelockerOrder>> ordersByPosition,
-    int accNum,
-  ) async {
     final List<TradeDto> trades = [];
+
+    for (TradelockerOrder order in orders) {
+      TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
+
+      trades.add(dto);
+    }
 
     for (TradelockerPosition position in positions) {
       TradeDto dto = TradeExtension.fromTradeLocker(position, ordersByPosition);
@@ -262,9 +246,11 @@ class TradeLockerEndpoint extends Endpoint {
       trades.add(dto);
     }
 
-    // print(trades);
+    // Return the combined list of open and closed trades
     return trades;
   }
+
+  /// Private Helper Functions
 
   Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
     List<TradelockerOrder> orders,
