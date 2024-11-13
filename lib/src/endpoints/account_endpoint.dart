@@ -12,6 +12,10 @@ class AccountEndpoint extends Endpoint {
       throw Exception('User not authenticated');
     }
 
+    // balance
+    // Title
+    // Status
+
     return await LinkedAccount.db.find(
       session,
       where: (t) => t.userInfoId.equals(authInfo.userId),
