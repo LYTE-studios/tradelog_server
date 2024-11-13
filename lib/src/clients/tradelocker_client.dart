@@ -10,7 +10,7 @@ import 'package:tradelog_server/src/util/request_queue.dart';
 class TradeLockerClient {
   Dio _dio;
 
-  RequestQueue queue = RequestQueue();
+  RequestQueue queue = RequestQueue(maxRequestsPerSecond: 2);
 
   final String baseUrl;
 
