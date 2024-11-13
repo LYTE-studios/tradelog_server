@@ -302,8 +302,8 @@ class TradeLockerEndpoint extends Endpoint {
       );
 
       if (response.data == null || response.data['d'] == null) {
-        throw GeneralTradelyException(
-          'Trade response invalid: ${response.statusCode} - ${response.statusMessage}: ${response.data}',
+        throw NetworkTradelyException(
+          response,
         );
       }
 
@@ -366,8 +366,7 @@ class TradeLockerEndpoint extends Endpoint {
 
       // Check if the response is valid and contains the expected data
       if (response.data == null || response.data['d'] == null) {
-        // print(response.data); // uncomment if random error
-        throw GeneralTradelyException('Invalid response or no data found.');
+        throw NetworkTradelyException(response);
       }
 
       // Extract and process the orders
