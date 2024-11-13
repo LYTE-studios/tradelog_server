@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:sentry/sentry.dart';
 
@@ -8,6 +10,13 @@ class NetworkTradelyException implements Exception {
     this.networkResponse,
   ) {
     Sentry.captureException(
+      this,
+    );
+  }
+
+  @override
+  String toString() {
+    return jsonEncode(
       {
         "url": networkResponse.realUri.toString(),
         "status": networkResponse.statusCode,

@@ -7,7 +7,12 @@ class GeneralTradelyException implements Exception {
     this.message,
   ) {
     Sentry.captureException(
-      message,
+      this,
     );
+  }
+
+  @override
+  String toString() {
+    return message;
   }
 }

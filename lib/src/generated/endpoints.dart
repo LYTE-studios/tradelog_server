@@ -661,37 +661,6 @@ class Endpoints extends _i1.EndpointDispatch {
             params['account'],
           ),
         ),
-        'getAccounts': _i1.MethodConnector(
-          name: 'getAccounts',
-          params: {
-            'apiUrl': _i1.ParameterDescription(
-              name: 'apiUrl',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'apiKey': _i1.ParameterDescription(
-              name: 'apiKey',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-            'refreshToken': _i1.ParameterDescription(
-              name: 'refreshToken',
-              type: _i1.getType<String>(),
-              nullable: false,
-            ),
-          },
-          call: (
-            _i1.Session session,
-            Map<String, dynamic> params,
-          ) async =>
-              (endpoints['tradeLocker'] as _i10.TradeLockerEndpoint)
-                  .getAccounts(
-            session,
-            apiUrl: params['apiUrl'],
-            apiKey: params['apiKey'],
-            refreshToken: params['refreshToken'],
-          ),
-        ),
         'reauthenticate': _i1.MethodConnector(
           name: 'reauthenticate',
           params: {},

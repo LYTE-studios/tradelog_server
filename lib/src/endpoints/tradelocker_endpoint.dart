@@ -334,11 +334,8 @@ class TradeLockerEndpoint extends Endpoint {
 
     map['config'] = await client.get(session, '/trade/config');
 
-    List<TradelockerAccountInformation> accounts = await getAccounts(
+    List<TradelockerAccountInformation> accounts = await _getAccounts(
       session,
-      apiUrl: account.apiUrl,
-      apiKey: account.apiKey,
-      refreshToken: account.refreshToken,
     );
 
     map['orders'] = await client.get(
@@ -472,69 +469,59 @@ class TradeLockerEndpoint extends Endpoint {
     required String email,
     required String? title,
   }) async {
-    try {
-      var checkLinked = await LinkedAccount.db.findFirstRow(
-        session,
-        where: (o) => o.userInfoId.equals(userId),
-      );
+    var checkLinked = await LinkedAccount.db.findFirstRow(
+      session,
+      where: (o) => o.userInfoId.equals(userId),
+    );
 
-      var creds = await TradelockerCredentials.db.findFirstRow(
-        session,
-        where: (o) => o.email.equals(email),
-      );
+    var creds = await TradelockerCredentials.db.findFirstRow(
+      session,
+      where: (o) => o.email.equals(email),
+    );
 
-      if (creds == null) {
-        throw GeneralTradelyException('Credentials not found');
-      }
-
-      final accounts = await getAccounts(
-        session,
-        apiUrl: checkLinked?.apiUrl ?? "",
-        apiKey: apiKey,
-        refreshToken: refreshToken,
-      );
-
-      List<String> accountIds = accounts.map((x) => x.id).toList();
-      List<String> accountNumbers = accounts.map((x) => x.accNum).toList();
-
-      if (checkLinked == null) {
-        var linkedAccount = LinkedAccount(
-          userInfoId: userId,
-          apiUrl: url,
-          apiKey: apiKey,
-          refreshToken: creds.refreshToken ?? "",
-          platform: Platform.Tradelocker,
-          tradelockerCredentialsId: creds.id,
-          tradelockerAccountId: accountIds,
-          tradelockerAccounts: accountNumbers,
-          title: title,
-        );
-        await LinkedAccount.db.insertRow(session, linkedAccount);
-      } else {
-        checkLinked.apiKey = apiKey;
-        checkLinked.tradelockerAccountId = accountIds;
-        checkLinked.tradelockerAccounts = accountNumbers;
-        checkLinked.title = title;
-        await LinkedAccount.db.updateRow(session, checkLinked);
-      }
-    } catch (e) {
-      throw GeneralTradelyException('Failed to manage linked account: $e');
+    if (creds == null) {
+      throw GeneralTradelyException('Credentials not found');
     }
-  }
 
-  Future<List<TradelockerAccountInformation>> getAccounts(
-    Session session, {
-    required String apiUrl,
-    required String apiKey,
-    required String refreshToken,
-  }) async {
     await initializeClient(
       session,
-      url: apiUrl,
+      url: url,
       apiKey: apiKey,
       refreshToken: refreshToken,
     );
 
+    final accounts = await _getAccounts(
+      session,
+    );
+
+    List<String> accountIds = accounts.map((x) => x.id).toList();
+    List<String> accountNumbers = accounts.map((x) => x.accNum).toList();
+
+    if (checkLinked == null) {
+      var linkedAccount = LinkedAccount(
+        userInfoId: userId,
+        apiUrl: url,
+        apiKey: apiKey,
+        refreshToken: creds.refreshToken ?? "",
+        platform: Platform.Tradelocker,
+        tradelockerCredentialsId: creds.id,
+        tradelockerAccountId: accountIds,
+        tradelockerAccounts: accountNumbers,
+        title: title,
+      );
+      await LinkedAccount.db.insertRow(session, linkedAccount);
+    } else {
+      checkLinked.apiKey = apiKey;
+      checkLinked.tradelockerAccountId = accountIds;
+      checkLinked.tradelockerAccounts = accountNumbers;
+      checkLinked.title = title;
+      await LinkedAccount.db.updateRow(session, checkLinked);
+    }
+  }
+
+  Future<List<TradelockerAccountInformation>> _getAccounts(
+    Session session,
+  ) async {
     final accountsFuture = Completer<List<TradelockerAccountInformation>>();
     try {
       final response = await client.get(

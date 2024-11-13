@@ -34,5 +34,4 @@ tradeLocker:
   - refresh:
   - getAllTrades:
   - getRawOrders:
-  - getAccounts:
   - reauthenticate:
