@@ -4,7 +4,7 @@ import 'package:serverpod_cloud_storage_s3/serverpod_cloud_storage_s3.dart'
     as s3;
 import 'package:tradelog_server/src/clients/mail_client.dart';
 import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
-import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
+import 'package:tradelog_server/src/util/request_queue.dart';
 import 'package:tradelog_server/src/web/routes/root.dart';
 
 import 'src/generated/endpoints.dart';

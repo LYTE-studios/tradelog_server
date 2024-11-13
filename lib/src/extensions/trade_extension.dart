@@ -1,5 +1,5 @@
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/models/tradelocker_extension.dart';
+import 'package:tradelog_server/src/extensions/tradelocker_extension.dart';
 import 'package:tradelog_server/src/util/instruments.dart';
 
 extension TradeExtension on TradeDto {

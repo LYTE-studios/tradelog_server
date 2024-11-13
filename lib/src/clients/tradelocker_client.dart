@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
+import 'package:tradelog_server/src/util/request_queue.dart';
 
 class TradeLockerClient {
   Dio _dio;
+
+  RequestQueue queue = RequestQueue();
 
   final String baseUrl;
 
@@ -105,27 +110,53 @@ class TradeLockerClient {
       extraHeaders["accNum"] = accNum;
     }
 
-    Response response = await _dio.get(
-      endpoint,
-      options: Options(
-        headers: {
-          ..._dio.options.headers,
-          ...extraHeaders,
+    Completer getFuture = Completer<Response>();
+
+    queue.addRequest(
+      EndpointRequest(
+        priority: 1,
+        request: () async {
+          int retries = 0;
+
+          Future<Response> performGet() async {
+            return await _dio.get(
+              endpoint,
+              options: Options(
+                headers: {
+                  ..._dio.options.headers,
+                  ...extraHeaders,
+                },
+              ),
+            );
+          }
+
+          Future<Response> makeRequest() async {
+            Response response = await performGet();
+
+            if (response.statusCode == 429) {
+              // If the client has already tried twice, return the faulty response
+              if (retries > 3) {
+                return response;
+              }
+
+              retries += 1;
+
+              await Future.delayed(Duration(milliseconds: 500));
+
+              return makeRequest();
+            }
+
+            return response;
+          }
+
+          Response response = await makeRequest();
+
+          getFuture.complete(response);
         },
       ),
     );
 
-    if (response.statusCode == 429) {
-      await Future.delayed(Duration(milliseconds: 500));
-      return get(
-        session,
-        endpoint,
-        accNum: accNum,
-        extraHeaders: extraHeaders,
-      );
-    }
-
-    return response;
+    return await getFuture.future;
   }
 
   Future<Response> post(
@@ -137,17 +168,44 @@ class TradeLockerClient {
 
     await _checkTokenValidity(session);
 
-    Response response = await _dio.post(endpoint, data: data);
+    Completer getFuture = Completer<Response>();
 
-    if (response.statusCode == 429) {
-      await Future.delayed(Duration(milliseconds: 500));
-      return post(
-        session,
-        endpoint,
-        data,
-      );
-    }
+    queue.addRequest(
+      EndpointRequest(
+        priority: 1,
+        request: () async {
+          int retries = 0;
 
-    return response;
+          Future<Response> performPost() async {
+            return await _dio.post(endpoint, data: data);
+          }
+
+          Future<Response> makeRequest() async {
+            Response response = await performPost();
+
+            if (response.statusCode == 429) {
+              // If the client has already tried twice, return the faulty response
+              if (retries > 3) {
+                return response;
+              }
+
+              retries += 1;
+
+              await Future.delayed(Duration(milliseconds: 500));
+
+              return makeRequest();
+            }
+
+            return response;
+          }
+
+          Response response = await makeRequest();
+
+          getFuture.complete(response);
+        },
+      ),
+    );
+
+    return await getFuture.future;
   }
 }

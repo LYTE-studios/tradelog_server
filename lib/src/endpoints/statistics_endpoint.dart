@@ -6,7 +6,7 @@ class StatisticsEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<OverviewStatistics> getOverviewStatistics(Session session) async {
+  Future<OverviewStatisticsDto> getOverviewStatistics(Session session) async {
     // Retrieve cached trades or fetch fresh data if the cache is empty
     List<TradeDto>? trades = await GlobalEndpoint().getTrades(session);
 
@@ -25,7 +25,7 @@ class StatisticsEndpoint extends Endpoint {
         _countTradesByOption(currentMonthTrades, Option.long);
 
     // Return calculated statistics
-    return OverviewStatistics(
+    return OverviewStatisticsDto(
       netProfitLossThisMonth: netProfitLossThisMonth,
       tradeWinRateThisMonth: tradeWinRateThisMonth,
       realizedReturnThisMonth: realizedReturnThisMonth,

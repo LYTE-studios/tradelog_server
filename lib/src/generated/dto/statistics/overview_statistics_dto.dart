@@ -11,9 +11,9 @@
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
-abstract class OverviewStatistics
+abstract class OverviewStatisticsDto
     implements _i1.SerializableModel, _i1.ProtocolSerialization {
-  OverviewStatistics._({
+  OverviewStatisticsDto._({
     this.netProfitLossThisMonth,
     this.netProfitLossTrend,
     this.tradeWinRateThisMonth,
@@ -26,7 +26,7 @@ abstract class OverviewStatistics
     this.profitFactor,
   });
 
-  factory OverviewStatistics({
+  factory OverviewStatisticsDto({
     double? netProfitLossThisMonth,
     double? netProfitLossTrend,
     double? tradeWinRateThisMonth,
@@ -37,10 +37,11 @@ abstract class OverviewStatistics
     int? longTradesAmount,
     double? averageHoldingTime,
     double? profitFactor,
-  }) = _OverviewStatisticsImpl;
+  }) = _OverviewStatisticsDtoImpl;
 
-  factory OverviewStatistics.fromJson(Map<String, dynamic> jsonSerialization) {
-    return OverviewStatistics(
+  factory OverviewStatisticsDto.fromJson(
+      Map<String, dynamic> jsonSerialization) {
+    return OverviewStatisticsDto(
       netProfitLossThisMonth:
           (jsonSerialization['netProfitLossThisMonth'] as num?)?.toDouble(),
       netProfitLossTrend:
@@ -81,7 +82,7 @@ abstract class OverviewStatistics
 
   double? profitFactor;
 
-  OverviewStatistics copyWith({
+  OverviewStatisticsDto copyWith({
     double? netProfitLossThisMonth,
     double? netProfitLossTrend,
     double? tradeWinRateThisMonth,
@@ -141,8 +142,8 @@ abstract class OverviewStatistics
 
 class _Undefined {}
 
-class _OverviewStatisticsImpl extends OverviewStatistics {
-  _OverviewStatisticsImpl({
+class _OverviewStatisticsDtoImpl extends OverviewStatisticsDto {
+  _OverviewStatisticsDtoImpl({
     double? netProfitLossThisMonth,
     double? netProfitLossTrend,
     double? tradeWinRateThisMonth,
@@ -167,7 +168,7 @@ class _OverviewStatisticsImpl extends OverviewStatistics {
         );
 
   @override
-  OverviewStatistics copyWith({
+  OverviewStatisticsDto copyWith({
     Object? netProfitLossThisMonth = _Undefined,
     Object? netProfitLossTrend = _Undefined,
     Object? tradeWinRateThisMonth = _Undefined,
@@ -179,7 +180,7 @@ class _OverviewStatisticsImpl extends OverviewStatistics {
     Object? averageHoldingTime = _Undefined,
     Object? profitFactor = _Undefined,
   }) {
-    return OverviewStatistics(
+    return OverviewStatisticsDto(
       netProfitLossThisMonth: netProfitLossThisMonth is double?
           ? netProfitLossThisMonth
           : this.netProfitLossThisMonth,

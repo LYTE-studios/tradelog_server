@@ -4,10 +4,12 @@ import 'package:dio/dio.dart';
 import 'package:sentry/sentry.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
+import 'package:tradelog_server/src/exceptions/general_tradely_exception.dart';
+import 'package:tradelog_server/src/exceptions/network_tradely_exception.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/models/trade_extension.dart';
-import 'package:tradelog_server/src/models/tradelocker_extension.dart';
-import 'package:tradelog_server/src/rate_limiter/request_queue.dart';
+import 'package:tradelog_server/src/extensions/trade_extension.dart';
+import 'package:tradelog_server/src/extensions/tradelocker_extension.dart';
+import 'package:tradelog_server/src/util/request_queue.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
 
 class TradeLockerEndpoint extends Endpoint {
@@ -15,8 +17,6 @@ class TradeLockerEndpoint extends Endpoint {
   bool get requireLogin => true;
 
   late TradeLockerClient client;
-
-  static late RequestQueue requestQueue;
 
   Future<void> initializeClient(
     Session session, {
@@ -96,6 +96,8 @@ class TradeLockerEndpoint extends Endpoint {
   }) async {
     var authenticated = await session.authenticated;
 
+    assert(authenticated != null);
+
     // Find linked accounts associated with the current credentials
     var linkedAccount = await LinkedAccount.db.findFirstRow(
       session,
@@ -104,7 +106,9 @@ class TradeLockerEndpoint extends Endpoint {
     );
 
     if (linkedAccount == null) {
-      throw Exception('Linked account not found for credentials');
+      throw GeneralTradelyException(
+        'Linked account not found for credentials with userID: ${authenticated!.userId}',
+      );
     }
 
     await initializeClient(
@@ -125,13 +129,14 @@ class TradeLockerEndpoint extends Endpoint {
     if (response.statusCode == 201) {
       final data = response.data as Map<String, dynamic>;
       final newAccessToken = data['accessToken'] as String;
+
       // Update the access token for each linked account related to the current credentials
       linkedAccount.apiKey = newAccessToken;
       await LinkedAccount.db.updateRow(session, linkedAccount);
 
       return linkedAccount;
     } else {
-      throw Exception('Could not refresh token');
+      throw NetworkTradelyException(response);
     }
   }
 
@@ -156,18 +161,26 @@ class TradeLockerEndpoint extends Endpoint {
     for (var linkedAccount in linkedAccounts) {
       if (linkedAccount.tradelockerAccountId == null ||
           linkedAccount.tradelockerAccounts == null) {
-        throw Exception('No subaccounts found');
+        throw GeneralTradelyException('No subaccounts found');
       }
 
       String apiKey = linkedAccount.apiKey;
       String refreshToken = linkedAccount.refreshToken;
+
+      initializeClient(
+        session,
+        url: linkedAccount.apiUrl,
+        apiKey: apiKey,
+        refreshToken: refreshToken,
+      );
 
       final accountIds = linkedAccount.tradelockerAccountId!;
       final accountNumbers = linkedAccount.tradelockerAccounts!;
 
       // Ensure accountIds and accountNumbers have the same length
       if (accountIds.length != accountNumbers.length) {
-        throw Exception('Mismatch between account IDs and account numbers');
+        throw GeneralTradelyException(
+            'Mismatch between account IDs and account numbers');
       }
 
       for (int i = 0; i < accountIds.length; i++) {
@@ -178,9 +191,6 @@ class TradeLockerEndpoint extends Endpoint {
         try {
           List<TradeDto> trades = await _getTrades(
             session,
-            apiUrl: linkedAccount.apiUrl,
-            apiKey: apiKey,
-            refreshToken: refreshToken,
             accountId: accountId,
             accNum: accountNumber,
             from: from,
@@ -204,28 +214,14 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<List<TradeDto>> _getTrades(
     Session session, {
-    required String apiUrl,
-    required String apiKey,
-    required refreshToken,
     required int accountId,
     required int accNum,
     DateTime? from,
     DateTime? to,
   }) async {
-    // Initialize client for the current session
-    await initializeClient(
-      session,
-      url: apiUrl,
-      apiKey: apiKey,
-      refreshToken: refreshToken,
-    );
-
     // Fetch positions and orders from the external API (rate-limited)
     final positions = await _getPositionsWithRateLimit(
       session,
-      apiUrl: apiUrl,
-      apiKey: apiKey,
-      refreshToken: refreshToken,
       accountId: accountId,
       accNum: accNum,
       from: from,
@@ -234,9 +230,6 @@ class TradeLockerEndpoint extends Endpoint {
 
     final orders = await _getOrdersHistoryWithRateLimit(
       session,
-      apiUrl: apiUrl,
-      apiKey: apiKey,
-      refreshToken: refreshToken,
       accountId: accountId,
       accNum: accNum,
       from: from,
@@ -297,21 +290,11 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<List<TradelockerPosition>> _getPositionsWithRateLimit(
     Session session, {
-    required String apiUrl,
-    required String apiKey,
-    required String refreshToken,
     required int accountId,
     required int accNum,
     DateTime? from,
     DateTime? to,
   }) async {
-    await initializeClient(
-      session,
-      url: apiUrl,
-      apiKey: apiKey,
-      refreshToken: refreshToken,
-    );
-
     try {
       final response = await client.get(
         session,
@@ -324,7 +307,7 @@ class TradeLockerEndpoint extends Endpoint {
       );
 
       if (response.data == null || response.data['d'] == null) {
-        throw Exception(
+        throw GeneralTradelyException(
           'Trade response invalid: ${response.statusCode} - ${response.statusMessage}: ${response.data}',
         );
       }
@@ -337,11 +320,14 @@ class TradeLockerEndpoint extends Endpoint {
             ),
           )
           .toList();
-    } catch (e) {
-      // Send to Sentry for monitoring
-      Sentry.captureException(e);
-
-      rethrow;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw NetworkTradelyException(e.response!);
+      } else {
+        throw GeneralTradelyException(
+          'Something went wrong processing Positions for Tradelocker',
+        );
+      }
     }
   }
 
@@ -370,21 +356,11 @@ class TradeLockerEndpoint extends Endpoint {
 
   Future<List<TradelockerOrder>> _getOrdersHistoryWithRateLimit(
     Session session, {
-    required String apiUrl,
-    required String apiKey,
-    required String refreshToken,
     required int accountId,
     required int accNum,
     DateTime? from,
     DateTime? to,
   }) async {
-    await initializeClient(
-      session,
-      url: apiUrl,
-      apiKey: apiKey,
-      refreshToken: refreshToken,
-    );
-
     try {
       final response = await client.get(
         session,
@@ -399,23 +375,27 @@ class TradeLockerEndpoint extends Endpoint {
       // Check if the response is valid and contains the expected data
       if (response.data == null || response.data['d'] == null) {
         // print(response.data); // uncomment if random error
-        throw Exception('Invalid response or no data found.');
+        throw GeneralTradelyException('Invalid response or no data found.');
       }
 
       // Extract and process the orders
       final orders = response.data['d']['ordersHistory'] as List<dynamic>?;
       if (orders == null) {
-        throw Exception('No orders found in the response.');
+        throw GeneralTradelyException('No orders found in the response.');
       }
 
       return orders
           .map((order) =>
               TradeLockerExtension.orderFromJson(order as List<dynamic>))
           .toList();
-    } catch (e) {
-      // Send to Sentry for monitoring
-      Sentry.captureException(e);
-      rethrow;
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw NetworkTradelyException(e.response!);
+      } else {
+        throw GeneralTradelyException(
+          'Something went wrong processing Positions for Tradelocker',
+        );
+      }
     }
   }
 
@@ -428,33 +408,21 @@ class TradeLockerEndpoint extends Endpoint {
   ) async {
     final authFuture = Completer<Map<String, dynamic>>();
 
-    try {
-      final response = await client.post(
-        session,
-        '/auth/jwt/token',
-        {
-          'email': email,
-          'password': password,
-          'server': server,
-        },
-      );
+    final response = await client.post(
+      session,
+      '/auth/jwt/token',
+      {
+        'email': email,
+        'password': password,
+        'server': server,
+      },
+    );
 
-      if (response.statusCode == 201) {
-        final data = response.data as Map<String, dynamic>;
-        authFuture.complete(data);
-      } else {
-        throw Exception('Failed to authenticate: ${response.statusCode}');
-      }
-    } catch (e) {
-      if (e is DioException) {
-        if (e.response?.statusCode == 500) {
-          throw Exception('Internal server error: ${e.response?.data}');
-        } else {
-          throw Exception('Failed to authenticate: ${e.message}');
-        }
-      } else {
-        throw Exception('Unexpected error: $e');
-      }
+    if (response.statusCode == 201) {
+      final data = response.data as Map<String, dynamic>;
+      authFuture.complete(data);
+    } else {
+      throw NetworkTradelyException(response);
     }
 
     return await authFuture.future;
@@ -476,7 +444,7 @@ class TradeLockerEndpoint extends Endpoint {
         AccessToken(token: accessToken),
       );
     } catch (e) {
-      throw Exception('Failed to store access token: $e');
+      throw GeneralTradelyException('Failed to store access token: $e');
     }
 
     try {
@@ -501,7 +469,7 @@ class TradeLockerEndpoint extends Endpoint {
         await TradelockerCredentials.db.updateRow(session, checkCred);
       }
     } catch (e) {
-      throw Exception('Failed to store/update credentials: $e');
+      throw GeneralTradelyException('Failed to store/update credentials: $e');
     }
   }
 
@@ -526,7 +494,7 @@ class TradeLockerEndpoint extends Endpoint {
       );
 
       if (creds == null) {
-        throw Exception('Credentials not found');
+        throw GeneralTradelyException('Credentials not found');
       }
 
       final accounts = await getAccounts(
@@ -560,7 +528,7 @@ class TradeLockerEndpoint extends Endpoint {
         await LinkedAccount.db.updateRow(session, checkLinked);
       }
     } catch (e) {
-      throw Exception('Failed to manage linked account: $e');
+      throw GeneralTradelyException('Failed to manage linked account: $e');
     }
   }
 
@@ -578,37 +546,32 @@ class TradeLockerEndpoint extends Endpoint {
     );
 
     final accountsFuture = Completer<List<TradelockerAccountInformation>>();
-    requestQueue.addRequest(
-      EndpointRequest(
-        priority: 1,
-        request: () async {
-          try {
-            final response = await client.get(
-              session,
-              '/auth/jwt/all-accounts',
-            );
+    try {
+      final response = await client.get(
+        session,
+        '/auth/jwt/all-accounts',
+      );
 
-            // Check if 'accounts' key exists in the response data
-            if (response.data == null ||
-                !response.data.containsKey('accounts')) {
-              throw Exception('Missing accounts key in response');
-            }
-            print(response.data.toString());
+      // Check if 'accounts' key exists in the response data
+      if (response.data == null || !response.data.containsKey('accounts')) {
+        throw Exception('Missing accounts key in response');
+      }
 
-            var accountsData = response.data['accounts'];
+      var accountsData = response.data['accounts'];
 
-            // Map accounts data to TradelockerAccountInformation objects
-            accountsFuture.complete(List<TradelockerAccountInformation>.from(
-                accountsData
-                    .map((x) => TradelockerAccountInformation.fromJson(x))));
-          } catch (e) {
-            // Log the error before completing with an error
-            print("Error occurred in getAccounts: $e");
-            accountsFuture.completeError(e); // Complete with error if it fails
-          }
-        },
-      ),
-    );
+      // Map accounts data to TradelockerAccountInformation objects
+      accountsFuture.complete(
+        List<TradelockerAccountInformation>.from(
+          accountsData.map(
+            (x) => TradelockerAccountInformation.fromJson(x),
+          ),
+        ),
+      );
+    } catch (e) {
+      // Log the error before completing with an error
+      print("Error occurred in getAccounts: $e");
+      accountsFuture.completeError(e); // Complete with error if it fails
+    }
 
     return await accountsFuture.future;
   }

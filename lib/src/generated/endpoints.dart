@@ -19,12 +19,14 @@ import '../endpoints/profile_endpoint.dart' as _i7;
 import '../endpoints/statistics_endpoint.dart' as _i8;
 import '../endpoints/trade_endpoint.dart' as _i9;
 import '../endpoints/tradelocker_endpoint.dart' as _i10;
-import 'package:tradelog_server/src/generated/default/note.dart' as _i11;
+import 'package:tradelog_server/src/generated/tables/note.dart' as _i11;
 import 'package:tradelog_server/src/generated/profile/tradely_profile.dart'
     as _i12;
-import 'package:tradelog_server/src/generated/dto/trade_dto.dart' as _i13;
-import 'package:tradelog_server/src/generated/default/trade.dart' as _i14;
-import 'package:tradelog_server/src/generated/linked_account.dart' as _i15;
+import 'package:tradelog_server/src/generated/dto/trades/trade_dto.dart'
+    as _i13;
+import 'package:tradelog_server/src/generated/tables/trade.dart' as _i14;
+import 'package:tradelog_server/src/generated/tables/linked_account.dart'
+    as _i15;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i16;
 
 class Endpoints extends _i1.EndpointDispatch {
