@@ -8,15 +8,12 @@ class NetworkTradelyException implements Exception {
     this.networkResponse,
   ) {
     Sentry.captureException(
-      this,
-      hint: Hint.withMap(
-        {
-          "url": networkResponse.realUri.toString(),
-          "status": networkResponse.statusCode,
-          "message": networkResponse.statusMessage,
-          "data": networkResponse.data,
-        },
-      ),
+      {
+        "url": networkResponse.realUri.toString(),
+        "status": networkResponse.statusCode,
+        "message": networkResponse.statusMessage,
+        "data": networkResponse.data,
+      },
     );
   }
 }

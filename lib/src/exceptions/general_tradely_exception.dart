@@ -7,12 +7,7 @@ class GeneralTradelyException implements Exception {
     this.message,
   ) {
     Sentry.captureException(
-      this,
-      hint: Hint.withMap(
-        {
-          "message": message,
-        },
-      ),
+      message,
     );
   }
 }
