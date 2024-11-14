@@ -9,6 +9,8 @@ extension TradeLockerExtension on TradelockerPosition {
     for (var order in orders) {
       if (order.status == 'Filled' && order.filledQty > 0) {
         realizedPl += (order.filledQty * (order.avgPrice - avgPrice));
+      } else {
+        realizedPl += (order.qty * (order.avgPrice - avgPrice));
       }
     }
 

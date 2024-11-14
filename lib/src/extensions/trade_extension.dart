@@ -6,15 +6,8 @@ extension TradeExtension on TradeDto {
   static TradeDto fromTradeLockerOrder(
     TradelockerOrder order,
   ) {
-    // Calculate realized P&L and ROI for the position
-    final double realizedPl = 0;
-
-    final Option option = order.side == 'long' ? Option.long : Option.short;
-
-    final totalInvestment = order.filledQty * order.avgPrice;
-
-    final netRoi =
-        totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
+    final Option option =
+        order.side.toLowerCase() == 'buy' ? Option.long : Option.short;
 
     TradeStatus status = !order.isOpen ? TradeStatus.closed : TradeStatus.open;
 
@@ -26,8 +19,8 @@ extension TradeExtension on TradeDto {
       status: status,
       symbol: symbol,
       option: option,
-      netRoi: netRoi,
-      realizedPl: realizedPl,
+      netRoi: null,
+      realizedPl: null,
       openTime: order.createdDate,
       lotSize: order.filledQty,
     );
@@ -42,7 +35,8 @@ extension TradeExtension on TradeDto {
     // Calculate realized P&L and ROI for the position
     final realizedPl = position.calculateRealizedPl(associatedOrders);
 
-    final Option option = position.side == 'long' ? Option.long : Option.short;
+    final Option option =
+        position.side.toLowerCase() == 'buy' ? Option.long : Option.short;
 
     final totalInvestment = position.quantity * position.avgPrice;
 

@@ -365,11 +365,11 @@ class TradeLockerEndpoint extends Endpoint {
 
     final List<TradeDto> trades = [];
 
-    for (TradelockerOrder order in orders) {
-      TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
+    // for (TradelockerOrder order in orders) {
+    //   TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
 
-      trades.add(dto);
-    }
+    //   trades.add(dto);
+    // }
 
     for (TradelockerPosition position in positions) {
       TradeDto dto = TradeExtension.fromTradeLocker(position, ordersByPosition);
