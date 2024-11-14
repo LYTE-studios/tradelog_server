@@ -32,6 +32,7 @@ tradeLocker:
   - initializeClient:
   - authenticate:
   - refresh:
+  - getAccountDto:
   - getAllTrades:
   - getRawOrders:
   - reauthenticate:

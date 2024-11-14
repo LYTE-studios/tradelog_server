@@ -140,6 +140,47 @@ class TradeLockerEndpoint extends Endpoint {
     }
   }
 
+  Future<LinkedAccountDto> getAccountDto(
+      Session session, LinkedAccount linkedAccount) async {
+    // var authenticated = await session.authenticated;
+
+    // var linkedAccount = await LinkedAccount.db.findFirstRow(
+    //   session,
+    //   where: (o) => o.userInfoId.equals(authenticated!.userId),
+    // );
+
+    // if (linkedAccount == null) {
+    //   throw GeneralTradelyException('No linked accounts found for this user');
+    // }
+
+    var statusCurrency = await _getBalanceCurrency(session, linkedAccount);
+
+    if (statusCurrency.isEmpty) {
+      throw GeneralTradelyException(
+          'No status/currency found for this account');
+    }
+
+    //List<int> statuses = statusCurrency.map((x) => x.status).toList();
+    List<String> currency = statusCurrency.map((x) => x.currency).toList();
+    List<double> balance =
+        statusCurrency.map((x) => double.parse(x.accountBalance)).toList();
+
+    List<String> status = await _getStatus(session, linkedAccount);
+
+    if (status.isEmpty) {
+      throw GeneralTradelyException('No statuses found for this account');
+    }
+
+    return LinkedAccountDto(
+      linkedAccountId: linkedAccount.id,
+      title: linkedAccount.title,
+      platform: linkedAccount.platform,
+      status: status,
+      currency: currency,
+      balance: balance,
+    );
+  }
+
   Future<List<TradeDto>> getAllTrades(
     Session session, {
     DateTime? from,
@@ -202,6 +243,83 @@ class TradeLockerEndpoint extends Endpoint {
     allTrades.sort((a, b) => b.openTime.compareTo(a.openTime));
 
     return allTrades;
+  }
+
+  Future<List<TradelockerAccountInformation>> _getBalanceCurrency(
+      Session session, LinkedAccount linkedAccount) async {
+    String apiKey = linkedAccount.apiKey;
+    String refreshToken = linkedAccount.refreshToken;
+
+    initializeClient(
+      session,
+      url: linkedAccount.apiUrl,
+      apiKey: apiKey,
+      refreshToken: refreshToken,
+    );
+
+    final response = await client.get(
+      session,
+      '/auth/jwt/all-accounts',
+    );
+
+    if (response.data == null) {
+      throw NetworkTradelyException(response);
+    }
+
+    return List<TradelockerAccountInformation>.from(
+      response.data["accounts"].map(
+        (x) => TradelockerAccountInformation.fromJson(x),
+      ),
+    );
+  }
+
+  Future<List<String>> _getStatus(
+      Session session, LinkedAccount linkedAccount) async {
+    if (linkedAccount.tradelockerAccountId == null ||
+        linkedAccount.tradelockerAccounts == null) {
+      throw GeneralTradelyException('No subaccounts found');
+    }
+
+    final accountIds = linkedAccount.tradelockerAccountId!;
+    final accountNumbers = linkedAccount.tradelockerAccounts!;
+
+    // Ensure accountIds and accountNumbers have the same length
+    if (accountIds.length != accountNumbers.length) {
+      throw GeneralTradelyException(
+        'Mismatch between account IDs and account numbers',
+      );
+    }
+
+    String apiKey = linkedAccount.apiKey;
+    String refreshToken = linkedAccount.refreshToken;
+
+    initializeClient(
+      session,
+      url: linkedAccount.apiUrl,
+      apiKey: apiKey,
+      refreshToken: refreshToken,
+    );
+
+    List<String> statuses = [];
+
+    for (int i = 0; i < accountIds.length; i++) {
+      var accountId = int.parse(accountIds[i]);
+      var accountNumber = int.parse(accountNumbers[i]);
+
+      final response = await client.get(
+        session,
+        accNum: accountNumber,
+        '/trade/accounts',
+      );
+
+      if (response.data == null || response.data['d'] == null) {
+        throw NetworkTradelyException(response);
+      }
+
+      statuses.add(response.data['d']?[0]?['status']);
+    }
+
+    return statuses;
   }
 
   Future<List<TradeDto>> _getTrades(

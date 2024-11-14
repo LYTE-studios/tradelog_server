@@ -19,6 +19,7 @@ abstract class TradelockerAccountInformation
     required this.currency,
     required this.accNum,
     required this.accountBalance,
+    this.status,
   });
 
   factory TradelockerAccountInformation({
@@ -27,6 +28,7 @@ abstract class TradelockerAccountInformation
     required String currency,
     required String accNum,
     required String accountBalance,
+    String? status,
   }) = _TradelockerAccountInformationImpl;
 
   factory TradelockerAccountInformation.fromJson(
@@ -37,6 +39,7 @@ abstract class TradelockerAccountInformation
       currency: jsonSerialization['currency'] as String,
       accNum: jsonSerialization['accNum'] as String,
       accountBalance: jsonSerialization['accountBalance'] as String,
+      status: jsonSerialization['status'] as String?,
     );
   }
 
@@ -50,12 +53,15 @@ abstract class TradelockerAccountInformation
 
   String accountBalance;
 
+  String? status;
+
   TradelockerAccountInformation copyWith({
     String? id,
     String? name,
     String? currency,
     String? accNum,
     String? accountBalance,
+    String? status,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -65,6 +71,7 @@ abstract class TradelockerAccountInformation
       'currency': currency,
       'accNum': accNum,
       'accountBalance': accountBalance,
+      if (status != null) 'status': status,
     };
   }
 
@@ -76,6 +83,7 @@ abstract class TradelockerAccountInformation
       'currency': currency,
       'accNum': accNum,
       'accountBalance': accountBalance,
+      if (status != null) 'status': status,
     };
   }
 
@@ -85,6 +93,8 @@ abstract class TradelockerAccountInformation
   }
 }
 
+class _Undefined {}
+
 class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
   _TradelockerAccountInformationImpl({
     required String id,
@@ -92,12 +102,14 @@ class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
     required String currency,
     required String accNum,
     required String accountBalance,
+    String? status,
   }) : super._(
           id: id,
           name: name,
           currency: currency,
           accNum: accNum,
           accountBalance: accountBalance,
+          status: status,
         );
 
   @override
@@ -107,6 +119,7 @@ class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
     String? currency,
     String? accNum,
     String? accountBalance,
+    Object? status = _Undefined,
   }) {
     return TradelockerAccountInformation(
       id: id ?? this.id,
@@ -114,6 +127,7 @@ class _TradelockerAccountInformationImpl extends TradelockerAccountInformation {
       currency: currency ?? this.currency,
       accNum: accNum ?? this.accNum,
       accountBalance: accountBalance ?? this.accountBalance,
+      status: status is String? ? status : this.status,
     );
   }
 }
