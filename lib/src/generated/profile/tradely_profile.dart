@@ -8,8 +8,6 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 
-// ignore_for_file: invalid_use_of_visible_for_testing_member
-
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 
@@ -229,7 +227,7 @@ class TradelyProfileRepository {
   const TradelyProfileRepository._();
 
   Future<List<TradelyProfile>> find(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradelyProfileTable>? where,
     int? limit,
     int? offset,
@@ -238,19 +236,19 @@ class TradelyProfileRepository {
     _i1.OrderByListBuilder<TradelyProfileTable>? orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.find<TradelyProfile>(
+    return databaseAccessor.db.find<TradelyProfile>(
       where: where?.call(TradelyProfile.t),
       orderBy: orderBy?.call(TradelyProfile.t),
       orderByList: orderByList?.call(TradelyProfile.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<TradelyProfile?> findFirstRow(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradelyProfileTable>? where,
     int? offset,
     _i1.OrderByBuilder<TradelyProfileTable>? orderBy,
@@ -258,118 +256,118 @@ class TradelyProfileRepository {
     _i1.OrderByListBuilder<TradelyProfileTable>? orderByList,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findFirstRow<TradelyProfile>(
+    return databaseAccessor.db.findFirstRow<TradelyProfile>(
       where: where?.call(TradelyProfile.t),
       orderBy: orderBy?.call(TradelyProfile.t),
       orderByList: orderByList?.call(TradelyProfile.t),
       orderDescending: orderDescending,
       offset: offset,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<TradelyProfile?> findById(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     int id, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.findById<TradelyProfile>(
+    return databaseAccessor.db.findById<TradelyProfile>(
       id,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<TradelyProfile>> insert(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<TradelyProfile> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insert<TradelyProfile>(
+    return databaseAccessor.db.insert<TradelyProfile>(
       rows,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<TradelyProfile> insertRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     TradelyProfile row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.insertRow<TradelyProfile>(
+    return databaseAccessor.db.insertRow<TradelyProfile>(
       row,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<TradelyProfile>> update(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<TradelyProfile> rows, {
     _i1.ColumnSelections<TradelyProfileTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.update<TradelyProfile>(
+    return databaseAccessor.db.update<TradelyProfile>(
       rows,
       columns: columns?.call(TradelyProfile.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<TradelyProfile> updateRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     TradelyProfile row, {
     _i1.ColumnSelections<TradelyProfileTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.updateRow<TradelyProfile>(
+    return databaseAccessor.db.updateRow<TradelyProfile>(
       row,
       columns: columns?.call(TradelyProfile.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<TradelyProfile>> delete(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     List<TradelyProfile> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.delete<TradelyProfile>(
+    return databaseAccessor.db.delete<TradelyProfile>(
       rows,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<TradelyProfile> deleteRow(
-    _i1.Session session,
+    _i1.DatabaseAccessor databaseAccessor,
     TradelyProfile row, {
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteRow<TradelyProfile>(
+    return databaseAccessor.db.deleteRow<TradelyProfile>(
       row,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<List<TradelyProfile>> deleteWhere(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     required _i1.WhereExpressionBuilder<TradelyProfileTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.deleteWhere<TradelyProfile>(
+    return databaseAccessor.db.deleteWhere<TradelyProfile>(
       where: where(TradelyProfile.t),
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 
   Future<int> count(
-    _i1.Session session, {
+    _i1.DatabaseAccessor databaseAccessor, {
     _i1.WhereExpressionBuilder<TradelyProfileTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return session.db.count<TradelyProfile>(
+    return databaseAccessor.db.count<TradelyProfile>(
       where: where?.call(TradelyProfile.t),
       limit: limit,
-      transaction: transaction ?? session.transaction,
+      transaction: transaction ?? databaseAccessor.transaction,
     );
   }
 }
