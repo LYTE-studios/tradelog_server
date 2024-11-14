@@ -21,26 +21,26 @@ class AccountEndpoint extends Endpoint {
 
     for (var account in linkedAccounts) {
       switch (account.platform) {
-        case Platform.Tradelocker || Platform.TradelockerDemo:
-          var details =
-              await TradeLockerEndpoint().getAccountDto(session, account);
-          if (details == null) {
-            throw GeneralTradelyException(
-                "Error fetching TradeLocker account details: ${account.id}");
-          }
+        case Platform.TradelockerDemo:
+        case Platform.Tradelocker:
+          var details = await TradeLockerEndpoint().getAccountDto(
+            session,
+            account,
+          );
+
           linkedAccountDtos.add(details);
           break;
         case Platform.Metatrader:
           if (account.metaID == null) {
             throw GeneralTradelyException(
-                "MetaID not found for account: ${account.id}");
+              "MetaID not found for account: ${account.id}",
+            );
           }
-          var details = await MetaApiEndpoint()
-              .getAccountInformation(session, account.metaID!);
-          if (details == null) {
-            throw GeneralTradelyException(
-                "Error fetching MetaTrader account details: ${account.id}");
-          }
+          var details = await MetaApiEndpoint().getAccountInformation(
+            session,
+            account.metaID!,
+          );
+
           LinkedAccountDto linkedAccountDto = LinkedAccountDto(
             linkedAccountId: account.id,
             platform: account.platform,
@@ -52,7 +52,8 @@ class AccountEndpoint extends Endpoint {
           break;
         default:
           throw GeneralTradelyException(
-              "Unknown platform: ${account.platform}");
+            "Unknown platform: ${account.platform}",
+          );
       }
     }
 

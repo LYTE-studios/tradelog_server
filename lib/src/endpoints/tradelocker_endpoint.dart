@@ -141,23 +141,24 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Future<LinkedAccountDto> getAccountDto(
-      Session session, LinkedAccount linkedAccount) async {
-    // var authenticated = await session.authenticated;
+    Session session,
+    LinkedAccount linkedAccount,
+  ) async {
+    LinkedAccountDto? cachedAccount =
+        await session.caches.localPrio.get<LinkedAccountDto>(
+      'tradelocker-linked-account-${linkedAccount.id}',
+    );
 
-    // var linkedAccount = await LinkedAccount.db.findFirstRow(
-    //   session,
-    //   where: (o) => o.userInfoId.equals(authenticated!.userId),
-    // );
-
-    // if (linkedAccount == null) {
-    //   throw GeneralTradelyException('No linked accounts found for this user');
-    // }
+    if (cachedAccount != null) {
+      return cachedAccount;
+    }
 
     var statusCurrency = await _getBalanceCurrency(session, linkedAccount);
 
     if (statusCurrency.isEmpty) {
       throw GeneralTradelyException(
-          'No status/currency found for this account');
+        'No status/currency found for this account',
+      );
     }
 
     //List<int> statuses = statusCurrency.map((x) => x.status).toList();
@@ -171,7 +172,7 @@ class TradeLockerEndpoint extends Endpoint {
       throw GeneralTradelyException('No statuses found for this account');
     }
 
-    return LinkedAccountDto(
+    LinkedAccountDto dto = LinkedAccountDto(
       linkedAccountId: linkedAccount.id,
       title: linkedAccount.title,
       platform: linkedAccount.platform,
@@ -179,6 +180,16 @@ class TradeLockerEndpoint extends Endpoint {
       currency: currency,
       balance: balance,
     );
+
+    await session.caches.localPrio.put(
+      'tradelocker-linked-account-${linkedAccount.id}',
+      dto,
+      lifetime: Duration(
+        minutes: 5,
+      ),
+    );
+
+    return dto;
   }
 
   Future<List<TradeDto>> getAllTrades(
@@ -246,7 +257,9 @@ class TradeLockerEndpoint extends Endpoint {
   }
 
   Future<List<TradelockerAccountInformation>> _getBalanceCurrency(
-      Session session, LinkedAccount linkedAccount) async {
+    Session session,
+    LinkedAccount linkedAccount,
+  ) async {
     String apiKey = linkedAccount.apiKey;
     String refreshToken = linkedAccount.refreshToken;
 
