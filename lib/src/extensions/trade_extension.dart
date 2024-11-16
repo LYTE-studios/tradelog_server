@@ -28,12 +28,8 @@ extension TradeExtension on TradeDto {
 
   static TradeDto fromTradeLocker(
     TradelockerPosition position,
-    Map<String, List<TradelockerOrder>> ordersByPosition,
   ) {
-    final associatedOrders = ordersByPosition[position.id] ?? [];
-
-    // Calculate realized P&L and ROI for the position
-    final realizedPl = position.calculateRealizedPl(associatedOrders);
+    final realizedPl = position.unrealizedPl;
 
     final Option option =
         position.side.toLowerCase() == 'buy' ? Option.long : Option.short;
