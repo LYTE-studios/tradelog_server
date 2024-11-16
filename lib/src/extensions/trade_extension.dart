@@ -36,8 +36,7 @@ extension TradeExtension on TradeDto {
 
     final totalInvestment = position.quantity * position.avgPrice;
 
-    final netRoi =
-        totalInvestment != 0 ? (realizedPl / totalInvestment) * 100 : 0.0;
+    final netRoi = totalInvestment != 0 ? (realizedPl / totalInvestment) : 0.0;
 
     TradeStatus status =
         position.quantity == 0 ? TradeStatus.closed : TradeStatus.open;
