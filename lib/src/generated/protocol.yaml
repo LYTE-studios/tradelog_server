@@ -22,6 +22,7 @@ profile:
   - updateProfile:
   - getProfile:
 statistics:
+  - getAccountBalanceChart:
   - getOverviewStatistics:
 trade:
   - addTrade:

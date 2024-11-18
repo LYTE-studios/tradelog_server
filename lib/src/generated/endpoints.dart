@@ -440,6 +440,16 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'statistics',
       endpoint: endpoints['statistics']!,
       methodConnectors: {
+        'getAccountBalanceChart': _i1.MethodConnector(
+          name: 'getAccountBalanceChart',
+          params: {},
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['statistics'] as _i8.StatisticsEndpoint)
+                  .getAccountBalanceChart(session),
+        ),
         'getOverviewStatistics': _i1.MethodConnector(
           name: 'getOverviewStatistics',
           params: {},
@@ -449,7 +459,7 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['statistics'] as _i8.StatisticsEndpoint)
                   .getOverviewStatistics(session),
-        )
+        ),
       },
     );
     connectors['trade'] = _i1.EndpointConnector(

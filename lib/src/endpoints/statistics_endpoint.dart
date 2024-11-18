@@ -1,10 +1,50 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:tradelog_server/src/endpoints/account_endpoint.dart';
 import 'package:tradelog_server/src/endpoints/global_endpoint.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 
 class StatisticsEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
+
+  Future<Map<DateTime, double>> getAccountBalanceChart(Session session) async {
+    Map<DateTime, double> chartMap = {};
+
+    // Retrieve cached trades or fetch fresh data if the cache is empty
+    List<TradeDto>? trades = await GlobalEndpoint().getTrades(session);
+
+    trades.sort((a, b) => b.openTime.compareTo(a.openTime));
+
+    List<LinkedAccountDto> accounts =
+        await AccountEndpoint().fetchAccounts(session);
+
+    double totalBalance = 0;
+
+    for (LinkedAccountDto account in accounts) {
+      double balance = 0;
+
+      for (double value in account.balance ?? []) {
+        balance += value;
+      }
+
+      totalBalance += balance;
+    }
+
+    for (TradeDto trade in trades) {
+      DateTime date = DateTime.utc(
+        trade.openTime.year,
+        trade.openTime.month,
+        trade.openTime.day,
+      );
+
+      totalBalance += trade.realizedPl ?? 0;
+
+      chartMap[date] = totalBalance;
+    }
+
+    // Return calculated statistics
+    return chartMap;
+  }
 
   Future<OverviewStatisticsDto> getOverviewStatistics(Session session) async {
     // Retrieve cached trades or fetch fresh data if the cache is empty
