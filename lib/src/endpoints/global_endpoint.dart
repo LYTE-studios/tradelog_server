@@ -66,7 +66,7 @@ class GlobalEndpoint extends Endpoint {
       'trades-${authenticated!.userId}',
       tradeListWrapper,
       lifetime: Duration(
-        minutes: 5,
+        minutes: 10,
       ),
     );
   }
