@@ -11,3 +11,4 @@ fields:
   longTradesAmount: int?
   averageHoldingTime: double? # Expressed in minutes
   profitFactor: double?
+  equityChartData: Map<DateTime, double>?

@@ -50,6 +50,8 @@ class StatisticsEndpoint extends Endpoint {
     // Retrieve cached trades or fetch fresh data if the cache is empty
     List<TradeDto>? trades = await GlobalEndpoint().getTrades(session);
 
+    Map<DateTime, double> chartData = await getAccountBalanceChart(session);
+
     // // Filter trades closed in the current month
     // final now = DateTime.now();
     // final currentMonthTrades = _filterTradesForCurrentMonth(trades, now);
@@ -68,6 +70,7 @@ class StatisticsEndpoint extends Endpoint {
       realizedReturnThisMonth: realizedReturnThisMonth,
       shortTradesAmount: shortTradesAmount,
       longTradesAmount: longTradesAmount,
+      equityChartData: chartData,
     );
   }
 
