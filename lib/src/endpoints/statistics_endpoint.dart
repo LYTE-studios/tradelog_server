@@ -10,19 +10,16 @@ class StatisticsEndpoint extends Endpoint {
     // Retrieve cached trades or fetch fresh data if the cache is empty
     List<TradeDto>? trades = await GlobalEndpoint().getTrades(session);
 
-    // Filter trades closed in the current month
-    final now = DateTime.now();
-    final currentMonthTrades = _filterTradesForCurrentMonth(trades, now);
+    // // Filter trades closed in the current month
+    // final now = DateTime.now();
+    // final currentMonthTrades = _filterTradesForCurrentMonth(trades, now);
 
     // Calculate statistics
-    final netProfitLossThisMonth = _calculateNetProfitLoss(currentMonthTrades);
-    final tradeWinRateThisMonth = _calculateTradeWinRate(currentMonthTrades);
-    final realizedReturnThisMonth =
-        _calculateRealizedReturn(currentMonthTrades);
-    final shortTradesAmount =
-        _countTradesByOption(currentMonthTrades, Option.short);
-    final longTradesAmount =
-        _countTradesByOption(currentMonthTrades, Option.long);
+    final netProfitLossThisMonth = _calculateNetProfitLoss(trades);
+    final tradeWinRateThisMonth = _calculateTradeWinRate(trades);
+    final realizedReturnThisMonth = _calculateRealizedReturn(trades);
+    final shortTradesAmount = _countTradesByOption(trades, Option.short);
+    final longTradesAmount = _countTradesByOption(trades, Option.long);
 
     // Return calculated statistics
     return OverviewStatisticsDto(
