@@ -701,6 +701,8 @@ class TradeLockerEndpoint extends Endpoint {
     account.apiKey = accessToken;
     account.refreshToken = refreshToken;
 
+    await LinkedAccount.db.updateRow(session, account);
+
     return account;
   }
 
