@@ -655,12 +655,6 @@ class TradeLockerEndpoint extends Endpoint {
   ) async {
     var authenticated = await session.authenticated;
 
-    client = TradeLockerClient(
-      Configuration.tradelockerURI,
-      apiKey: '',
-      refreshToken: '',
-    );
-
     var linkedAccounts = await LinkedAccount.db.find(
       session,
       where: (o) => o.userInfoId.equals(authenticated!.userId),
@@ -672,6 +666,12 @@ class TradeLockerEndpoint extends Endpoint {
 
     // Step 1: Perform authentication
     for (var account in linkedAccounts) {
+      client = TradeLockerClient(
+        account.apiUrl,
+        apiKey: '',
+        refreshToken: '',
+      );
+
       var creds = await TradelockerCredentials.db.findFirstRow(
         session,
         where: (o) => o.id.equals(account.tradelockerCredentialsId),
