@@ -88,7 +88,14 @@ class TradeLockerClient {
       final expirationDate = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
 
       if (DateTime.now().isAfter(expirationDate)) {
-        TradeLockerEndpoint().reauthenticate(session);
+        LinkedAccount account =
+            await TradeLockerEndpoint().reauthenticateAccount(
+          session,
+          apiKey,
+        );
+
+        apiKey = account.apiKey;
+        refreshToken = account.refreshToken;
       }
     } catch (e) {
       throw Exception('Error decoding refreshToken: $e');

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:sentry/sentry.dart';
@@ -648,6 +649,59 @@ class TradeLockerEndpoint extends Endpoint {
     }
 
     return await accountsFuture.future;
+  }
+
+  Future<LinkedAccount> reauthenticateAccount(
+    Session session,
+    String apiKey,
+  ) async {
+    List<LinkedAccount> linkedAccounts = await LinkedAccount.db.find(
+      session,
+      where: (o) => o.apiKey.equals(apiKey),
+    );
+
+    LinkedAccount account = linkedAccounts.first;
+
+    linkedAccounts.remove(account);
+
+    await LinkedAccount.db.delete(session, linkedAccounts);
+
+    if (linkedAccounts.isEmpty) {
+      throw GeneralTradelyException('No Account found with apiKey: $apiKey');
+    }
+
+    client = TradeLockerClient(
+      account.apiUrl,
+      apiKey: '',
+      refreshToken: '',
+    );
+
+    var creds = await TradelockerCredentials.db.findFirstRow(
+      session,
+      where: (o) => o.id.equals(account.tradelockerCredentialsId),
+    );
+
+    if (creds == null) {
+      throw Exception(
+        'Credentials not found for linked account ${account.id}',
+      );
+    }
+
+    final data = await _performAuthentication(
+      session,
+      client,
+      creds.email,
+      creds.password,
+      creds.server,
+    );
+
+    final accessToken = data['accessToken'] as String;
+    final refreshToken = data['refreshToken'] as String;
+
+    account.apiKey = accessToken;
+    account.refreshToken = refreshToken;
+
+    return account;
   }
 
   Future<void> reauthenticate(
