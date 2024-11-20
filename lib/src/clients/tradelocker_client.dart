@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
@@ -87,8 +88,7 @@ class TradeLockerClient {
       final expirationDate = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
 
       if (DateTime.now().isAfter(expirationDate)) {
-        throw Exception('Refresh token has expired');
-        //await TradeLockerEndpoint().authenticate(session, email, password, server)
+        TradeLockerEndpoint().reauthenticate(session);
       }
     } catch (e) {
       throw Exception('Error decoding refreshToken: $e');
