@@ -346,16 +346,8 @@ class TradeLockerEndpoint extends Endpoint {
     DateTime? from,
     DateTime? to,
   }) async {
-    // Fetch positions and orders from the external API (rate-limited)
-    List<TradelockerPosition> positions = await _getPositionsWithRateLimit(
-      session,
-      accountId: accountId,
-      accNum: accNum,
-      from: from,
-      to: to,
-    );
-
-    // List<TradelockerOrder> orders = await _getOrdersHistoryWithRateLimit(
+    // // Fetch positions and orders from the external API (rate-limited)
+    // List<TradelockerPosition> positions = await _getPositionsWithRateLimit(
     //   session,
     //   accountId: accountId,
     //   accNum: accNum,
@@ -363,19 +355,27 @@ class TradeLockerEndpoint extends Endpoint {
     //   to: to,
     // );
 
+    List<TradelockerOrder> orders = await _getOrdersHistoryWithRateLimit(
+      session,
+      accountId: accountId,
+      accNum: accNum,
+      from: from,
+      to: to,
+    );
+
     final List<TradeDto> trades = [];
 
-    // for (TradelockerOrder order in orders) {
-    //   TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
-
-    //   trades.add(dto);
-    // }
-
-    for (TradelockerPosition position in positions) {
-      TradeDto dto = TradeExtension.fromTradeLocker(position);
+    for (TradelockerOrder order in orders) {
+      TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
 
       trades.add(dto);
     }
+
+    // for (TradelockerPosition position in positions) {
+    //   TradeDto dto = TradeExtension.fromTradeLocker(position);
+
+    //   trades.add(dto);
+    // }
 
     // Return the combined list of open and closed trades
     return trades;
@@ -383,19 +383,19 @@ class TradeLockerEndpoint extends Endpoint {
 
   /// Private Helper Functions
 
-  // Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
-  //   List<TradelockerOrder> orders,
-  // ) {
-  //   final Map<String, List<TradelockerOrder>> ordersByPosition = {};
+  Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
+    List<TradelockerOrder> orders,
+  ) {
+    final Map<String, List<TradelockerOrder>> ordersByPosition = {};
 
-  //   for (var order in orders) {
-  //     if (order.positionId != null) {
-  //       ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
-  //     }
-  //   }
+    for (var order in orders) {
+      if (order.positionId != null) {
+        ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
+      }
+    }
 
-  //   return ordersByPosition;
-  // }
+    return ordersByPosition;
+  }
 
   Future<List<TradelockerPosition>> _getPositionsWithRateLimit(
     Session session, {

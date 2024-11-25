@@ -6,10 +6,17 @@ extension TradeExtension on TradeDto {
   static TradeDto fromTradeLockerOrder(
     TradelockerOrder order,
   ) {
+    final realizedPl = order.stopPrice;
+
     final Option option =
         order.side.toLowerCase() == 'buy' ? Option.long : Option.short;
 
     TradeStatus status = !order.isOpen ? TradeStatus.closed : TradeStatus.open;
+
+    final totalInvestment = order.qty * order.avgPrice;
+
+    final netRoi =
+        totalInvestment != 0 ? ((realizedPl ?? 0) / totalInvestment) : 0.0;
 
     // Sub-request: Fetch symbol for each position, queued and rate-limited
     final String symbol =
@@ -19,7 +26,7 @@ extension TradeExtension on TradeDto {
       status: status,
       symbol: symbol,
       option: option,
-      netRoi: null,
+      netRoi: netRoi,
       realizedPl: null,
       openTime: order.createdDate,
       lotSize: order.filledQty,
