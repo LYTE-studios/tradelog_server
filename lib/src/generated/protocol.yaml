@@ -1,10 +1,12 @@
 account:
+  - removeAccount:
   - fetchAccounts:
 file:
   - getUploadDescription:
   - verifyUpload:
 global:
   - getTrades:
+  - refreshCaches:
 metaApi:
   - initializeClient:
   - authenticate:
@@ -36,4 +38,5 @@ tradeLocker:
   - getAccountDto:
   - getAllTrades:
   - getRawOrders:
+  - reauthenticateAccount:
   - reauthenticate:
