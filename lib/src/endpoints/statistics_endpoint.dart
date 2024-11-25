@@ -46,9 +46,17 @@ class StatisticsEndpoint extends Endpoint {
     return chartMap;
   }
 
-  Future<OverviewStatisticsDto> getOverviewStatistics(Session session) async {
+  Future<OverviewStatisticsDto> getOverviewStatistics(
+    Session session, {
+    DateTime? from,
+    DateTime? to,
+  }) async {
     // Retrieve cached trades or fetch fresh data if the cache is empty
-    List<TradeDto>? trades = await GlobalEndpoint().getTrades(session);
+    List<TradeDto>? trades = await GlobalEndpoint().getTrades(
+      session,
+      from: from,
+      to: to,
+    );
 
     Map<DateTime, double> chartData = await getAccountBalanceChart(session);
 

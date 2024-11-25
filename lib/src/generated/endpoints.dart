@@ -480,13 +480,28 @@ class Endpoints extends _i1.EndpointDispatch {
         ),
         'getOverviewStatistics': _i1.MethodConnector(
           name: 'getOverviewStatistics',
-          params: {},
+          params: {
+            'from': _i1.ParameterDescription(
+              name: 'from',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'to': _i1.ParameterDescription(
+              name: 'to',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+          },
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
               (endpoints['statistics'] as _i8.StatisticsEndpoint)
-                  .getOverviewStatistics(session),
+                  .getOverviewStatistics(
+            session,
+            from: params['from'],
+            to: params['to'],
+          ),
         ),
       },
     );
