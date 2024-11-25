@@ -362,7 +362,7 @@ class TradeLockerEndpoint extends Endpoint {
 
     final List<TradeDto> trades = [];
 
-    for (TradelockerOrder order in orders) {
+    for (TradelockerOrder order in _groupOrdersByPosition(orders).values) {
       TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
 
       trades.add(dto);
@@ -380,14 +380,14 @@ class TradeLockerEndpoint extends Endpoint {
 
   /// Private Helper Functions
 
-  Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
+  Map<String, TradelockerOrder> _groupOrdersByPosition(
     List<TradelockerOrder> orders,
   ) {
-    final Map<String, List<TradelockerOrder>> ordersByPosition = {};
+    final Map<String, TradelockerOrder> ordersByPosition = {};
 
     for (var order in orders) {
       if (order.positionId != null) {
-        ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
+        ordersByPosition[order.positionId!] = order;
       }
     }
 
