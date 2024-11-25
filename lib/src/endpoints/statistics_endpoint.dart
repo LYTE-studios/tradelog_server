@@ -37,7 +37,7 @@ class StatisticsEndpoint extends Endpoint {
         trade.openTime.day,
       );
 
-      totalBalance += trade.realizedPl ?? 0;
+      totalBalance -= trade.realizedPl ?? 0;
 
       chartMap[date] = totalBalance;
     }
