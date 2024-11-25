@@ -1,12 +1,13 @@
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/extensions/tradelocker_extension.dart';
 import 'package:tradelog_server/src/util/instruments.dart';
 
 extension TradeExtension on TradeDto {
   static TradeDto fromTradeLockerOrder(
     TradelockerOrder order,
   ) {
-    final realizedPl = order.stopPrice;
+    double realizedPl = order.stopPrice == null
+        ? 0
+        : (order.price - (order.stopPrice ?? 0)) * order.qty;
 
     final Option option =
         order.side.toLowerCase() == 'buy' ? Option.long : Option.short;
@@ -15,8 +16,7 @@ extension TradeExtension on TradeDto {
 
     final totalInvestment = order.qty * order.avgPrice;
 
-    final netRoi =
-        totalInvestment != 0 ? ((realizedPl ?? 0) / totalInvestment) : 0.0;
+    final netRoi = totalInvestment != 0 ? (realizedPl / totalInvestment) : 0.0;
 
     // Sub-request: Fetch symbol for each position, queued and rate-limited
     final String symbol =
@@ -27,7 +27,7 @@ extension TradeExtension on TradeDto {
       symbol: symbol,
       option: option,
       netRoi: netRoi,
-      realizedPl: null,
+      realizedPl: realizedPl,
       openTime: order.createdDate,
       lotSize: order.filledQty,
     );
