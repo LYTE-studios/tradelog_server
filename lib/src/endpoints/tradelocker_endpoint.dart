@@ -105,14 +105,11 @@ class TradeLockerEndpoint extends Endpoint {
     // Find linked accounts associated with the current credentials
     var linkedAccount = await LinkedAccount.db.findFirstRow(
       session,
-      where: (o) =>
-          o.apiKey.equals(apiKey) & o.userInfoId.equals(authenticated!.userId),
+      where: (o) => o.apiKey.equals(apiKey),
     );
 
     if (linkedAccount == null) {
-      throw GeneralTradelyException(
-        'Linked account not found for credentials with userID: ${authenticated!.userId}',
-      );
+      throw GeneralTradelyException('No Account found');
     }
 
     await initializeClient(
