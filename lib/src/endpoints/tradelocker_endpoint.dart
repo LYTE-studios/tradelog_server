@@ -663,13 +663,13 @@ class TradeLockerEndpoint extends Endpoint {
       where: (o) => o.apiKey.equals(apiKey),
     );
 
-    LinkedAccount account = linkedAccounts.first;
+    LinkedAccount? account = linkedAccounts.firstOrNull;
 
     linkedAccounts.remove(account);
 
     await LinkedAccount.db.delete(session, linkedAccounts);
 
-    if (linkedAccounts.isEmpty) {
+    if (account == null) {
       throw GeneralTradelyException('No Account found with apiKey: $apiKey');
     }
 
@@ -678,7 +678,6 @@ class TradeLockerEndpoint extends Endpoint {
       apiKey: '',
       refreshToken: '',
     );
-
     var creds = await TradelockerCredentials.db.findFirstRow(
       session,
       where: (o) => o.id.equals(account.tradelockerCredentialsId),
