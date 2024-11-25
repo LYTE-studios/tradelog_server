@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:sentry/sentry.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
+import 'package:tradelog_server/src/endpoints/global_endpoint.dart';
 import 'package:tradelog_server/src/exceptions/general_tradely_exception.dart';
 import 'package:tradelog_server/src/exceptions/network_tradely_exception.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
@@ -87,6 +88,8 @@ class TradeLockerEndpoint extends Endpoint {
       email: email,
       title: title,
     );
+
+    await GlobalEndpoint.refreshCaches(session);
 
     return accessToken;
   }

@@ -36,6 +36,14 @@ class GlobalEndpoint extends Endpoint {
     return cachedTrades;
   }
 
+  static Future<void> refreshCaches(Session session) async {
+    var authenticated = await session.authenticated;
+
+    await session.caches.localPrio.invalidateKey(
+      'trades-${authenticated!.userId}',
+    );
+  }
+
   /// Fetches the cached trades. Returns [null] if none are found
   static Future<List<TradeDto>?> _getCachedTrades(
     Session session,
