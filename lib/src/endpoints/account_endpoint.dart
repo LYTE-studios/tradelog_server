@@ -8,8 +8,12 @@ class AccountEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<void> removeAccount(Session session, LinkedAccount account) async {
-    await LinkedAccount.db.deleteRow(session, account);
+  Future<void> removeAccount(Session session, int accountId) async {
+    AuthenticationInfo? authInfo = await session.authenticated;
+
+    await LinkedAccount.db.deleteWhere(session,
+        where: (t) =>
+            t.id.equals(accountId) & t.userInfoId.equals(authInfo!.userId));
   }
 
   Future<List<LinkedAccountDto>> fetchAccounts(Session session) async {

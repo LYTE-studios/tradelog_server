@@ -89,7 +89,7 @@ class TradeLockerEndpoint extends Endpoint {
       title: title,
     );
 
-    await GlobalEndpoint.refreshCaches(session);
+    await GlobalEndpoint().refreshCaches(session);
 
     return accessToken;
   }

@@ -36,7 +36,7 @@ class GlobalEndpoint extends Endpoint {
     return cachedTrades;
   }
 
-  static Future<void> refreshCaches(Session session) async {
+  Future<void> refreshCaches(Session session) async {
     var authenticated = await session.authenticated;
 
     await session.caches.localPrio.invalidateKey(
