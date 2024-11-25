@@ -2,35 +2,42 @@ import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/util/instruments.dart';
 
 extension TradeExtension on TradeDto {
+  void calculateProfits(double price, double stopPrice, double quantity) {
+    if (option == Option.long) {
+      realizedPl = (stopPrice - price) * quantity;
+    } else {
+      realizedPl = (price - stopPrice) * quantity;
+    }
+    double totalInvestment = quantity * price;
+
+    netRoi = totalInvestment != 0 ? ((realizedPl ?? 0) / totalInvestment) : 0.0;
+  }
+
   static TradeDto fromTradeLockerOrder(
     TradelockerOrder order,
   ) {
-    double realizedPl = order.stopPrice == null
-        ? 0
-        : (order.price - (order.stopPrice ?? 0)) * order.qty;
+    TradeStatus status = !order.isOpen ? TradeStatus.closed : TradeStatus.open;
 
     final Option option =
         order.side.toLowerCase() == 'buy' ? Option.long : Option.short;
-
-    TradeStatus status = !order.isOpen ? TradeStatus.closed : TradeStatus.open;
-
-    final totalInvestment = order.qty * order.avgPrice;
-
-    final netRoi = totalInvestment != 0 ? (realizedPl / totalInvestment) : 0.0;
 
     // Sub-request: Fetch symbol for each position, queued and rate-limited
     final String symbol =
         Instrument.instrumentMap[order.tradableInstrumentId] ?? 'unknown';
 
-    return TradeDto(
+    TradeDto dto = TradeDto(
       status: status,
       symbol: symbol,
       option: option,
-      netRoi: netRoi,
-      realizedPl: realizedPl,
+      // netRoi: netRoi,
+      // realizedPl: realizedPl,
       openTime: order.createdDate,
       lotSize: order.filledQty,
     );
+
+    dto.calculateProfits(order.price, order.stopPrice ?? 0, order.qty);
+
+    return dto;
   }
 
   static TradeDto fromTradeLocker(
