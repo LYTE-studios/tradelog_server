@@ -19,14 +19,14 @@ import '../endpoints/profile_endpoint.dart' as _i7;
 import '../endpoints/statistics_endpoint.dart' as _i8;
 import '../endpoints/trade_endpoint.dart' as _i9;
 import '../endpoints/tradelocker_endpoint.dart' as _i10;
-import 'package:tradelog_server/src/generated/tables/linked_account.dart'
-    as _i11;
-import 'package:tradelog_server/src/generated/tables/note.dart' as _i12;
+import 'package:tradelog_server/src/generated/tables/note.dart' as _i11;
 import 'package:tradelog_server/src/generated/profile/tradely_profile.dart'
-    as _i13;
+    as _i12;
 import 'package:tradelog_server/src/generated/dto/trades/trade_dto.dart'
-    as _i14;
-import 'package:tradelog_server/src/generated/tables/trade.dart' as _i15;
+    as _i13;
+import 'package:tradelog_server/src/generated/tables/trade.dart' as _i14;
+import 'package:tradelog_server/src/generated/tables/linked_account.dart'
+    as _i15;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i16;
 
 class Endpoints extends _i1.EndpointDispatch {
@@ -95,9 +95,9 @@ class Endpoints extends _i1.EndpointDispatch {
         'removeAccount': _i1.MethodConnector(
           name: 'removeAccount',
           params: {
-            'account': _i1.ParameterDescription(
-              name: 'account',
-              type: _i1.getType<_i11.LinkedAccount>(),
+            'accountId': _i1.ParameterDescription(
+              name: 'accountId',
+              type: _i1.getType<int>(),
               nullable: false,
             )
           },
@@ -107,7 +107,7 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['account'] as _i2.AccountEndpoint).removeAccount(
             session,
-            params['account'],
+            params['accountId'],
           ),
         ),
         'fetchAccounts': _i1.MethodConnector(
@@ -389,7 +389,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'note': _i1.ParameterDescription(
               name: 'note',
-              type: _i1.getType<_i12.Note>(),
+              type: _i1.getType<_i11.Note>(),
               nullable: false,
             )
           },
@@ -407,7 +407,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'note': _i1.ParameterDescription(
               name: 'note',
-              type: _i1.getType<_i12.Note>(),
+              type: _i1.getType<_i11.Note>(),
               nullable: false,
             )
           },
@@ -440,7 +440,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'profile': _i1.ParameterDescription(
               name: 'profile',
-              type: _i1.getType<_i13.TradelyProfile>(),
+              type: _i1.getType<_i12.TradelyProfile>(),
               nullable: false,
             )
           },
@@ -499,7 +499,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'dto': _i1.ParameterDescription(
               name: 'dto',
-              type: _i1.getType<_i14.TradeDto>(),
+              type: _i1.getType<_i13.TradeDto>(),
               nullable: false,
             )
           },
@@ -517,7 +517,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'trade': _i1.ParameterDescription(
               name: 'trade',
-              type: _i1.getType<_i15.Trade>(),
+              type: _i1.getType<_i14.Trade>(),
               nullable: false,
             )
           },
@@ -660,7 +660,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'linkedAccount': _i1.ParameterDescription(
               name: 'linkedAccount',
-              type: _i1.getType<_i11.LinkedAccount>(),
+              type: _i1.getType<_i15.LinkedAccount>(),
               nullable: false,
             )
           },
@@ -704,7 +704,7 @@ class Endpoints extends _i1.EndpointDispatch {
           params: {
             'account': _i1.ParameterDescription(
               name: 'account',
-              type: _i1.getType<_i11.LinkedAccount>(),
+              type: _i1.getType<_i15.LinkedAccount>(),
               nullable: false,
             )
           },
