@@ -8,11 +8,45 @@ class StatisticsEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<Map<DateTime, double>> getAccountBalanceChart(Session session) async {
+  Future<Map<DateTime, double>> getPnlChart(Session session) async {
     Map<DateTime, double> chartMap = {};
 
     // Retrieve cached trades or fetch fresh data if the cache is empty
     List<TradeDto>? trades = await GlobalEndpoint().getTrades(session);
+
+    trades.sort((a, b) => b.openTime.compareTo(a.openTime));
+
+    double currentPnl = 0;
+
+    for (TradeDto trade in trades) {
+      DateTime date = DateTime.utc(
+        trade.openTime.year,
+        trade.openTime.month,
+        trade.openTime.day,
+      );
+
+      currentPnl += trade.realizedPl ?? 0;
+
+      chartMap[date] = currentPnl;
+    }
+
+    // Return calculated statistics
+    return chartMap;
+  }
+
+  Future<Map<DateTime, double>> getAccountBalanceChart(
+    Session session, {
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    Map<DateTime, double> chartMap = {};
+
+    // Retrieve cached trades or fetch fresh data if the cache is empty
+    List<TradeDto>? trades = await GlobalEndpoint().getTrades(
+      session,
+      from: from,
+      to: to,
+    );
 
     trades.sort((a, b) => b.openTime.compareTo(a.openTime));
 
@@ -125,10 +159,11 @@ class StatisticsEndpoint extends Endpoint {
     );
   }
 
-  Future<StatisticsDto> getDiaryStatistics(Session session, {
+  Future<StatisticsDto> getDiaryStatistics(
+    Session session, {
     DateTime? from,
     DateTime? to,
-  }) async { 
+  }) async {
     List<TradeDto>? trades = await GlobalEndpoint().getTrades(
       session,
       from: from,

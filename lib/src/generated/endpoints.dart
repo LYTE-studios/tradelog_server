@@ -504,15 +504,40 @@ class Endpoints extends _i1.EndpointDispatch {
       name: 'statistics',
       endpoint: endpoints['statistics']!,
       methodConnectors: {
-        'getAccountBalanceChart': _i1.MethodConnector(
-          name: 'getAccountBalanceChart',
+        'getPnlChart': _i1.MethodConnector(
+          name: 'getPnlChart',
           params: {},
           call: (
             _i1.Session session,
             Map<String, dynamic> params,
           ) async =>
               (endpoints['statistics'] as _i8.StatisticsEndpoint)
-                  .getAccountBalanceChart(session),
+                  .getPnlChart(session),
+        ),
+        'getAccountBalanceChart': _i1.MethodConnector(
+          name: 'getAccountBalanceChart',
+          params: {
+            'from': _i1.ParameterDescription(
+              name: 'from',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'to': _i1.ParameterDescription(
+              name: 'to',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['statistics'] as _i8.StatisticsEndpoint)
+                  .getAccountBalanceChart(
+            session,
+            from: params['from'],
+            to: params['to'],
+          ),
         ),
         'getOverviewStatistics': _i1.MethodConnector(
           name: 'getOverviewStatistics',
