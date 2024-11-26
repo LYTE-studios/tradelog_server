@@ -9,12 +9,18 @@ class TradeAnalyzer {
 
   // Method to calculate net profit/loss (realizedPl)
   double calculateRealizedPl(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0.0;
+    }
+
     return trades.fold(0.0, (sum, trade) => sum + trade.realizedPl!);
   }
 
   // Method to calculate the trade win rate percentage
   double calculateWinRate(List<TradeDto> trades) {
-    if (trades.isEmpty) return 0.0;
+    if (trades.isEmpty) {
+      return 0.0;
+    }
 
     int winCount = trades.where((trade) => trade.realizedPl! > 0).length;
     return (winCount / trades.length) * 100;
@@ -22,6 +28,9 @@ class TradeAnalyzer {
 
   // Method to calculate the average risk/reward (R:R) ratio
   double calculateAverageRR(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0.0;
+    }
     List<double?> winningTrades = trades
         .where((trade) => trade.realizedPl! > 0)
         .map((trade) => trade.realizedPl)
@@ -44,10 +53,17 @@ class TradeAnalyzer {
   }
 
   int calculateBreakEvenTrades(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0;
+    }
     return trades.where((trade) => trade.realizedPl == 0).length;
   }
 
   int calculateMaxConsecutiveLosses(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0;
+    }
+
     int maxConsecutiveLosses = 0;
     int currentLossStreak = 0;
 
@@ -66,6 +82,9 @@ class TradeAnalyzer {
   }
 
   int calculateMaxWinStreak(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0;
+    }
     int maxWinStreak = 0;
     int currentWinStreak = 0;
 
@@ -106,7 +125,9 @@ class TradeAnalyzer {
   // }
 
   double? calculateLargestProfit(List<TradeDto> trades) {
-    if (trades.isEmpty) return 0.0;
+    if (trades.isEmpty) {
+      return 0.0;
+    }
 
     return trades
         .map((trade) => trade.realizedPl)
@@ -114,6 +135,10 @@ class TradeAnalyzer {
   }
 
   double calculateBestTradingMonth(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0.0;
+    }
+
     Map<String, double> monthProfits = {};
 
     for (var trade in trades) {
@@ -132,6 +157,10 @@ class TradeAnalyzer {
   }
 
   double calculateWorstTradingMonth(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0.0;
+    }
+
     Map<String, double> monthProfits = {};
 
     for (var trade in trades) {
@@ -150,6 +179,10 @@ class TradeAnalyzer {
   }
 
   double calculateAverageTradingMonth(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0.0;
+    }
+
     Map<String, double> monthProfits = {};
 
     for (var trade in trades) {
@@ -167,6 +200,10 @@ class TradeAnalyzer {
   }
 
   double calculateAverageWinningTrade(List<TradeDto> trades) {
+    if (trades.isEmpty) {
+      return 0.0;
+    }
+
     List<double?> winningTrades = trades
         .where((trade) => trade.realizedPl! > 0)
         .map((trade) => trade.realizedPl)
