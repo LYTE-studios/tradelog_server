@@ -8,11 +8,19 @@ class StatisticsEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<Map<DateTime, double>> getPnlChart(Session session) async {
+  Future<Map<DateTime, double>> getPnlChart(
+    Session session, {
+    DateTime? from,
+    DateTime? to,
+  }) async {
     Map<DateTime, double> chartMap = {};
 
     // Retrieve cached trades or fetch fresh data if the cache is empty
-    List<TradeDto>? trades = await GlobalEndpoint().getTrades(session);
+    List<TradeDto>? trades = await GlobalEndpoint().getTrades(
+      session,
+      from: from,
+      to: to,
+    );
 
     trades.sort((a, b) => b.openTime.compareTo(a.openTime));
 
