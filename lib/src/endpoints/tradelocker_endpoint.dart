@@ -1,8 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:sentry/sentry.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/endpoints/global_endpoint.dart';
@@ -11,7 +9,6 @@ import 'package:tradelog_server/src/exceptions/network_tradely_exception.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/extensions/trade_extension.dart';
 import 'package:tradelog_server/src/extensions/tradelocker_extension.dart';
-import 'package:tradelog_server/src/util/request_queue.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
 
 class TradeLockerEndpoint extends Endpoint {
@@ -363,42 +360,29 @@ class TradeLockerEndpoint extends Endpoint {
     //final List<TradeDto> trades = [];
 
     // Group orders by positionId
-  Map<String, List<TradelockerOrder>> groupedOrders = _groupOrdersByPosition(orders);
+    Map<String, List<TradelockerOrder>> groupedOrders =
+        _groupOrdersByPosition(orders);
 
-  final List<TradeDto> trades = [];
+    final List<TradeDto> trades = [];
 
-  for (var positionOrders in groupedOrders.values) {
-    // Sort orders chronologically for each position
-    positionOrders.sort((a, b) => a.createdDate.compareTo(b.createdDate));
+    for (var positionOrders in groupedOrders.values) {
+      // Sort orders chronologically for each position
+      positionOrders.sort((a, b) => a.createdDate.compareTo(b.createdDate));
 
-    // Calculate hold time (difference between the first and last order)
-    double holdTime = positionOrders.last.createdDate
-        .difference(positionOrders.first.createdDate)
-        .inMinutes
-        .toDouble();
+      // Calculate hold time (difference between the first and last order)
+      double holdTime = positionOrders.last.createdDate
+          .difference(positionOrders.first.createdDate)
+          .inMinutes
+          .toDouble();
 
-    for (var order in positionOrders) {
       // Use a TradeExtension-like method for consistency
-      TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
+      TradeDto dto = TradeExtension.fromTradeLockerOrder(positionOrders.first);
 
       // Update the hold time for the TradeDto
       dto.holdTime = holdTime;
 
       trades.add(dto);
     }
-  }
-
-    // for (TradelockerOrder order in _groupOrdersByPosition(orders).values) {
-    //   TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
-
-    //   trades.add(dto);
-    // }
-
-    // for (TradelockerPosition position in positions) {
-    //   TradeDto dto = TradeExtension.fromTradeLocker(position);
-
-    //   trades.add(dto);
-    // }
 
     // Return the combined list of open and closed trades
     return trades;
@@ -407,18 +391,18 @@ class TradeLockerEndpoint extends Endpoint {
   /// Private Helper Functions
 
   Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
-  List<TradelockerOrder> orders,
-) {
-  final Map<String, List<TradelockerOrder>> ordersByPosition = {};
+    List<TradelockerOrder> orders,
+  ) {
+    final Map<String, List<TradelockerOrder>> ordersByPosition = {};
 
-  for (var order in orders) {
-    if (order.positionId != null) {
-      ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
+    for (var order in orders) {
+      if (order.positionId != null) {
+        ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
+      }
     }
-  }
 
-  return ordersByPosition;
-}
+    return ordersByPosition;
+  }
 
   Future<List<TradelockerPosition>> _getPositionsWithRateLimit(
     Session session, {

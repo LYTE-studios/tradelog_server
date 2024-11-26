@@ -88,7 +88,7 @@ class GlobalEndpoint extends Endpoint {
     Session session,
   ) async {
     var authenticated = await session.authenticated;
-
+    
     if (authenticated == null) {
       throw GeneralTradelyException('User not authenticated');
     }
@@ -100,7 +100,7 @@ class GlobalEndpoint extends Endpoint {
       var metaTrades = await MetaApiEndpoint().getAllTrades(
         session,
       );
-      
+
       trades.addAll(metaTrades);
     } catch (e) {
       session.log('Error fetching trades from MetaTrader: $e');
