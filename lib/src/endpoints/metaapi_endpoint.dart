@@ -213,27 +213,48 @@ class MetaApiEndpoint extends Endpoint {
     );
 
     // Group orders by positionId
-    Map<String, List<MetatraderOrder>> ordersByPosition = {};
+    Map<String, List<MetatraderOrder>> groupedOrders =
+        _groupOrdersByPosition(orders);
+
+    // Convert grouped orders into TradeDto objects
+    final List<TradeDto> trades = [];
+    for (var positionOrders in groupedOrders.values) {
+      // Sort orders chronologically for each position
+      positionOrders.sort((a, b) => a.doneTime!.compareTo(b.doneTime!));
+
+      // Calculate hold time (difference between the first and last order)
+      double holdTime = positionOrders.last.doneTime!
+          .difference(positionOrders.first.doneTime!)
+          .inMinutes
+          .toDouble();
+
+      // Use the first order as the base for TradeDto
+      var firstOrder = positionOrders.first;
+
+      // Create TradeDto using the first order
+      TradeDto dto = TradeExtension.fromMetaTraderOrder(firstOrder);
+
+      // Set the calculated hold time
+      dto.holdTime = holdTime;
+
+      trades.add(dto);
+    }
+
+    return trades;
+  }
+
+  Map<String, List<MetatraderOrder>> _groupOrdersByPosition(
+    List<MetatraderOrder> orders,
+  ) {
+    final Map<String, List<MetatraderOrder>> ordersByPosition = {};
+
     for (var order in orders) {
       if (order.positionId != null) {
         ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
       }
     }
 
-    // Convert grouped orders into TradeDto objects
-    final List<TradeDto> trades = [];
-    for (var positionOrders in ordersByPosition.values) {
-      // Process orders in chronological order
-      positionOrders.sort((a, b) => a.doneTime!.compareTo(b.doneTime!));
-
-      for (var order in positionOrders) {
-        // Use a TradeExtension-like method for consistency
-        TradeDto dto = TradeExtension.fromMetaTraderOrder(order);
-        trades.add(dto);
-      }
-    }
-
-    return trades;
+    return ordersByPosition;
   }
 
   /// Retrieves the list of open orders for the specified MetaTrader account.
