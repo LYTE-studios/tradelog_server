@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
@@ -12,7 +11,7 @@ import 'package:tradelog_server/src/util/request_queue.dart';
 class TradeLockerClient {
   Dio _dio;
 
-  RequestQueue queue = RequestQueue(maxRequestsPerSecond: 2);
+  RequestQueue queue = RequestQueue(maxRequestsPerSecond: 5);
 
   final String baseUrl;
 
