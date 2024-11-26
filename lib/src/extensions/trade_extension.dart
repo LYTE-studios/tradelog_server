@@ -25,8 +25,6 @@ extension TradeExtension on TradeDto {
     final String symbol =
         Instrument.instrumentMap[order.tradableInstrumentId] ?? 'unknown';
     
-    final holdTime = order.lastModified.difference(order.createdDate).inMinutes.toDouble();
-
     TradeDto dto = TradeDto(
       status: status,
       symbol: symbol,
@@ -34,7 +32,6 @@ extension TradeExtension on TradeDto {
       // netRoi: netRoi,
       // realizedPl: realizedPl,
       openTime: order.createdDate,
-      holdTime: holdTime,
       lotSize: order.filledQty,
     );
 
@@ -88,16 +85,12 @@ extension TradeExtension on TradeDto {
     // Fetch symbol for the trade
     final String symbol = order.symbol;
 
-    // Calculate holdTime in minutes
-    final double holdTime = order.doneTime == null ? 0.0 : order.doneTime!.difference(order.time).inMinutes.toDouble();
-
     // Initialize TradeDto
     TradeDto dto = TradeDto(
       status: status,
       symbol: symbol,
       option: option,
       openTime: order.doneTime ?? DateTime.now(),
-      holdTime: holdTime,
       lotSize: order.volume,
     );
 

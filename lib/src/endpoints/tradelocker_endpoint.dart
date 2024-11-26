@@ -360,13 +360,39 @@ class TradeLockerEndpoint extends Endpoint {
       to: to,
     );
 
-    final List<TradeDto> trades = [];
+    //final List<TradeDto> trades = [];
 
-    for (TradelockerOrder order in _groupOrdersByPosition(orders).values) {
+    // Group orders by positionId
+  Map<String, List<TradelockerOrder>> groupedOrders = _groupOrdersByPosition(orders);
+
+  final List<TradeDto> trades = [];
+
+  for (var positionOrders in groupedOrders.values) {
+    // Sort orders chronologically for each position
+    positionOrders.sort((a, b) => a.createdDate.compareTo(b.createdDate));
+
+    // Calculate hold time (difference between the first and last order)
+    double holdTime = positionOrders.last.createdDate
+        .difference(positionOrders.first.createdDate)
+        .inMinutes
+        .toDouble();
+
+    for (var order in positionOrders) {
+      // Use a TradeExtension-like method for consistency
       TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
+
+      // Update the hold time for the TradeDto
+      dto.holdTime = holdTime;
 
       trades.add(dto);
     }
+  }
+
+    // for (TradelockerOrder order in _groupOrdersByPosition(orders).values) {
+    //   TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
+
+    //   trades.add(dto);
+    // }
 
     // for (TradelockerPosition position in positions) {
     //   TradeDto dto = TradeExtension.fromTradeLocker(position);
@@ -380,19 +406,19 @@ class TradeLockerEndpoint extends Endpoint {
 
   /// Private Helper Functions
 
-  Map<String, TradelockerOrder> _groupOrdersByPosition(
-    List<TradelockerOrder> orders,
-  ) {
-    final Map<String, TradelockerOrder> ordersByPosition = {};
+  Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
+  List<TradelockerOrder> orders,
+) {
+  final Map<String, List<TradelockerOrder>> ordersByPosition = {};
 
-    for (var order in orders) {
-      if (order.positionId != null) {
-        ordersByPosition[order.positionId!] = order;
-      }
+  for (var order in orders) {
+    if (order.positionId != null) {
+      ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
     }
-
-    return ordersByPosition;
   }
+
+  return ordersByPosition;
+}
 
   Future<List<TradelockerPosition>> _getPositionsWithRateLimit(
     Session session, {
