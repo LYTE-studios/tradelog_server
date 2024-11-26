@@ -8,34 +8,6 @@ class StatisticsEndpoint extends Endpoint {
   @override
   bool get requireLogin => true;
 
-  Future<Map<DateTime, double>> getPnlChart(
-    Session session, {
-    DateTime? from,
-    DateTime? to,
-  }) async {
-    Map<DateTime, double> chartMap = {};
-
-    // Retrieve cached trades or fetch fresh data if the cache is empty
-    List<TradeDto>? trades = await GlobalEndpoint().getTrades(
-      session,
-      from: from,
-      to: to,
-    );
-
-    trades.sort((a, b) => b.openTime.compareTo(a.openTime));
-
-    double currentPnl = 0;
-
-    for (TradeDto trade in trades) {
-      currentPnl += trade.realizedPl ?? 0;
-
-      chartMap[trade.openTime] = currentPnl;
-    }
-
-    // Return calculated statistics
-    return chartMap;
-  }
-
   Future<Map<DateTime, double>> getAccountBalanceChart(
     Session session, {
     DateTime? from,
@@ -134,6 +106,18 @@ class StatisticsEndpoint extends Endpoint {
     // final now = DateTime.now();
     // final currentMonthTrades = _filterTradesForCurrentMonth(trades, now);
 
+    Map<DateTime, double> chartMap = {};
+
+    trades.sort((a, b) => b.openTime.compareTo(a.openTime));
+
+    double currentPnl = 0;
+
+    for (TradeDto trade in trades) {
+      currentPnl += trade.realizedPl ?? 0;
+
+      chartMap[trade.openTime] = currentPnl;
+    }
+
     final analyzer = TradeAnalyzer();
 
     // Calculate statistics
@@ -158,6 +142,7 @@ class StatisticsEndpoint extends Endpoint {
       bestTradingMonth: bestMonth,
       worstTradingMonth: worstMonth,
       averageTradingMonth: averageMonth,
+      equityChart: chartMap,
     );
   }
 

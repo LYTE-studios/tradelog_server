@@ -761,6 +761,12 @@ class Protocol extends _i1.SerializationManagerServer {
               deserialize<DateTime>(e['k']), deserialize<double>(e['v']))))
           : null) as dynamic;
     }
+    if (t == _i1.getType<Map<DateTime, double>?>()) {
+      return (data != null
+          ? Map.fromEntries((data as List).map((e) => MapEntry(
+              deserialize<DateTime>(e['k']), deserialize<double>(e['v']))))
+          : null) as dynamic;
+    }
     if (t == _i1.getType<List<String>?>()) {
       return (data != null
           ? (data as List).map((e) => deserialize<String>(e)).toList()

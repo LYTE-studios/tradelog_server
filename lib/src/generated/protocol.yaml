@@ -25,7 +25,6 @@ profile:
   - updateProfile:
   - getProfile:
 statistics:
-  - getPnlChart:
   - getAccountBalanceChart:
   - getOverviewStatistics:
   - getStatistics:

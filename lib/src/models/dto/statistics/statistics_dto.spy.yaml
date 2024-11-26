@@ -14,3 +14,4 @@ fields:
   averageTradingMonth: double?
   maxWinStreak: int?
   averageWinStreak: double?
+  equityChart: Map<DateTime, double>?
