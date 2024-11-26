@@ -27,15 +27,9 @@ class StatisticsEndpoint extends Endpoint {
     double currentPnl = 0;
 
     for (TradeDto trade in trades) {
-      DateTime date = DateTime.utc(
-        trade.openTime.year,
-        trade.openTime.month,
-        trade.openTime.day,
-      );
-
       currentPnl += trade.realizedPl ?? 0;
 
-      chartMap[date] = currentPnl;
+      chartMap[trade.openTime] = currentPnl;
     }
 
     // Return calculated statistics
