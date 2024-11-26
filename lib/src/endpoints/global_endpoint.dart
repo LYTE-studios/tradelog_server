@@ -1,4 +1,5 @@
 import 'package:serverpod/serverpod.dart';
+import 'package:tradelog_server/src/endpoints/metaapi_endpoint.dart';
 import 'package:tradelog_server/src/endpoints/tradelocker_endpoint.dart';
 import 'package:tradelog_server/src/exceptions/general_tradely_exception.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
@@ -95,15 +96,12 @@ class GlobalEndpoint extends Endpoint {
     var trades = <TradeDto>[];
 
     try {
-      // TODO enable meta trades
-      // var metaTrades = await MetaApiEndpoint().getTrades(
-      //   session,
-      //   account.metaID!,
-      // );
-
-      //await MetaApiEndpoint().getTrades(session, account.metaID!);
-      //print(metaTrades);
-      // trades.addAll(metaTrades);
+      //TODO enable meta trades
+      var metaTrades = await MetaApiEndpoint().getAllTrades(
+        session,
+      );
+      
+      trades.addAll(metaTrades);
     } catch (e) {
       session.log('Error fetching trades from MetaTrader: $e');
     }

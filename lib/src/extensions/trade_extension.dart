@@ -24,6 +24,8 @@ extension TradeExtension on TradeDto {
     // Sub-request: Fetch symbol for each position, queued and rate-limited
     final String symbol =
         Instrument.instrumentMap[order.tradableInstrumentId] ?? 'unknown';
+    
+    final holdTime = order.lastModified.difference(order.createdDate).inMinutes.toDouble();
 
     TradeDto dto = TradeDto(
       status: status,
@@ -32,6 +34,7 @@ extension TradeExtension on TradeDto {
       // netRoi: netRoi,
       // realizedPl: realizedPl,
       openTime: order.createdDate,
+      holdTime: holdTime,
       lotSize: order.filledQty,
     );
 
@@ -70,39 +73,38 @@ extension TradeExtension on TradeDto {
     );
   }
 
-  static TradeDto fromMetaTrader(MetatraderPosition position) {
-    Option option = position.type == 'buy' ? Option.long : Option.short;
+  static TradeDto fromMetaTraderOrder(MetatraderOrder order) {
+    // Determine trade status
+    TradeStatus status = order.type == 'ORDER_TYPE_CLOSE'
+        ? TradeStatus.closed
+        : TradeStatus.open;
 
-    // Determine the trade status based on the volume; if volume is zero, position is closed
-    TradeStatus status =
-        position.volume == 0 ? TradeStatus.closed : TradeStatus.open;
+    // Determine option (long/short)
+    Option option = Option.short;
+    if (order.type == 'ORDER_TYPE_BUY' || order.type == 'ORDER_TYPE_BUY_LIMIT') {
+      option = Option.long;
+    }
 
-    // Calculate the Net Profit/Loss (realizedProfit if closed, else unrealizedProfit)
-    // double netPnl = status == TradeStatus.closed
-    //     ? position.realizedProfit
-    //     : position.unrealizedProfit;
+    // Fetch symbol for the trade
+    final String symbol = order.symbol;
 
-    // Handle cases where openPrice or volume might be zero to avoid division by zero errors
-    // double initialInvestment = position.openPrice * position.volume;
-    //
-    // double netroi =
-    //     (initialInvestment != 0) ? (netpl / initialInvestment) * 100 : 0.0;
+    // Calculate holdTime in minutes
+    final double holdTime = order.doneTime == null ? 0.0 : order.doneTime!.difference(order.time).inMinutes.toDouble();
 
-    // Fetch the corresponding open time from the position
-    DateTime openTime = position.time;
-
-    return TradeDto(
+    // Initialize TradeDto
+    TradeDto dto = TradeDto(
       status: status,
-      symbol: position.symbol,
+      symbol: symbol,
       option: option,
-      // TODO: calculate fee currency
-      feeCurrency: "\$",
-      fee: position.commission,
-      openTime: openTime,
-      lotSize: position.volume,
-      takeProfit: position.takeProfit,
-      stopLoss: position.stopLoss,
+      openTime: order.doneTime ?? DateTime.now(),
+      holdTime: holdTime,
+      lotSize: order.volume,
     );
+
+    // Calculate profits and ROI
+    dto.calculateProfits(order.openPrice ?? 0, order.stopLimitPrice ?? 0, order.volume);
+
+    return dto;
   }
 
   static TradeDto fromDefault(Trade trade) {

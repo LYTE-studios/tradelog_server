@@ -8,6 +8,8 @@
 // ignore_for_file: type_literal_in_constant_pattern
 // ignore_for_file: use_super_parameters
 
+// ignore_for_file: invalid_use_of_visible_for_testing_member
+
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:serverpod/serverpod.dart' as _i1;
 import 'package:serverpod_auth_server/serverpod_auth_server.dart' as _i2;
@@ -248,7 +250,7 @@ class NoteRepository {
   final attachRow = const NoteAttachRowRepository._();
 
   Future<List<Note>> find(
-    _i1.DatabaseAccessor databaseAccessor, {
+    _i1.Session session, {
     _i1.WhereExpressionBuilder<NoteTable>? where,
     int? limit,
     int? offset,
@@ -258,20 +260,20 @@ class NoteRepository {
     _i1.Transaction? transaction,
     NoteInclude? include,
   }) async {
-    return databaseAccessor.db.find<Note>(
+    return session.db.find<Note>(
       where: where?.call(Note.t),
       orderBy: orderBy?.call(Note.t),
       orderByList: orderByList?.call(Note.t),
       orderDescending: orderDescending,
       limit: limit,
       offset: offset,
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
       include: include,
     );
   }
 
   Future<Note?> findFirstRow(
-    _i1.DatabaseAccessor databaseAccessor, {
+    _i1.Session session, {
     _i1.WhereExpressionBuilder<NoteTable>? where,
     int? offset,
     _i1.OrderByBuilder<NoteTable>? orderBy,
@@ -280,121 +282,121 @@ class NoteRepository {
     _i1.Transaction? transaction,
     NoteInclude? include,
   }) async {
-    return databaseAccessor.db.findFirstRow<Note>(
+    return session.db.findFirstRow<Note>(
       where: where?.call(Note.t),
       orderBy: orderBy?.call(Note.t),
       orderByList: orderByList?.call(Note.t),
       orderDescending: orderDescending,
       offset: offset,
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
       include: include,
     );
   }
 
   Future<Note?> findById(
-    _i1.DatabaseAccessor databaseAccessor,
+    _i1.Session session,
     int id, {
     _i1.Transaction? transaction,
     NoteInclude? include,
   }) async {
-    return databaseAccessor.db.findById<Note>(
+    return session.db.findById<Note>(
       id,
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
       include: include,
     );
   }
 
   Future<List<Note>> insert(
-    _i1.DatabaseAccessor databaseAccessor,
+    _i1.Session session,
     List<Note> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return databaseAccessor.db.insert<Note>(
+    return session.db.insert<Note>(
       rows,
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 
   Future<Note> insertRow(
-    _i1.DatabaseAccessor databaseAccessor,
+    _i1.Session session,
     Note row, {
     _i1.Transaction? transaction,
   }) async {
-    return databaseAccessor.db.insertRow<Note>(
+    return session.db.insertRow<Note>(
       row,
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 
   Future<List<Note>> update(
-    _i1.DatabaseAccessor databaseAccessor,
+    _i1.Session session,
     List<Note> rows, {
     _i1.ColumnSelections<NoteTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return databaseAccessor.db.update<Note>(
+    return session.db.update<Note>(
       rows,
       columns: columns?.call(Note.t),
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 
   Future<Note> updateRow(
-    _i1.DatabaseAccessor databaseAccessor,
+    _i1.Session session,
     Note row, {
     _i1.ColumnSelections<NoteTable>? columns,
     _i1.Transaction? transaction,
   }) async {
-    return databaseAccessor.db.updateRow<Note>(
+    return session.db.updateRow<Note>(
       row,
       columns: columns?.call(Note.t),
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 
   Future<List<Note>> delete(
-    _i1.DatabaseAccessor databaseAccessor,
+    _i1.Session session,
     List<Note> rows, {
     _i1.Transaction? transaction,
   }) async {
-    return databaseAccessor.db.delete<Note>(
+    return session.db.delete<Note>(
       rows,
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 
   Future<Note> deleteRow(
-    _i1.DatabaseAccessor databaseAccessor,
+    _i1.Session session,
     Note row, {
     _i1.Transaction? transaction,
   }) async {
-    return databaseAccessor.db.deleteRow<Note>(
+    return session.db.deleteRow<Note>(
       row,
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 
   Future<List<Note>> deleteWhere(
-    _i1.DatabaseAccessor databaseAccessor, {
+    _i1.Session session, {
     required _i1.WhereExpressionBuilder<NoteTable> where,
     _i1.Transaction? transaction,
   }) async {
-    return databaseAccessor.db.deleteWhere<Note>(
+    return session.db.deleteWhere<Note>(
       where: where(Note.t),
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 
   Future<int> count(
-    _i1.DatabaseAccessor databaseAccessor, {
+    _i1.Session session, {
     _i1.WhereExpressionBuilder<NoteTable>? where,
     int? limit,
     _i1.Transaction? transaction,
   }) async {
-    return databaseAccessor.db.count<Note>(
+    return session.db.count<Note>(
       where: where?.call(Note.t),
       limit: limit,
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 }
@@ -403,7 +405,7 @@ class NoteAttachRowRepository {
   const NoteAttachRowRepository._();
 
   Future<void> user(
-    _i1.DatabaseAccessor databaseAccessor,
+    _i1.Session session,
     Note note,
     _i2.UserInfo user, {
     _i1.Transaction? transaction,
@@ -416,10 +418,10 @@ class NoteAttachRowRepository {
     }
 
     var $note = note.copyWith(userId: user.id);
-    await databaseAccessor.db.updateRow<Note>(
+    await session.db.updateRow<Note>(
       $note,
       columns: [Note.t.userId],
-      transaction: transaction ?? databaseAccessor.transaction,
+      transaction: transaction ?? session.transaction,
     );
   }
 }

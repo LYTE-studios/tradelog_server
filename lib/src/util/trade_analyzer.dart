@@ -8,7 +8,7 @@ class TradeAnalyzer {
   }
 
   // Method to calculate net profit/loss (realizedPl)
-  double calculaterealizedPl(List<TradeDto> trades) {
+  double calculateRealizedPl(List<TradeDto> trades) {
     return trades.fold(0.0, (sum, trade) => sum + trade.realizedPl!);
   }
 
@@ -40,7 +40,6 @@ class TradeAnalyzer {
     double avgLoss =
         losingTrades.reduce((a, b) => a! + b!)! / losingTrades.length;
 
-    // Caverage R:R ratio
     return avgWin / avgLoss;
   }
 
@@ -66,6 +65,46 @@ class TradeAnalyzer {
     return maxConsecutiveLosses;
   }
 
+  int calculateMaxWinStreak(List<TradeDto> trades) {
+    int maxWinStreak = 0;
+    int currentWinStreak = 0;
+
+    for (var trade in trades) {
+      if (trade.realizedPl! > 0) {
+        currentWinStreak++;
+        if (currentWinStreak > maxWinStreak) {
+          maxWinStreak = currentWinStreak;
+        }
+      } else {
+        currentWinStreak = 0; // Reset streak if a non-losing trade occurs
+      }
+    }
+
+    return maxWinStreak;
+  }
+
+  //TODO: Implement calculateAverageWinStreak
+  // double calculateAverageWinStreak(List<TradeDto> trades) {
+  //   List<int> winStreaks = [];
+  //   int currentWinStreak = 0;
+
+  //   for (var trade in trades) {
+  //     if (trade.realizedPl! > 0) {
+  //       currentWinStreak++;
+  //     } else {
+  //       if (currentWinStreak > 0) {
+  //         winStreaks.add(currentWinStreak);
+  //         currentWinStreak = 0;
+  //       }
+  //     }
+  //   }
+
+  //   if (winStreaks.isEmpty) return 0.0;
+
+  //   double totalWinStreaks = winStreaks.reduce((a, b) => a + b).toDouble();
+  //   return totalWinStreaks / winStreaks.length;
+  // }
+
   double? calculateLargestProfit(List<TradeDto> trades) {
     if (trades.isEmpty) return 0.0;
 
@@ -74,7 +113,7 @@ class TradeAnalyzer {
         .reduce((a, b) => a! > b! ? a : b);
   }
 
-  DateTime calculateBestTradingMonth(List<TradeDto> trades) {
+  double calculateBestTradingMonth(List<TradeDto> trades) {
     Map<String, double> monthProfits = {};
 
     for (var trade in trades) {
@@ -88,12 +127,11 @@ class TradeAnalyzer {
 
     String bestMonth = monthProfits.keys
         .reduce((a, b) => monthProfits[a]! > monthProfits[b]! ? a : b);
-    List<String> bestMonthParts = bestMonth.split('-');
 
-    return DateTime(int.parse(bestMonthParts[0]), int.parse(bestMonthParts[1]));
+    return monthProfits[bestMonth]!;
   }
 
-  DateTime calculateWorstTradingMonth(List<TradeDto> trades) {
+  double calculateWorstTradingMonth(List<TradeDto> trades) {
     Map<String, double> monthProfits = {};
 
     for (var trade in trades) {
@@ -107,10 +145,8 @@ class TradeAnalyzer {
 
     String worstMonth = monthProfits.keys
         .reduce((a, b) => monthProfits[a]! < monthProfits[b]! ? a : b);
-    List<String> worstMonthParts = worstMonth.split('-');
 
-    return DateTime(
-        int.parse(worstMonthParts[0]), int.parse(worstMonthParts[1]));
+    return monthProfits[worstMonth]!;
   }
 
   double calculateAverageTradingMonth(List<TradeDto> trades) {
@@ -128,5 +164,17 @@ class TradeAnalyzer {
     // Calculate the average profit
     double totalProfit = monthProfits.values.reduce((a, b) => a + b);
     return totalProfit / monthProfits.length;
+  }
+
+  double calculateAverageWinningTrade(List<TradeDto> trades) {
+    List<double?> winningTrades = trades
+        .where((trade) => trade.realizedPl! > 0)
+        .map((trade) => trade.realizedPl)
+        .toList();
+
+    if (winningTrades.isEmpty) return 0.0;
+
+    double totalWin = winningTrades.reduce((a, b) => a! + b!)!;
+    return totalWin / winningTrades.length;
   }
 }

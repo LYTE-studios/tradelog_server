@@ -12,6 +12,7 @@ metaApi:
   - authenticate:
   - getAccountInformation:
   - getPositions:
+  - getAllTrades:
   - getTrades:
   - getOrders:
   - getHistoryOrdersByTime:
@@ -26,6 +27,8 @@ profile:
 statistics:
   - getAccountBalanceChart:
   - getOverviewStatistics:
+  - getStatistics:
+  - getDiaryStatistics:
 trade:
   - addTrade:
   - deleteTrade:

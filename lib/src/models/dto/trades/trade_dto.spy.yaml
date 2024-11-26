@@ -15,6 +15,7 @@ fields:
 
   openTime: DateTime
   closeTime: DateTime?
+  holdTime: double?
 
   lotSize: double
 

@@ -64,16 +64,16 @@ void run(List<String> args) async {
     RouteStaticDirectory(serverDirectory: 'static', basePath: '/'),
     '/*',
   );
-  pod.addCloudStorage(
-    s3.S3CloudStorage(
-      serverpod: pod,
-      storageId: 'public',
-      public: true,
-      region: 'us-east-1',
-      bucket: 'tradely',
-      publicHost: 'storage.tradely.lytestudios.be',
-    ),
-  );
+  // pod.addCloudStorage(
+  //   s3.S3CloudStorage(
+  //     serverpod: pod,
+  //     storageId: 'public',
+  //     public: true,
+  //     region: 'us-east-1',
+  //     bucket: 'tradely',
+  //     publicHost: 'storage.tradely.lytestudios.be',
+  //   ),
+  // );
 
   // Start the server.
   await pod.start();

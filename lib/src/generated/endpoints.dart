@@ -293,6 +293,30 @@ class Endpoints extends _i1.EndpointDispatch {
             params['accountId'],
           ),
         ),
+        'getAllTrades': _i1.MethodConnector(
+          name: 'getAllTrades',
+          params: {
+            'from': _i1.ParameterDescription(
+              name: 'from',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'to': _i1.ParameterDescription(
+              name: 'to',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['metaApi'] as _i5.MetaApiEndpoint).getAllTrades(
+            session,
+            from: params['from'],
+            to: params['to'],
+          ),
+        ),
         'getTrades': _i1.MethodConnector(
           name: 'getTrades',
           params: {
@@ -300,7 +324,17 @@ class Endpoints extends _i1.EndpointDispatch {
               name: 'accountId',
               type: _i1.getType<String>(),
               nullable: false,
-            )
+            ),
+            'from': _i1.ParameterDescription(
+              name: 'from',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'to': _i1.ParameterDescription(
+              name: 'to',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
           },
           call: (
             _i1.Session session,
@@ -308,7 +342,9 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['metaApi'] as _i5.MetaApiEndpoint).getTrades(
             session,
-            params['accountId'],
+            accountId: params['accountId'],
+            from: params['from'],
+            to: params['to'],
           ),
         ),
         'getOrders': _i1.MethodConnector(
@@ -498,6 +534,55 @@ class Endpoints extends _i1.EndpointDispatch {
           ) async =>
               (endpoints['statistics'] as _i8.StatisticsEndpoint)
                   .getOverviewStatistics(
+            session,
+            from: params['from'],
+            to: params['to'],
+          ),
+        ),
+        'getStatistics': _i1.MethodConnector(
+          name: 'getStatistics',
+          params: {
+            'from': _i1.ParameterDescription(
+              name: 'from',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'to': _i1.ParameterDescription(
+              name: 'to',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['statistics'] as _i8.StatisticsEndpoint).getStatistics(
+            session,
+            from: params['from'],
+            to: params['to'],
+          ),
+        ),
+        'getDiaryStatistics': _i1.MethodConnector(
+          name: 'getDiaryStatistics',
+          params: {
+            'from': _i1.ParameterDescription(
+              name: 'from',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+            'to': _i1.ParameterDescription(
+              name: 'to',
+              type: _i1.getType<DateTime?>(),
+              nullable: true,
+            ),
+          },
+          call: (
+            _i1.Session session,
+            Map<String, dynamic> params,
+          ) async =>
+              (endpoints['statistics'] as _i8.StatisticsEndpoint)
+                  .getDiaryStatistics(
             session,
             from: params['from'],
             to: params['to'],

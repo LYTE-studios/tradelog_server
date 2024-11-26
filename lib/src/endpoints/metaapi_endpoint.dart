@@ -1,5 +1,7 @@
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/metaapi_client.dart';
+import 'package:tradelog_server/src/exceptions/general_tradely_exception.dart';
+import 'package:tradelog_server/src/extensions/trade_extension.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
 
@@ -149,60 +151,89 @@ class MetaApiEndpoint extends Endpoint {
     }
   }
 
-  Future<List<TradeDto>> getTrades(Session session, String accountId) async {
+  Future<List<TradeDto>> getAllTrades(
+    Session session, {
+    DateTime? from,
+    DateTime? to,
+  }) async {
+    var authenticated = await session.authenticated;
+
+    if (authenticated == null) {
+      throw GeneralTradelyException('User not authenticated');
+    }
+
+    var trades = <TradeDto>[];
+
+    var linkedAccounts = await LinkedAccount.db.find(
+      session,
+      where: (o) =>
+          o.userInfoId.equals(authenticated.userId) &
+          o.platform.equals(Platform.Metatrader),
+    );
+
+    for (var account in linkedAccounts) {
+      try {
+        var metaTrades = await getTrades(
+          session,
+          accountId: account.metaID!,
+          from: from,
+          to: to,
+        );
+
+        trades.addAll(metaTrades);
+      } catch (e) {
+        session.log('Error fetching trades from MetaTrader: $e');
+      }
+    }
+
+    return trades;
+  }
+
+  Future<List<TradeDto>> getTrades(
+    Session session, {
+    required String accountId,
+    DateTime? from,
+    DateTime? to,
+  }) async {
     await initializeClient(session);
 
-    // Fetch orders for the specified account within a date range
+    // Fetch orders for the specified account
     final orderResponse = await client.get(
-        '/users/current/accounts/$accountId/history-orders/time/:${DateTime(2021)}/:${DateTime.now()}');
+      '/users/current/accounts/$accountId/history-orders/time/${from ?? DateTime(2021)}/${to ?? DateTime.now()}',
+    );
 
-    if (orderResponse.statusCode == 200) {
-      // Convert response data to a list of MetatraderOrder objects
-      var orders = List<MetatraderOrder>.from(
-          orderResponse.data.map((x) => MetatraderOrder.fromJson(x)));
-
-      // Group orders by positionId
-      Map<String, List<MetatraderOrder>> ordersByPosition = {};
-      for (var order in orders) {
-        ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
-      }
-
-      // Calculate net profit/loss and convert to DisplayTrade objects
-      var displayTrades = <TradeDto>[];
-      for (var entry in ordersByPosition.entries) {
-        var positionOrders = entry.value;
-
-        double netpl = 0.0;
-        double netroi = 0.0;
-
-        // Process orders in pairs to calculate netpl based on buy/sell price differences
-        for (var i = 0; i < positionOrders.length - 1; i++) {
-          var buyOrder = positionOrders[i];
-          var sellOrder = positionOrders[i + 1];
-
-          // Calculate profit/loss only if we have a BUY followed by a SELL
-          if (buyOrder.type == 'ORDER_TYPE_BUY' &&
-              sellOrder.type == 'ORDER_TYPE_SELL') {
-            netpl +=
-                (sellOrder.openPrice! - buyOrder.openPrice!) * buyOrder.volume;
-            double investment = buyOrder.openPrice! * buyOrder.volume;
-            netroi += investment != 0 ? (netpl / investment) * 100 : 0.0;
-          }
-        }
-
-        // Use the first order as the basis for DisplayTrade properties
-        var baseOrder = positionOrders.first;
-
-        // displayTrades.add(
-        //   TradeExtension.fromMetaTrader(),
-        // );
-      }
-
-      return displayTrades;
-    } else {
+    if (orderResponse.statusCode != 200) {
       throw Exception(
           'Failed to fetch order history - Error code: ${orderResponse.statusCode}');
     }
+
+    // Convert response data to a list of MetatraderOrder objects
+    List<MetatraderOrder> orders = List<MetatraderOrder>.from(
+      orderResponse.data.map((x) => MetatraderOrder.fromJson(x)),
+    );
+
+    // Group orders by positionId
+    Map<String, List<MetatraderOrder>> ordersByPosition = {};
+    for (var order in orders) {
+      if (order.positionId != null) {
+        ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
+      }
+    }
+
+    // Convert grouped orders into TradeDto objects
+    final List<TradeDto> trades = [];
+    for (var positionOrders in ordersByPosition.values) {
+      // Process orders in chronological order
+      positionOrders.sort((a, b) => a.doneTime!.compareTo(b.doneTime!));
+
+      for (var order in positionOrders) {
+        // Use a TradeExtension-like method for consistency
+        TradeDto dto = TradeExtension.fromMetaTraderOrder(order);
+        trades.add(dto);
+      }
+    }
+
+    return trades;
   }
 
   /// Retrieves the list of open orders for the specified MetaTrader account.

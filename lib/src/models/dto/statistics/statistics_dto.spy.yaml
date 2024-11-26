@@ -1,0 +1,16 @@
+class: StatisticsDto
+fields:
+  totalPL: double?
+  averageWinningTrade: double?
+  totalNumberOfTrades: int?
+  numberOfBreakEvenTrades: int?
+  maxConsecutiveLosses: int?
+  totalFees: double?
+  largestProfit: double?
+  largestLoss: double?
+  averageHoldingTime: double?
+  bestTradingMonth: double?
+  worstTradingMonth: double?
+  averageTradingMonth: double?
+  maxWinStreak: int?
+  averageWinStreak: double?
