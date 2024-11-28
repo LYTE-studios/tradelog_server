@@ -14,16 +14,12 @@ extension TradeExtension on TradeDto {
   }
 
   static TradeDto fromTradeLockerOrder(
-    TradelockerOrder order,
+    TradelockerOrder order, String symbol,
   ) {
     TradeStatus status = !order.isOpen ? TradeStatus.closed : TradeStatus.open;
 
     final Option option =
         order.side.toLowerCase() == 'buy' ? Option.long : Option.short;
-
-    // Sub-request: Fetch symbol for each position, queued and rate-limited
-    final String symbol =
-        Instrument.instrumentMap[order.tradableInstrumentId] ?? 'unknown';
     
     TradeDto dto = TradeDto(
       status: status,

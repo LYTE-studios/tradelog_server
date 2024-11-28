@@ -166,6 +166,12 @@ class Protocol extends _i1.SerializationManagerServer {
           isNullable: true,
           dartType: 'String?',
         ),
+        _i2.ColumnDefinition(
+          name: 'tradelockerInstruments',
+          columnType: _i2.ColumnType.json,
+          isNullable: true,
+          dartType: 'Map<String,List<protocol:TradelockerInstrument>>?',
+        ),
       ],
       foreignKeys: [
         _i2.ForeignKeyDefinition(
@@ -785,14 +791,6 @@ class Protocol extends _i1.SerializationManagerServer {
           .map((e) => deserialize<_i34.StopLossThreshold>(e))
           .toList() as dynamic;
     }
-    if (t == List<_i34.TickCost>) {
-      return (data as List).map((e) => deserialize<_i34.TickCost>(e)).toList()
-          as dynamic;
-    }
-    if (t == List<_i34.TickSize>) {
-      return (data as List).map((e) => deserialize<_i34.TickSize>(e)).toList()
-          as dynamic;
-    }
     if (t == _i1.getType<List<String>?>()) {
       return (data != null
           ? (data as List).map((e) => deserialize<String>(e)).toList()
@@ -802,6 +800,17 @@ class Protocol extends _i1.SerializationManagerServer {
       return (data != null
           ? (data as List).map((e) => deserialize<String>(e)).toList()
           : null) as dynamic;
+    }
+    if (t == _i1.getType<Map<String, List<_i34.TradelockerInstrument>>?>()) {
+      return (data != null
+          ? (data as Map).map((k, v) => MapEntry(deserialize<String>(k),
+              deserialize<List<_i34.TradelockerInstrument>>(v)))
+          : null) as dynamic;
+    }
+    if (t == List<_i34.TradelockerInstrument>) {
+      return (data as List)
+          .map((e) => deserialize<_i34.TradelockerInstrument>(e))
+          .toList() as dynamic;
     }
     if (t == List<_i35.LinkedAccountDto>) {
       return (data as List)
