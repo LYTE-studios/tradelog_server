@@ -28,7 +28,7 @@ extension TradeExtension on TradeDto {
       symbol: symbol,
       option: option,
       // netRoi: netRoi,
-      realizedPl: position?.unrealizedPl ?? 0,
+      realizedPl: position?.unrealizedPl,
       openTime: order.createdDate,
       lotSize: order.filledQty,
     );
