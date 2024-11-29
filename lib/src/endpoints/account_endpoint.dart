@@ -21,8 +21,9 @@ class AccountEndpoint extends Endpoint {
 
     var linkedAccounts = await LinkedAccount.db
         .find(session, where: (o) => o.userInfoId.equals(authInfo!.userId));
+
     if (linkedAccounts.isEmpty) {
-      throw GeneralTradelyException("No linked accounts found");
+      return [];
     }
 
     List<LinkedAccountDto> linkedAccountDtos = [];

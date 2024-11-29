@@ -1,0 +1,499 @@
+{
+  "moduleName": "tradelog",
+  "tables": [
+    {
+      "name": "linked_account",
+      "dartName": "LinkedAccount",
+      "module": "tradelog",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "columnType": 6,
+          "isNullable": false,
+          "columnDefault": "nextval('linked_account_id_seq'::regclass)",
+          "dartType": "int?"
+        },
+        {
+          "name": "userInfoId",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "int"
+        },
+        {
+          "name": "apiUrl",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "apiKey",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "refreshToken",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "platform",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "protocol:Platform"
+        },
+        {
+          "name": "tradelockerCredentialsId",
+          "columnType": 6,
+          "isNullable": true,
+          "dartType": "int?"
+        },
+        {
+          "name": "tradelockerAccountId",
+          "columnType": 8,
+          "isNullable": true,
+          "dartType": "List<String>?"
+        },
+        {
+          "name": "tradelockerAccounts",
+          "columnType": 8,
+          "isNullable": true,
+          "dartType": "List<String>?"
+        },
+        {
+          "name": "metaID",
+          "columnType": 0,
+          "isNullable": true,
+          "dartType": "String?"
+        },
+        {
+          "name": "title",
+          "columnType": 0,
+          "isNullable": true,
+          "dartType": "String?"
+        },
+        {
+          "name": "tradelockerInstruments",
+          "columnType": 8,
+          "isNullable": true,
+          "dartType": "Map<String,List<protocol:TradelockerInstrument>>?"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "constraintName": "linked_account_fk_0",
+          "columns": [
+            "userInfoId"
+          ],
+          "referenceTable": "serverpod_user_info",
+          "referenceTableSchema": "public",
+          "referenceColumns": [
+            "id"
+          ],
+          "onUpdate": 3,
+          "onDelete": 3
+        },
+        {
+          "constraintName": "linked_account_fk_1",
+          "columns": [
+            "tradelockerCredentialsId"
+          ],
+          "referenceTable": "tradelocker_credentials",
+          "referenceTableSchema": "public",
+          "referenceColumns": [
+            "id"
+          ],
+          "onUpdate": 3,
+          "onDelete": 3
+        }
+      ],
+      "indexes": [
+        {
+          "indexName": "linked_account_pkey",
+          "elements": [
+            {
+              "type": 0,
+              "definition": "id"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": true
+        },
+        {
+          "indexName": "user_info_id_unique_idx",
+          "elements": [
+            {
+              "type": 0,
+              "definition": "userInfoId"
+            }
+          ],
+          "type": "btree",
+          "isUnique": false,
+          "isPrimary": false
+        }
+      ],
+      "managed": true
+    },
+    {
+      "name": "note",
+      "dartName": "Note",
+      "module": "tradelog",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "columnType": 6,
+          "isNullable": false,
+          "columnDefault": "nextval('note_id_seq'::regclass)",
+          "dartType": "int?"
+        },
+        {
+          "name": "content",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "userId",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "int"
+        },
+        {
+          "name": "date",
+          "columnType": 4,
+          "isNullable": false,
+          "dartType": "DateTime"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "constraintName": "note_fk_0",
+          "columns": [
+            "userId"
+          ],
+          "referenceTable": "serverpod_user_info",
+          "referenceTableSchema": "public",
+          "referenceColumns": [
+            "id"
+          ],
+          "onUpdate": 3,
+          "onDelete": 3
+        }
+      ],
+      "indexes": [
+        {
+          "indexName": "note_pkey",
+          "elements": [
+            {
+              "type": 0,
+              "definition": "id"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": true
+        }
+      ],
+      "managed": true
+    },
+    {
+      "name": "trade",
+      "dartName": "Trade",
+      "module": "tradelog",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "columnType": 6,
+          "isNullable": false,
+          "columnDefault": "nextval('trade_id_seq'::regclass)",
+          "dartType": "int?"
+        },
+        {
+          "name": "linkedAccountId",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "int"
+        },
+        {
+          "name": "userId",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "int"
+        },
+        {
+          "name": "realizedPl",
+          "columnType": 3,
+          "isNullable": true,
+          "dartType": "double?"
+        },
+        {
+          "name": "status",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "protocol:TradeStatus"
+        },
+        {
+          "name": "symbol",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "option",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "protocol:Option"
+        },
+        {
+          "name": "feeCurrency",
+          "columnType": 0,
+          "isNullable": true,
+          "dartType": "String?"
+        },
+        {
+          "name": "fee",
+          "columnType": 3,
+          "isNullable": true,
+          "dartType": "double?"
+        },
+        {
+          "name": "openTime",
+          "columnType": 4,
+          "isNullable": false,
+          "dartType": "DateTime"
+        },
+        {
+          "name": "closeTime",
+          "columnType": 4,
+          "isNullable": true,
+          "dartType": "DateTime?"
+        },
+        {
+          "name": "lotSize",
+          "columnType": 3,
+          "isNullable": false,
+          "dartType": "double"
+        },
+        {
+          "name": "takeProfit",
+          "columnType": 3,
+          "isNullable": true,
+          "dartType": "double?"
+        },
+        {
+          "name": "stopLoss",
+          "columnType": 3,
+          "isNullable": true,
+          "dartType": "double?"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "constraintName": "trade_fk_0",
+          "columns": [
+            "linkedAccountId"
+          ],
+          "referenceTable": "linked_account",
+          "referenceTableSchema": "public",
+          "referenceColumns": [
+            "id"
+          ],
+          "onUpdate": 3,
+          "onDelete": 3
+        },
+        {
+          "constraintName": "trade_fk_1",
+          "columns": [
+            "userId"
+          ],
+          "referenceTable": "serverpod_user_info",
+          "referenceTableSchema": "public",
+          "referenceColumns": [
+            "id"
+          ],
+          "onUpdate": 3,
+          "onDelete": 3
+        }
+      ],
+      "indexes": [
+        {
+          "indexName": "trade_pkey",
+          "elements": [
+            {
+              "type": 0,
+              "definition": "id"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": true
+        }
+      ],
+      "managed": true
+    },
+    {
+      "name": "tradelocker_credentials",
+      "dartName": "TradelockerCredentials",
+      "module": "tradelog",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "columnType": 6,
+          "isNullable": false,
+          "columnDefault": "nextval('tradelocker_credentials_id_seq'::regclass)",
+          "dartType": "int?"
+        },
+        {
+          "name": "email",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "password",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "server",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "refreshToken",
+          "columnType": 0,
+          "isNullable": true,
+          "dartType": "String?"
+        },
+        {
+          "name": "userId",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "int"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "constraintName": "tradelocker_credentials_fk_0",
+          "columns": [
+            "userId"
+          ],
+          "referenceTable": "serverpod_user_info",
+          "referenceTableSchema": "public",
+          "referenceColumns": [
+            "id"
+          ],
+          "onUpdate": 3,
+          "onDelete": 3
+        }
+      ],
+      "indexes": [
+        {
+          "indexName": "tradelocker_credentials_pkey",
+          "elements": [
+            {
+              "type": 0,
+              "definition": "id"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": true
+        }
+      ],
+      "managed": true
+    },
+    {
+      "name": "tradely_profile",
+      "dartName": "TradelyProfile",
+      "module": "tradelog",
+      "schema": "public",
+      "columns": [
+        {
+          "name": "id",
+          "columnType": 6,
+          "isNullable": false,
+          "columnDefault": "nextval('tradely_profile_id_seq'::regclass)",
+          "dartType": "int?"
+        },
+        {
+          "name": "userInfoId",
+          "columnType": 6,
+          "isNullable": false,
+          "dartType": "int"
+        },
+        {
+          "name": "firstName",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "lastName",
+          "columnType": 0,
+          "isNullable": false,
+          "dartType": "String"
+        },
+        {
+          "name": "dateOfBirth",
+          "columnType": 4,
+          "isNullable": true,
+          "dartType": "DateTime?"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "constraintName": "tradely_profile_fk_0",
+          "columns": [
+            "userInfoId"
+          ],
+          "referenceTable": "serverpod_user_info",
+          "referenceTableSchema": "public",
+          "referenceColumns": [
+            "id"
+          ],
+          "onUpdate": 3,
+          "onDelete": 3
+        }
+      ],
+      "indexes": [
+        {
+          "indexName": "tradely_profile_pkey",
+          "elements": [
+            {
+              "type": 0,
+              "definition": "id"
+            }
+          ],
+          "type": "btree",
+          "isUnique": true,
+          "isPrimary": true
+        }
+      ],
+      "managed": true
+    }
+  ],
+  "installedModules": [
+    {
+      "module": "serverpod",
+      "version": "20240516151843329"
+    },
+    {
+      "module": "serverpod_auth",
+      "version": "20240520102713718"
+    },
+    {
+      "module": "tradelog",
+      "version": "20241128182445536"
+    }
+  ],
+  "migrationApiVersion": 1
+}
