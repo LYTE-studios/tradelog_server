@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:collection/collection.dart';
 import 'package:dio/dio.dart';
 import 'package:sentry/sentry.dart';
 import 'package:serverpod/serverpod.dart';
@@ -244,8 +245,9 @@ class TradeLockerEndpoint extends Endpoint {
         var accountNumber = int.parse(accountNumbers[i]);
         var instruments = accountInstruments[accountIds[i]];
 
-        if(instruments == null) {
-          throw GeneralTradelyException('No instruments found for this account');
+        if (instruments == null) {
+          throw GeneralTradelyException(
+              'No instruments found for this account');
         }
 
         // Call getTrades for this account
@@ -355,14 +357,14 @@ class TradeLockerEndpoint extends Endpoint {
     DateTime? from,
     DateTime? to,
   }) async {
-    // // Fetch positions and orders from the external API (rate-limited)
-    // List<TradelockerPosition> positions = await _getPositionsWithRateLimit(
-    //   session,
-    //   accountId: accountId,
-    //   accNum: accNum,
-    //   from: from,
-    //   to: to,
-    // );
+    // Fetch positions and orders from the external API (rate-limited)
+    List<TradelockerPosition> positions = await _getPositionsWithRateLimit(
+      session,
+      accountId: accountId,
+      accNum: accNum,
+      from: from,
+      to: to,
+    );
 
     List<TradelockerOrder> orders = await _getOrdersHistoryWithRateLimit(
       session,
@@ -380,7 +382,10 @@ class TradeLockerEndpoint extends Endpoint {
 
     final List<TradeDto> trades = [];
 
-    for (var positionOrders in groupedOrders.values) {
+    for (MapEntry<String, List<TradelockerOrder>> entry
+        in groupedOrders.entries) {
+      List<TradelockerOrder> positionOrders = entry.value;
+
       // Sort orders chronologically for each position
       positionOrders.sort((a, b) => a.createdDate.compareTo(b.createdDate));
 
@@ -390,19 +395,33 @@ class TradeLockerEndpoint extends Endpoint {
           .inMinutes
           .toDouble();
 
-      for (var order in positionOrders) {
-        // Use a TradeExtension-like method for consistency
-        final symbol = instruments.firstWhere(
-          (x) => x.tradableInstrumentId == order.tradableInstrumentId,
-          orElse: () => TradelockerInstrument(tradableInstrumentId: 0, name: 'unknown'),
-        ).name;
-        TradeDto dto = TradeExtension.fromTradeLockerOrder(order, symbol);
+      TradelockerOrder order = positionOrders.first;
 
-        // Update the hold time for the TradeDto
-        dto.holdTime = holdTime;
+      TradelockerPosition? position = positions.firstWhereOrNull(
+        (e) => e.id == entry.key,
+      );
 
-        trades.add(dto);
-      }
+      // Use a TradeExtension-like method for consistency
+      final symbol = instruments
+          .firstWhere(
+            (x) => x.tradableInstrumentId == order.tradableInstrumentId,
+            orElse: () => TradelockerInstrument(
+              tradableInstrumentId: 0,
+              name: 'unknown',
+            ),
+          )
+          .name;
+
+      TradeDto dto = TradeExtension.fromTradeLockerOrder(
+        order,
+        symbol,
+        position,
+      );
+
+      // Update the hold time for the TradeDto
+      dto.holdTime = holdTime;
+
+      trades.add(dto);
     }
 
     // for (TradelockerOrder order in _groupOrdersByPosition(orders).values) {

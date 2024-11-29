@@ -14,24 +14,24 @@ extension TradeExtension on TradeDto {
   }
 
   static TradeDto fromTradeLockerOrder(
-    TradelockerOrder order, String symbol,
+    TradelockerOrder order,
+    String symbol,
+    TradelockerPosition? position,
   ) {
     TradeStatus status = !order.isOpen ? TradeStatus.closed : TradeStatus.open;
 
     final Option option =
         order.side.toLowerCase() == 'buy' ? Option.long : Option.short;
-    
+
     TradeDto dto = TradeDto(
       status: status,
       symbol: symbol,
       option: option,
       // netRoi: netRoi,
-      // realizedPl: realizedPl,
+      realizedPl: position?.unrealizedPl ?? 0,
       openTime: order.createdDate,
       lotSize: order.filledQty,
     );
-
-    dto.calculateProfits(order.price, order.stopPrice ?? 0, order.qty);
 
     return dto;
   }
@@ -74,7 +74,8 @@ extension TradeExtension on TradeDto {
 
     // Determine option (long/short)
     Option option = Option.short;
-    if (order.type == 'ORDER_TYPE_BUY' || order.type == 'ORDER_TYPE_BUY_LIMIT') {
+    if (order.type == 'ORDER_TYPE_BUY' ||
+        order.type == 'ORDER_TYPE_BUY_LIMIT') {
       option = Option.long;
     }
 
@@ -91,7 +92,11 @@ extension TradeExtension on TradeDto {
     );
 
     // Calculate profits and ROI
-    dto.calculateProfits(order.openPrice ?? 0, order.stopLimitPrice ?? 0, order.volume);
+    dto.calculateProfits(
+      order.openPrice ?? 0,
+      order.stopLimitPrice ?? 0,
+      order.volume,
+    );
 
     return dto;
   }
