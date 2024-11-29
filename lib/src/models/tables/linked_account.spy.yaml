@@ -13,6 +13,7 @@ fields:
   tradelockerAccounts: List<String>?
   metaID: String?
   title: String?
+  tradelockerInstruments: Map<String, List<TradelockerInstrument>>?
 indexes:
   user_info_id_unique_idx:
     fields: userInfoId

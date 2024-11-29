@@ -26,6 +26,7 @@ abstract class LinkedAccount
     this.tradelockerAccounts,
     this.metaID,
     this.title,
+    this.tradelockerInstruments,
   });
 
   factory LinkedAccount({
@@ -40,6 +41,7 @@ abstract class LinkedAccount
     List<String>? tradelockerAccounts,
     String? metaID,
     String? title,
+    Map<String, List<_i2.TradelockerInstrument>>? tradelockerInstruments,
   }) = _LinkedAccountImpl;
 
   factory LinkedAccount.fromJson(Map<String, dynamic> jsonSerialization) {
@@ -60,6 +62,15 @@ abstract class LinkedAccount
           .toList(),
       metaID: jsonSerialization['metaID'] as String?,
       title: jsonSerialization['title'] as String?,
+      tradelockerInstruments:
+          (jsonSerialization['tradelockerInstruments'] as Map?)
+              ?.map((k, v) => MapEntry(
+                    k as String,
+                    (v as List)
+                        .map((e) => _i2.TradelockerInstrument.fromJson(
+                            (e as Map<String, dynamic>)))
+                        .toList(),
+                  )),
     );
   }
 
@@ -90,6 +101,8 @@ abstract class LinkedAccount
 
   String? title;
 
+  Map<String, List<_i2.TradelockerInstrument>>? tradelockerInstruments;
+
   @override
   _i1.Table get table => t;
 
@@ -105,6 +118,7 @@ abstract class LinkedAccount
     List<String>? tradelockerAccounts,
     String? metaID,
     String? title,
+    Map<String, List<_i2.TradelockerInstrument>>? tradelockerInstruments,
   });
   @override
   Map<String, dynamic> toJson() {
@@ -123,6 +137,9 @@ abstract class LinkedAccount
         'tradelockerAccounts': tradelockerAccounts?.toJson(),
       if (metaID != null) 'metaID': metaID,
       if (title != null) 'title': title,
+      if (tradelockerInstruments != null)
+        'tradelockerInstruments': tradelockerInstruments?.toJson(
+            valueToJson: (v) => v.toJson(valueToJson: (v) => v.toJson())),
     };
   }
 
@@ -143,6 +160,10 @@ abstract class LinkedAccount
         'tradelockerAccounts': tradelockerAccounts?.toJson(),
       if (metaID != null) 'metaID': metaID,
       if (title != null) 'title': title,
+      if (tradelockerInstruments != null)
+        'tradelockerInstruments': tradelockerInstruments?.toJson(
+            valueToJson: (v) =>
+                v.toJson(valueToJson: (v) => v.toJsonForProtocol())),
     };
   }
 
@@ -191,6 +212,7 @@ class _LinkedAccountImpl extends LinkedAccount {
     List<String>? tradelockerAccounts,
     String? metaID,
     String? title,
+    Map<String, List<_i2.TradelockerInstrument>>? tradelockerInstruments,
   }) : super._(
           id: id,
           userInfoId: userInfoId,
@@ -203,6 +225,7 @@ class _LinkedAccountImpl extends LinkedAccount {
           tradelockerAccounts: tradelockerAccounts,
           metaID: metaID,
           title: title,
+          tradelockerInstruments: tradelockerInstruments,
         );
 
   @override
@@ -218,6 +241,7 @@ class _LinkedAccountImpl extends LinkedAccount {
     Object? tradelockerAccounts = _Undefined,
     Object? metaID = _Undefined,
     Object? title = _Undefined,
+    Object? tradelockerInstruments = _Undefined,
   }) {
     return LinkedAccount(
       id: id is int? ? id : this.id,
@@ -237,6 +261,17 @@ class _LinkedAccountImpl extends LinkedAccount {
           : this.tradelockerAccounts?.map((e0) => e0).toList(),
       metaID: metaID is String? ? metaID : this.metaID,
       title: title is String? ? title : this.title,
+      tradelockerInstruments: tradelockerInstruments
+              is Map<String, List<_i2.TradelockerInstrument>>?
+          ? tradelockerInstruments
+          : this.tradelockerInstruments?.map((
+                key0,
+                value0,
+              ) =>
+                  MapEntry(
+                    key0,
+                    value0.map((e1) => e1.copyWith()).toList(),
+                  )),
     );
   }
 }
@@ -285,6 +320,10 @@ class LinkedAccountTable extends _i1.Table {
       'title',
       this,
     );
+    tradelockerInstruments = _i1.ColumnSerializable(
+      'tradelockerInstruments',
+      this,
+    );
   }
 
   late final _i1.ColumnInt userInfoId;
@@ -307,6 +346,8 @@ class LinkedAccountTable extends _i1.Table {
 
   late final _i1.ColumnString title;
 
+  late final _i1.ColumnSerializable tradelockerInstruments;
+
   @override
   List<_i1.Column> get columns => [
         id,
@@ -320,6 +361,7 @@ class LinkedAccountTable extends _i1.Table {
         tradelockerAccounts,
         metaID,
         title,
+        tradelockerInstruments,
       ];
 }
 

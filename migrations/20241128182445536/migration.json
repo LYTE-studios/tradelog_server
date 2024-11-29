@@ -1,0 +1,28 @@
+{
+  "actions": [
+    {
+      "type": "alterTable",
+      "alterTable": {
+        "name": "linked_account",
+        "schema": "public",
+        "addColumns": [
+          {
+            "name": "tradelockerInstruments",
+            "columnType": 8,
+            "isNullable": true,
+            "dartType": "Map<String,List<protocol:TradelockerInstrument>>?"
+          }
+        ],
+        "deleteColumns": [],
+        "modifyColumns": [],
+        "addIndexes": [],
+        "deleteIndexes": [],
+        "addForeignKeys": [],
+        "deleteForeignKeys": [],
+        "warnings": []
+      }
+    }
+  ],
+  "warnings": [],
+  "migrationApiVersion": 1
+}

@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
+import 'package:sentry/sentry.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/tradelocker_client.dart';
 import 'package:tradelog_server/src/endpoints/global_endpoint.dart';
@@ -9,6 +11,7 @@ import 'package:tradelog_server/src/exceptions/network_tradely_exception.dart';
 import 'package:tradelog_server/src/generated/protocol.dart';
 import 'package:tradelog_server/src/extensions/trade_extension.dart';
 import 'package:tradelog_server/src/extensions/tradelocker_extension.dart';
+import 'package:tradelog_server/src/util/request_queue.dart';
 import 'package:tradelog_server/src/util/configuration.dart';
 
 class TradeLockerEndpoint extends Endpoint {
@@ -223,6 +226,7 @@ class TradeLockerEndpoint extends Endpoint {
 
       final accountIds = linkedAccount.tradelockerAccountId!;
       final accountNumbers = linkedAccount.tradelockerAccounts!;
+      final accountInstruments = linkedAccount.tradelockerInstruments;
 
       // Ensure accountIds and accountNumbers have the same length
       if (accountIds.length != accountNumbers.length) {
@@ -231,15 +235,25 @@ class TradeLockerEndpoint extends Endpoint {
         );
       }
 
+      if (accountInstruments == null) {
+        throw GeneralTradelyException('No instruments found');
+      }
+
       for (int i = 0; i < accountIds.length; i++) {
         var accountId = int.parse(accountIds[i]);
         var accountNumber = int.parse(accountNumbers[i]);
+        var instruments = accountInstruments[accountIds[i]];
+
+        if(instruments == null) {
+          throw GeneralTradelyException('No instruments found for this account');
+        }
 
         // Call getTrades for this account
         List<TradeDto> trades = await _getTrades(
           session,
           accountId: accountId,
           accNum: accountNumber,
+          instruments: instruments,
           from: from,
           to: to,
         );
@@ -337,6 +351,7 @@ class TradeLockerEndpoint extends Endpoint {
     Session session, {
     required int accountId,
     required int accNum,
+    required List<TradelockerInstrument> instruments,
     DateTime? from,
     DateTime? to,
   }) async {
@@ -375,14 +390,32 @@ class TradeLockerEndpoint extends Endpoint {
           .inMinutes
           .toDouble();
 
-      // Use a TradeExtension-like method for consistency
-      TradeDto dto = TradeExtension.fromTradeLockerOrder(positionOrders.first);
+      for (var order in positionOrders) {
+        // Use a TradeExtension-like method for consistency
+        final symbol = instruments.firstWhere(
+          (x) => x.tradableInstrumentId == order.tradableInstrumentId,
+          orElse: () => TradelockerInstrument(tradableInstrumentId: 0, name: 'unknown'),
+        ).name;
+        TradeDto dto = TradeExtension.fromTradeLockerOrder(order, symbol);
 
-      // Update the hold time for the TradeDto
-      dto.holdTime = holdTime;
+        // Update the hold time for the TradeDto
+        dto.holdTime = holdTime;
 
-      trades.add(dto);
+        trades.add(dto);
+      }
     }
+
+    // for (TradelockerOrder order in _groupOrdersByPosition(orders).values) {
+    //   TradeDto dto = TradeExtension.fromTradeLockerOrder(order);
+
+    //   trades.add(dto);
+    // }
+
+    // for (TradelockerPosition position in positions) {
+    //   TradeDto dto = TradeExtension.fromTradeLocker(position);
+
+    //   trades.add(dto);
+    // }
 
     // Return the combined list of open and closed trades
     return trades;
@@ -436,6 +469,42 @@ class TradeLockerEndpoint extends Endpoint {
             ),
           )
           .toList();
+    } on DioException catch (e) {
+      if (e.response != null) {
+        throw NetworkTradelyException(e.response!);
+      } else {
+        throw GeneralTradelyException(
+          'Something went wrong processing Positions for Tradelocker',
+        );
+      }
+    }
+  }
+
+  Future<List<TradelockerInstrument>> _getInstrumentsWithRateLimit(
+    Session session, {
+    required int accountId,
+    required int accNum,
+  }) async {
+    try {
+      final response = await client.get(
+        session,
+        '/trade/accounts/$accountId/instruments',
+        accNum: accNum,
+      );
+
+      if (response.data == null || response.data['d'] == null) {
+        throw NetworkTradelyException(
+          response,
+        );
+      }
+
+      return List<TradelockerInstrument>.from(
+        response.data["d"]["instruments"].map(
+          (x) => TradelockerInstrument.fromJson(x),
+        ),
+      );
+
+      //return response.data.toString();
     } on DioException catch (e) {
       if (e.response != null) {
         throw NetworkTradelyException(e.response!);
@@ -612,6 +681,20 @@ class TradeLockerEndpoint extends Endpoint {
     List<String> accountIds = accounts.map((x) => x.id).toList();
     List<String> accountNumbers = accounts.map((x) => x.accNum).toList();
 
+    Map<String, List<TradelockerInstrument>> instruments = {};
+
+    for (var accountId in accountIds) {
+      var accNum = accountNumbers[accountIds.indexOf(accountId)];
+
+      var accountInstruments = await _getInstrumentsWithRateLimit(
+        session,
+        accountId: int.parse(accountId),
+        accNum: int.parse(accNum),
+      );
+
+      instruments[accountId] = accountInstruments;
+    }
+
     var linkedAccount = LinkedAccount(
       userInfoId: userId,
       apiUrl: url,
@@ -622,6 +705,7 @@ class TradeLockerEndpoint extends Endpoint {
       tradelockerAccountId: accountIds,
       tradelockerAccounts: accountNumbers,
       title: title,
+      tradelockerInstruments: instruments,
     );
 
     await LinkedAccount.db.insertRow(session, linkedAccount);
