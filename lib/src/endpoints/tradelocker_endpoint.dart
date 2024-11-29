@@ -374,16 +374,16 @@ class TradeLockerEndpoint extends Endpoint {
       to: to,
     );
 
-    //final List<TradeDto> trades = [];
-
-    // Group orders by positionId
-    Map<String, List<TradelockerOrder>> groupedOrders =
-        _groupOrdersByPosition(orders);
-
     final List<TradeDto> trades = [];
 
-    for (MapEntry<String, List<TradelockerOrder>> entry
+    // Group orders by positionId
+    Map<TradelockerPosition, List<TradelockerOrder>> groupedOrders =
+        _groupOrdersByPosition(orders, positions);
+
+    for (MapEntry<TradelockerPosition, List<TradelockerOrder>> entry
         in groupedOrders.entries) {
+      TradelockerPosition position = entry.key;
+
       List<TradelockerOrder> positionOrders = entry.value;
 
       // Sort orders chronologically for each position
@@ -396,10 +396,6 @@ class TradeLockerEndpoint extends Endpoint {
           .toDouble();
 
       TradelockerOrder order = positionOrders.first;
-
-      TradelockerPosition? position = positions.firstWhereOrNull(
-        (e) => e.id == entry.key,
-      );
 
       // Use a TradeExtension-like method for consistency
       final symbol = instruments
@@ -442,14 +438,27 @@ class TradeLockerEndpoint extends Endpoint {
 
   /// Private Helper Functions
 
-  Map<String, List<TradelockerOrder>> _groupOrdersByPosition(
+  Map<TradelockerPosition, List<TradelockerOrder>> _groupOrdersByPosition(
     List<TradelockerOrder> orders,
+    List<TradelockerPosition> positions,
   ) {
-    final Map<String, List<TradelockerOrder>> ordersByPosition = {};
+    final Map<TradelockerPosition, List<TradelockerOrder>> ordersByPosition =
+        {};
 
     for (var order in orders) {
       if (order.positionId != null) {
-        ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
+        TradelockerPosition? position = positions.firstWhereOrNull(
+          (e) => e.id == order.positionId,
+        );
+
+        if (position == null) {
+          continue;
+        }
+
+        ordersByPosition[position] = [
+          ...(ordersByPosition[position] ?? []),
+          order
+        ];
       }
     }
 
