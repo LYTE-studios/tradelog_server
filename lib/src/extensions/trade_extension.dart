@@ -66,7 +66,10 @@ extension TradeExtension on TradeDto {
     );
   }
 
-  static TradeDto fromMetaTraderOrder(MetatraderOrder order) {
+  static TradeDto fromMetaTraderOrder(
+    MetatraderOrder order,
+    MetatraderPosition? position,
+  ) {
     // Determine trade status
     TradeStatus status = order.type == 'ORDER_TYPE_CLOSE'
         ? TradeStatus.closed
@@ -87,15 +90,9 @@ extension TradeExtension on TradeDto {
       status: status,
       symbol: symbol,
       option: option,
+      realizedPl: position?.profit,
       openTime: order.doneTime ?? DateTime.now(),
       lotSize: order.volume,
-    );
-
-    // Calculate profits and ROI
-    dto.calculateProfits(
-      order.openPrice ?? 0,
-      order.stopLimitPrice ?? 0,
-      order.volume,
     );
 
     return dto;

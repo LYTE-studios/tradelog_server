@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:serverpod/serverpod.dart';
 import 'package:tradelog_server/src/clients/metaapi_client.dart';
 import 'package:tradelog_server/src/exceptions/general_tradely_exception.dart';
@@ -197,6 +198,8 @@ class MetaApiEndpoint extends Endpoint {
   }) async {
     await initializeClient(session);
 
+    List<MetatraderPosition> positions = await getPositions(session, accountId);
+
     // Fetch orders for the specified account
     final orderResponse = await client.get(
       '/users/current/accounts/$accountId/history-orders/time/${from ?? DateTime(2021)}/${to ?? DateTime.now()}',
@@ -213,12 +216,20 @@ class MetaApiEndpoint extends Endpoint {
     );
 
     // Group orders by positionId
-    Map<String, List<MetatraderOrder>> groupedOrders =
-        _groupOrdersByPosition(orders);
+    Map<MetatraderPosition, List<MetatraderOrder>> groupedOrders =
+        _groupOrdersByPosition(
+      orders,
+      positions,
+    );
 
     // Convert grouped orders into TradeDto objects
     final List<TradeDto> trades = [];
-    for (var positionOrders in groupedOrders.values) {
+
+    for (MapEntry<MetatraderPosition, List<MetatraderOrder>> entry
+        in groupedOrders.entries) {
+      MetatraderPosition position = entry.key;
+      List<MetatraderOrder> positionOrders = entry.value;
+
       // Sort orders chronologically for each position
       positionOrders.sort((a, b) => a.doneTime!.compareTo(b.doneTime!));
 
@@ -229,10 +240,14 @@ class MetaApiEndpoint extends Endpoint {
           .toDouble();
 
       // Use the first order as the base for TradeDto
-      var firstOrder = positionOrders.first;
+      MetatraderOrder? firstOrder = positionOrders.firstOrNull;
+
+      if (firstOrder == null) {
+        continue;
+      }
 
       // Create TradeDto using the first order
-      TradeDto dto = TradeExtension.fromMetaTraderOrder(firstOrder);
+      TradeDto dto = TradeExtension.fromMetaTraderOrder(firstOrder, position);
 
       // Set the calculated hold time
       dto.holdTime = holdTime;
@@ -243,14 +258,26 @@ class MetaApiEndpoint extends Endpoint {
     return trades;
   }
 
-  Map<String, List<MetatraderOrder>> _groupOrdersByPosition(
+  Map<MetatraderPosition, List<MetatraderOrder>> _groupOrdersByPosition(
     List<MetatraderOrder> orders,
+    List<MetatraderPosition> positions,
   ) {
-    final Map<String, List<MetatraderOrder>> ordersByPosition = {};
+    final Map<MetatraderPosition, List<MetatraderOrder>> ordersByPosition = {};
 
     for (var order in orders) {
       if (order.positionId != null) {
-        ordersByPosition.putIfAbsent(order.positionId!, () => []).add(order);
+        MetatraderPosition? position = positions.firstWhereOrNull(
+          (e) => e.id == order.positionId,
+        );
+
+        if (position == null) {
+          continue;
+        }
+
+        ordersByPosition[position] = [
+          ...(ordersByPosition[position] ?? []),
+          order
+        ];
       }
     }
 
