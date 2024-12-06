@@ -1,321 +1,252 @@
-import 'package:collection/collection.dart';
-import 'package:serverpod/serverpod.dart';
-import 'package:tradelog_server/src/clients/metaapi_client.dart';
-import 'package:tradelog_server/src/exceptions/general_tradely_exception.dart';
-import 'package:tradelog_server/src/extensions/trade_extension.dart';
-import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/util/configuration.dart';
+// import 'package:collection/collection.dart';
+// import 'package:serverpod/serverpod.dart';
+// import 'package:tradelog_server/src/clients/metaapi_client.dart';
+// import 'package:tradelog_server/src/exceptions/general_tradely_exception.dart';
+// import 'package:tradelog_server/src/extensions/trade_extension.dart';
+// import 'package:tradelog_server/src/generated/protocol.dart';
+// import 'package:tradelog_server/src/util/configuration.dart';
 
-class MetaApiEndpoint extends Endpoint {
-  @override
-  bool get requireLogin => true;
+// class MetaApiEndpoint extends Endpoint {
+//   @override
+//   bool get requireLogin => true;
 
-  late MetaApiClient client;
+//   late MetaApiClient client;
 
-  /// Initializes the MetaApiClient using an access token from the session cache.
-  /// If no access token is found, retrieves it from the linked account.
-  /// Throws an exception if no linked account is found or if there's an error during initialization.
-  Future<void> initializeClient(Session session, {int accNum = -1}) async {
-    var authenticated = await session.authenticated;
-    var accessToken = await session.caches.localPrio
-        .get<AccessToken>('metatrader-${authenticated!.userId}');
+//   /// Authenticates the user by storing the provided API key and linking it to the user's account.
+//   /// If a linked account exists, it updates the API key. Otherwise, it inserts a new linked account.
+//   /// Caches the access token after authentication.
+//   Future<void> authenticate(
+//     Session session, {
+//     String? title,
+//     required String server,
+//     required String login,
+//     required String password,
+//     required String platform,
+//   }) async {
+//     var authenticated = await session.authenticated;
 
-    if (accessToken != null) {
-      client = MetaApiClient(
-        Configuration.metaApiURILN,
-        accessToken.token,
-      );
-      return;
-    }
+//     // Insert or update the linked account, setting the metaId
+//     // try {
+//     //   var linkedAccount = LinkedAccount(
+//     //     userInfoId: authenticated!.userId,
+//     //     apiKey: apiKey,
+//     //     apiUrl: Configuration.metaApiURILN,
+//     //     // TODO: check refresh token logic with METAPI
+//     //     refreshToken: "",
+//     //     platform: Platform.Metatrader,
+//     //     metaID: metaId,
+//     //     // Set the metaId here
+//     //     title: title,
+//     //   );
+//     //   await LinkedAccount.db.insertRow(session, linkedAccount);
+//     // } catch (e) {
+//     //   throw Exception(
+//     //       'Database error while inserting/updating linked account - Error: $e');
+//     // }
+//   }
 
-    var linkedAccount = await LinkedAccount.db.findFirstRow(
-      session,
-      where: (o) =>
-          o.userInfoId.equals(authenticated.userId) &
-          o.platform.equals(Platform.Metatrader),
-    );
+//   /// Retrieves the account information for the specified MetaTrader account.
+//   /// Initializes the MetaApiClient if not already initialized.
+//   /// Returns a [MetaTradingAccountInformation] object if successful, otherwise throws an exception.
+//   Future<MetaTradingAccountInformation> getAccountInformation(
+//       Session session, String accountId) async {
+//     await initializeClient(session);
 
-    if (linkedAccount == null) {
-      throw Exception('Access token not found in cache/No account linked');
-    }
+//     final response = await client
+//         .get('/users/current/accounts/$accountId/account-information');
+//     if (response.statusCode == 200) {
+//       try {
+//         return MetaTradingAccountInformation.fromJson(response.data);
+//       } catch (e) {
+//         throw Exception('Failed to parse account information - Error: $e');
+//       }
+//     } else {
+//       throw Exception(
+//           'Failed to fetch account information - Error code: ${response.statusCode}');
+//     }
+//   }
 
-    accessToken = AccessToken(token: linkedAccount.apiKey);
+//   /// Retrieves the list of open positions for the specified MetaTrader account.
+//   /// Initializes the MetaApiClient if not already initialized.
+//   /// Returns a list of [MetatraderPosition] objects if successful, otherwise throws an exception.
+//   Future<List<MetatraderPosition>> getPositions(
+//       Session session, String accountId) async {
+//     final response =
+//         await client.get('/users/current/accounts/$accountId/positions');
+//     if (response.statusCode == 200) {
+//       print(response.data);
+//       return List<MetatraderPosition>.from(
+//           response.data.map((x) => MetatraderPosition.fromJson(x)));
+//     } else {
+//       throw Exception(
+//           'Failed to fetch positions - Error code: ${response.statusCode}');
+//     }
+//   }
 
-    await session.caches.localPrio
-        .put('metatrader-${authenticated.userId}', accessToken);
+//   Future<List<TradeDto>> getAllTrades(
+//     Session session, {
+//     DateTime? from,
+//     DateTime? to,
+//   }) async {
+//     var authenticated = await session.authenticated;
 
-    client = MetaApiClient(
-      Configuration.metaApiURILN,
-      accessToken.token,
-    );
-  }
+//     if (authenticated == null) {
+//       throw GeneralTradelyException('User not authenticated');
+//     }
 
-  /// Authenticates the user by storing the provided API key and linking it to the user's account.
-  /// If a linked account exists, it updates the API key. Otherwise, it inserts a new linked account.
-  /// Caches the access token after authentication.
-  Future<void> authenticate(
-    Session session,
-    String apiKey,
-    String metaId, {
-    String? title,
-  }) async {
-    var authenticated = await session.authenticated;
-    var accessToken = AccessToken(token: apiKey);
+//     var trades = <TradeDto>[];
 
-    // Check if a linked account exists for this user on the MetaTrader platform
-    LinkedAccount? checkLinked;
-    try {
-      checkLinked = await LinkedAccount.db.findFirstRow(
-        session,
-        where: (o) =>
-            o.userInfoId.equals(authenticated!.userId) &
-            o.platform.equals(Platform.Metatrader),
-      );
-    } catch (e) {
-      throw Exception(
-          'Database error while checking linked account - Error: $e');
-    }
+//     var linkedAccounts = await LinkedAccount.db.find(
+//       session,
+//       where: (o) =>
+//           o.userInfoId.equals(authenticated.userId) &
+//           o.platform.equals(Platform.Metatrader),
+//     );
 
-    // Insert or update the linked account, setting the metaId
-    try {
-      if (checkLinked == null) {
-        var linkedAccount = LinkedAccount(
-          userInfoId: authenticated!.userId,
-          apiKey: apiKey,
-          apiUrl: Configuration.metaApiURILN,
-          // TODO: check refresh token logic with METAPI
-          refreshToken: "",
-          platform: Platform.Metatrader,
-          metaID: metaId,
-          // Set the metaId here
-          title: title,
-        );
-        await LinkedAccount.db.insertRow(session, linkedAccount);
-      } else {
-        checkLinked.apiKey = apiKey;
-        checkLinked.metaID =
-            metaId; // Update the metaId here if it already exists
-        checkLinked.title = title;
-        await LinkedAccount.db.updateRow(session, checkLinked);
-      }
-    } catch (e) {
-      throw Exception(
-          'Database error while inserting/updating linked account - Error: $e');
-    }
+//     for (var account in linkedAccounts) {
+//       try {
+//         var metaTrades = await getTrades(
+//           session,
+//           accountId: account.metaID!,
+//           from: from,
+//           to: to,
+//         );
 
-    // Cache the access token
-    try {
-      await session.caches.localPrio
-          .put('metatrader-${authenticated!.userId}', accessToken);
-    } catch (e) {
-      throw Exception('Error caching access token - Error: $e');
-    }
-  }
+//         trades.addAll(metaTrades);
+//       } catch (e) {
+//         session.log('Error fetching trades from MetaTrader: $e');
+//       }
+//     }
 
-  /// Retrieves the account information for the specified MetaTrader account.
-  /// Initializes the MetaApiClient if not already initialized.
-  /// Returns a [MetaTradingAccountInformation] object if successful, otherwise throws an exception.
-  Future<MetaTradingAccountInformation> getAccountInformation(
-      Session session, String accountId) async {
-    await initializeClient(session);
+//     return trades;
+//   }
 
-    final response = await client
-        .get('/users/current/accounts/$accountId/account-information');
-    if (response.statusCode == 200) {
-      try {
-        return MetaTradingAccountInformation.fromJson(response.data);
-      } catch (e) {
-        throw Exception('Failed to parse account information - Error: $e');
-      }
-    } else {
-      throw Exception(
-          'Failed to fetch account information - Error code: ${response.statusCode}');
-    }
-  }
+//   Future<List<TradeDto>> getTrades(
+//     Session session, {
+//     required String accountId,
+//     DateTime? from,
+//     DateTime? to,
+//   }) async {
+//     await initializeClient(session);
 
-  /// Retrieves the list of open positions for the specified MetaTrader account.
-  /// Initializes the MetaApiClient if not already initialized.
-  /// Returns a list of [MetatraderPosition] objects if successful, otherwise throws an exception.
-  Future<List<MetatraderPosition>> getPositions(
-      Session session, String accountId) async {
-    await initializeClient(session);
+//     List<MetatraderPosition> positions = await getPositions(session, accountId);
 
-    final response =
-        await client.get('/users/current/accounts/$accountId/positions');
-    if (response.statusCode == 200) {
-      print(response.data);
-      return List<MetatraderPosition>.from(
-          response.data.map((x) => MetatraderPosition.fromJson(x)));
-    } else {
-      throw Exception(
-          'Failed to fetch positions - Error code: ${response.statusCode}');
-    }
-  }
+//     // Fetch orders for the specified account
+//     final orderResponse = await client.get(
+//       '/users/current/accounts/$accountId/history-orders/time/${from ?? DateTime(2021)}/${to ?? DateTime.now()}',
+//     );
 
-  Future<List<TradeDto>> getAllTrades(
-    Session session, {
-    DateTime? from,
-    DateTime? to,
-  }) async {
-    var authenticated = await session.authenticated;
+//     if (orderResponse.statusCode != 200) {
+//       throw Exception(
+//           'Failed to fetch order history - Error code: ${orderResponse.statusCode}');
+//     }
 
-    if (authenticated == null) {
-      throw GeneralTradelyException('User not authenticated');
-    }
+//     // Convert response data to a list of MetatraderOrder objects
+//     List<MetatraderOrder> orders = List<MetatraderOrder>.from(
+//       orderResponse.data.map((x) => MetatraderOrder.fromJson(x)),
+//     );
 
-    var trades = <TradeDto>[];
+//     // Group orders by positionId
+//     Map<MetatraderPosition, List<MetatraderOrder>> groupedOrders =
+//         _groupOrdersByPosition(
+//       orders,
+//       positions,
+//     );
 
-    var linkedAccounts = await LinkedAccount.db.find(
-      session,
-      where: (o) =>
-          o.userInfoId.equals(authenticated.userId) &
-          o.platform.equals(Platform.Metatrader),
-    );
+//     // Convert grouped orders into TradeDto objects
+//     final List<TradeDto> trades = [];
 
-    for (var account in linkedAccounts) {
-      try {
-        var metaTrades = await getTrades(
-          session,
-          accountId: account.metaID!,
-          from: from,
-          to: to,
-        );
+//     for (MapEntry<MetatraderPosition, List<MetatraderOrder>> entry
+//         in groupedOrders.entries) {
+//       MetatraderPosition position = entry.key;
+//       List<MetatraderOrder> positionOrders = entry.value;
 
-        trades.addAll(metaTrades);
-      } catch (e) {
-        session.log('Error fetching trades from MetaTrader: $e');
-      }
-    }
+//       // Sort orders chronologically for each position
+//       positionOrders.sort((a, b) => a.doneTime!.compareTo(b.doneTime!));
 
-    return trades;
-  }
+//       // Calculate hold time (difference between the first and last order)
+//       double holdTime = positionOrders.last.doneTime!
+//           .difference(positionOrders.first.doneTime!)
+//           .inMinutes
+//           .toDouble();
 
-  Future<List<TradeDto>> getTrades(
-    Session session, {
-    required String accountId,
-    DateTime? from,
-    DateTime? to,
-  }) async {
-    await initializeClient(session);
+//       // Use the first order as the base for TradeDto
+//       MetatraderOrder? firstOrder = positionOrders.firstOrNull;
 
-    List<MetatraderPosition> positions = await getPositions(session, accountId);
+//       if (firstOrder == null) {
+//         continue;
+//       }
 
-    // Fetch orders for the specified account
-    final orderResponse = await client.get(
-      '/users/current/accounts/$accountId/history-orders/time/${from ?? DateTime(2021)}/${to ?? DateTime.now()}',
-    );
+//       // Create TradeDto using the first order
+//       TradeDto dto = TradeExtension.fromMetaTraderOrder(firstOrder, position);
 
-    if (orderResponse.statusCode != 200) {
-      throw Exception(
-          'Failed to fetch order history - Error code: ${orderResponse.statusCode}');
-    }
+//       // Set the calculated hold time
+//       dto.holdTime = holdTime;
 
-    // Convert response data to a list of MetatraderOrder objects
-    List<MetatraderOrder> orders = List<MetatraderOrder>.from(
-      orderResponse.data.map((x) => MetatraderOrder.fromJson(x)),
-    );
+//       trades.add(dto);
+//     }
 
-    // Group orders by positionId
-    Map<MetatraderPosition, List<MetatraderOrder>> groupedOrders =
-        _groupOrdersByPosition(
-      orders,
-      positions,
-    );
+//     return trades;
+//   }
 
-    // Convert grouped orders into TradeDto objects
-    final List<TradeDto> trades = [];
+//   Map<MetatraderPosition, List<MetatraderOrder>> _groupOrdersByPosition(
+//     List<MetatraderOrder> orders,
+//     List<MetatraderPosition> positions,
+//   ) {
+//     final Map<MetatraderPosition, List<MetatraderOrder>> ordersByPosition = {};
 
-    for (MapEntry<MetatraderPosition, List<MetatraderOrder>> entry
-        in groupedOrders.entries) {
-      MetatraderPosition position = entry.key;
-      List<MetatraderOrder> positionOrders = entry.value;
+//     for (var order in orders) {
+//       if (order.positionId != null) {
+//         MetatraderPosition? position = positions.firstWhereOrNull(
+//           (e) => e.id == order.positionId,
+//         );
 
-      // Sort orders chronologically for each position
-      positionOrders.sort((a, b) => a.doneTime!.compareTo(b.doneTime!));
+//         if (position == null) {
+//           continue;
+//         }
 
-      // Calculate hold time (difference between the first and last order)
-      double holdTime = positionOrders.last.doneTime!
-          .difference(positionOrders.first.doneTime!)
-          .inMinutes
-          .toDouble();
+//         ordersByPosition[position] = [
+//           ...(ordersByPosition[position] ?? []),
+//           order
+//         ];
+//       }
+//     }
 
-      // Use the first order as the base for TradeDto
-      MetatraderOrder? firstOrder = positionOrders.firstOrNull;
+//     return ordersByPosition;
+//   }
 
-      if (firstOrder == null) {
-        continue;
-      }
+//   /// Retrieves the list of open orders for the specified MetaTrader account.
+//   /// Initializes the MetaApiClient if not already initialized.
+//   /// Returns a list of [MetatraderOrder] objects if successful, otherwise throws an exception.
+//   Future<List<MetatraderOrder>> getOrders(
+//       Session session, String accountId) async {
+//     await initializeClient(session);
 
-      // Create TradeDto using the first order
-      TradeDto dto = TradeExtension.fromMetaTraderOrder(firstOrder, position);
+//     final response = await client.get(
+//         '/users/current/accounts/$accountId/history-orders/time/:${DateTime(2021)}/:${DateTime.now()}');
+//     if (response.statusCode == 200) {
+//       return List<MetatraderOrder>.from(
+//           response.data.map((x) => MetatraderOrder.fromJson(x)));
+//     } else {
+//       throw Exception(
+//           'Failed to fetch orders - Error code: ${response.statusCode}');
+//     }
+//   }
 
-      // Set the calculated hold time
-      dto.holdTime = holdTime;
+//   /// Retrieves the history of orders for the specified MetaTrader account within the given time range.
+//   /// Initializes the MetaApiClient if not already initialized.
+//   /// Returns the history orders as a string if successful, otherwise throws an exception.
+//   Future<String> getHistoryOrdersByTime(Session session, String accountId,
+//       String startTime, String endTime) async {
+//     await initializeClient(session);
 
-      trades.add(dto);
-    }
-
-    return trades;
-  }
-
-  Map<MetatraderPosition, List<MetatraderOrder>> _groupOrdersByPosition(
-    List<MetatraderOrder> orders,
-    List<MetatraderPosition> positions,
-  ) {
-    final Map<MetatraderPosition, List<MetatraderOrder>> ordersByPosition = {};
-
-    for (var order in orders) {
-      if (order.positionId != null) {
-        MetatraderPosition? position = positions.firstWhereOrNull(
-          (e) => e.id == order.positionId,
-        );
-
-        if (position == null) {
-          continue;
-        }
-
-        ordersByPosition[position] = [
-          ...(ordersByPosition[position] ?? []),
-          order
-        ];
-      }
-    }
-
-    return ordersByPosition;
-  }
-
-  /// Retrieves the list of open orders for the specified MetaTrader account.
-  /// Initializes the MetaApiClient if not already initialized.
-  /// Returns a list of [MetatraderOrder] objects if successful, otherwise throws an exception.
-  Future<List<MetatraderOrder>> getOrders(
-      Session session, String accountId) async {
-    await initializeClient(session);
-
-    final response = await client.get(
-        '/users/current/accounts/$accountId/history-orders/time/:${DateTime(2021)}/:${DateTime.now()}');
-    if (response.statusCode == 200) {
-      return List<MetatraderOrder>.from(
-          response.data.map((x) => MetatraderOrder.fromJson(x)));
-    } else {
-      throw Exception(
-          'Failed to fetch orders - Error code: ${response.statusCode}');
-    }
-  }
-
-  /// Retrieves the history of orders for the specified MetaTrader account within the given time range.
-  /// Initializes the MetaApiClient if not already initialized.
-  /// Returns the history orders as a string if successful, otherwise throws an exception.
-  Future<String> getHistoryOrdersByTime(Session session, String accountId,
-      String startTime, String endTime) async {
-    await initializeClient(session);
-
-    final response = await client.get(
-        '/users/current/accounts/$accountId/history-orders/time/$startTime/$endTime');
-    if (response.statusCode == 200) {
-      return response.data.toString();
-    } else {
-      throw Exception(
-          'Failed to fetch history orders - Error code: ${response.statusCode}');
-    }
-  }
-}
+//     final response = await client.get(
+//         '/users/current/accounts/$accountId/history-orders/time/$startTime/$endTime');
+//     if (response.statusCode == 200) {
+//       return response.data.toString();
+//     } else {
+//       throw Exception(
+//           'Failed to fetch history orders - Error code: ${response.statusCode}');
+//     }
+//   }
+// }

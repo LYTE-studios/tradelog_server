@@ -50,10 +50,12 @@ class TradeLockerClient {
       final expirationDate = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
 
       if (DateTime.now().isAfter(expirationDate)) {
-        LinkedAccount account =
-            await TradeLockerEndpoint().refresh(session, apiKey: apiKey);
+        // LinkedAccount account = await TradeLockerEndpoint().refresh(
+        //   session,
+        //   apiKey: apiKey,
+        // );
 
-        apiKey = account.apiKey;
+        // apiKey = account.apiKey;
 
         _dio = Dio(
           BaseOptions(
@@ -87,14 +89,14 @@ class TradeLockerClient {
       final expirationDate = DateTime.fromMillisecondsSinceEpoch(expiry * 1000);
 
       if (DateTime.now().isAfter(expirationDate)) {
-        LinkedAccount account =
-            await TradeLockerEndpoint().reauthenticateAccount(
-          session,
-          apiKey,
-        );
+        // LinkedAccount account =
+        //     await TradeLockerEndpoint().reauthenticateAccount(
+        //   session,
+        //   apiKey,
+        // );
 
-        apiKey = account.apiKey;
-        refreshToken = account.refreshToken;
+        // apiKey = account.apiKey;
+        // refreshToken = account.refreshToken;
       }
     } catch (e) {
       throw Exception('Error decoding refreshToken: $e');

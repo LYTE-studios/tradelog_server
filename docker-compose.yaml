@@ -3,13 +3,13 @@
 version: '3.7'
 
 services:
-  api:
-    build: .
-    network_mode: "host"
-    expose:
-      - "8080"
-      - "8081"
-    restart: on-failure
+  # api:
+  #   build: .
+  #   network_mode: "host"
+  #   expose:
+  #     - "8080"
+  #     - "8081"
+  #   restart: on-failure
   # postgres:
   #    image: postgres:14.1
   #    ports:
@@ -24,6 +24,7 @@ services:
     command: redis-server
     environment:
       - REDIS_REPLICATION_MODE=master
+      # Add to the existing services
 volumes:
   tradelog_data:
 

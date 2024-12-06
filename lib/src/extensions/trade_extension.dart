@@ -1,5 +1,4 @@
 import 'package:tradelog_server/src/generated/protocol.dart';
-import 'package:tradelog_server/src/util/instruments.dart';
 
 extension TradeExtension on TradeDto {
   void calculateProfits(double price, double stopPrice, double quantity) {
@@ -51,13 +50,9 @@ extension TradeExtension on TradeDto {
     TradeStatus status =
         position.quantity == 0 ? TradeStatus.closed : TradeStatus.open;
 
-    // Sub-request: Fetch symbol for each position, queued and rate-limited
-    final String symbol =
-        Instrument.instrumentMap[position.tradableInstrumentId] ?? 'unknown';
-
     return TradeDto(
       status: status,
-      symbol: symbol,
+      symbol: '',
       option: option,
       netRoi: netRoi,
       realizedPl: realizedPl,

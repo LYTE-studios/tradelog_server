@@ -1,15 +1,11 @@
-class Configuration {
+class UrlConfiguration {
   // Define your debug and production URLs
-  static const String tradelockerDemoURI =
+  static const String tradelockerDemo =
       'https://demo.tradelocker.com/backend-api';
-  static const String tradelockerURI =
+
+  static const String tradelockerLive =
       'https://live.tradelocker.com/backend-api';
-  static const String metaApiURINYProd =
-      'https://mt-client-api-v1.new-york.agiliumtrade.ai'; //tp be modified
-  static const String metaApiURILNProd =
-      'https://mt-client-api-v1.london.agiliumtrade.ai'; //to be modified
 
-  static String get metaApiURINY => metaApiURINYProd;
-
-  static String get metaApiURILN => metaApiURILNProd;
+  static const String metaApiAccountManagement =
+      'https://mt-provisioning-api-v1.agiliumtrade.agiliumtrade.ai';
 }

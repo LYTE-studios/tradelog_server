@@ -1,0 +1,20 @@
+
+class: MetaApiAuthenticationDto
+fields:
+    # Email or username login 
+    login: String
+
+    password: String
+
+    # User specific Account Name
+    name: String
+
+
+    # Name of the server
+    server: String
+
+    # mt4 or mt5
+    platform: String
+
+    magic: int, default=0
+

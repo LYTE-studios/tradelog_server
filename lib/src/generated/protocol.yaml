@@ -7,15 +7,6 @@ file:
 global:
   - getTrades:
   - refreshCaches:
-metaApi:
-  - initializeClient:
-  - authenticate:
-  - getAccountInformation:
-  - getPositions:
-  - getAllTrades:
-  - getTrades:
-  - getOrders:
-  - getHistoryOrdersByTime:
 note:
   - getNoteForDate:
   - deleteNote:
@@ -34,12 +25,3 @@ trade:
   - deleteTrade:
   - fetchTrades:
   - importTrades:
-tradeLocker:
-  - initializeClient:
-  - authenticate:
-  - refresh:
-  - getAccountDto:
-  - getAllTrades:
-  - getRawOrders:
-  - reauthenticateAccount:
-  - reauthenticate:

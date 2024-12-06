@@ -30,35 +30,35 @@ class AccountEndpoint extends Endpoint {
 
     for (var account in linkedAccounts) {
       switch (account.platform) {
-        case Platform.TradelockerDemo:
-        case Platform.Tradelocker:
-          var details = await TradeLockerEndpoint().getAccountDto(
-            session,
-            account,
-          );
+        case Platform.tradelockerDemo:
+        case Platform.tradelockerLive:
+          // var details = await TradeLockerEndpoint().getAccountDto(
+          //   session,
+          //   account,
+          // );
 
-          linkedAccountDtos.add(details);
+          // linkedAccountDtos.add(details);
           break;
-        case Platform.Metatrader:
-          if (account.metaID == null) {
-            throw GeneralTradelyException(
-              "MetaID not found for account: ${account.id}",
-            );
-          }
-          var details = await MetaApiEndpoint().getAccountInformation(
-            session,
-            account.metaID!,
-          );
+        // case Platform.Metatrader:
+        //   if (account.metaID == null) {
+        //     throw GeneralTradelyException(
+        //       "MetaID not found for account: ${account.id}",
+        //     );
+        //   }
+        //   var details = await MetaApiEndpoint().getAccountInformation(
+        //     session,
+        //     account.metaID!,
+        //   );
 
-          LinkedAccountDto linkedAccountDto = LinkedAccountDto(
-            linkedAccountId: account.id,
-            platform: account.platform,
-            title: account.title,
-            currency: [details.currency],
-            balance: [details.balance],
-          );
-          linkedAccountDtos.add(linkedAccountDto);
-          break;
+        //   LinkedAccountDto linkedAccountDto = LinkedAccountDto(
+        //     linkedAccountId: account.id,
+        //     platform: account.platform,
+        //     title: account.title,
+        //     currency: [details.currency],
+        //     balance: [details.balance],
+        //   );
+        //   linkedAccountDtos.add(linkedAccountDto);
+        //   break;
         default:
           throw GeneralTradelyException(
             "Unknown platform: ${account.platform}",

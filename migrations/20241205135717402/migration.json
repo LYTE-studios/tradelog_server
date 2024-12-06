@@ -1,0 +1,173 @@
+{
+  "actions": [
+    {
+      "type": "deleteTable",
+      "deleteTable": "linked_account"
+    },
+    {
+      "type": "createTable",
+      "createTable": {
+        "name": "linked_account",
+        "dartName": "LinkedAccount",
+        "module": "tradelog",
+        "schema": "public",
+        "columns": [
+          {
+            "name": "id",
+            "columnType": 6,
+            "isNullable": false,
+            "columnDefault": "nextval('linked_account_id_seq'::regclass)",
+            "dartType": "int?"
+          },
+          {
+            "name": "name",
+            "columnType": 0,
+            "isNullable": true,
+            "dartType": "String?"
+          },
+          {
+            "name": "userInfoId",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "int"
+          },
+          {
+            "name": "platform",
+            "columnType": 6,
+            "isNullable": false,
+            "dartType": "protocol:Platform"
+          },
+          {
+            "name": "accountInformation",
+            "columnType": 8,
+            "isNullable": false,
+            "dartType": "Map<String,String>"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "constraintName": "linked_account_fk_0",
+            "columns": [
+              "userInfoId"
+            ],
+            "referenceTable": "serverpod_user_info",
+            "referenceTableSchema": "public",
+            "referenceColumns": [
+              "id"
+            ],
+            "onUpdate": 3,
+            "onDelete": 3
+          }
+        ],
+        "indexes": [
+          {
+            "indexName": "linked_account_pkey",
+            "elements": [
+              {
+                "type": 0,
+                "definition": "id"
+              }
+            ],
+            "type": "btree",
+            "isUnique": true,
+            "isPrimary": true
+          }
+        ],
+        "managed": true
+      }
+    }
+  ],
+  "warnings": [
+    {
+      "type": "columnDropped",
+      "message": "Column \"apiUrl\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "apiUrl"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"apiKey\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "apiKey"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"refreshToken\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "refreshToken"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"tradelockerCredentialsId\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "tradelockerCredentialsId"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"tradelockerAccountId\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "tradelockerAccountId"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"tradelockerAccounts\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "tradelockerAccounts"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"metaID\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "metaID"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"title\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "title"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "columnDropped",
+      "message": "Column \"tradelockerInstruments\" of table \"linked_account\" will be dropped.",
+      "table": "linked_account",
+      "columns": [
+        "tradelockerInstruments"
+      ],
+      "destrucive": true
+    },
+    {
+      "type": "tableDropped",
+      "message": "One or more columns are added to table \"linked_account\" which cannot be added in a table migration. The complete table will be deleted and recreated.",
+      "table": "linked_account",
+      "columns": [
+        "accountInformation"
+      ],
+      "destrucive": true
+    }
+  ],
+  "migrationApiVersion": 1
+}

@@ -1,0 +1,6 @@
+enum: Platform
+values:
+    - mt4
+    - mt5
+    - tradelockerLive
+    - tradelockerDemo

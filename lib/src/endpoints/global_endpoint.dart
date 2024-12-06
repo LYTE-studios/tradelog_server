@@ -88,7 +88,7 @@ class GlobalEndpoint extends Endpoint {
     Session session,
   ) async {
     var authenticated = await session.authenticated;
-    
+
     if (authenticated == null) {
       throw GeneralTradelyException('User not authenticated');
     }
@@ -96,18 +96,18 @@ class GlobalEndpoint extends Endpoint {
     var trades = <TradeDto>[];
 
     try {
-      //TODO enable meta trades
-      var metaTrades = await MetaApiEndpoint().getAllTrades(
-        session,
-      );
+      // var metaTrades = await MetaApiEndpoint().getAllTrades(
+      //   session,
+      // );
 
-      trades.addAll(metaTrades);
+      // trades.addAll(metaTrades);
     } catch (e) {
       session.log('Error fetching trades from MetaTrader: $e');
     }
 
-    var tlTrades = await TradeLockerEndpoint().getAllTrades(session);
-    trades.addAll(tlTrades);
+    // var tlTrades = await TradeLockerEndpoint().getAllTrades(session);
+
+    // trades.addAll(tlTrades);
 
     trades.sort((a, b) => b.openTime.compareTo(a.openTime));
 

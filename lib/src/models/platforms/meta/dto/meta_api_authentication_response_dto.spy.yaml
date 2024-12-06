@@ -1,0 +1,9 @@
+
+
+
+class: MetaApiAuthenticationResponseDto
+fields:
+    id: String
+    state: String
+
+
